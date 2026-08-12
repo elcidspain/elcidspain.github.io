@@ -1,0 +1,539 @@
+{
+  "schema": "aumara.flight-path",
+  "version": "1.0.0",
+  "georef": "AUMARA_WORLD_GEOREFERENCE_v1.json",
+  "localOrigin": {
+    "role": "stable-local-model-origin",
+    "source": "official-cadastral-reference-point",
+    "utm30n": {
+      "easting": 758784.34,
+      "northing": 4298083.43
+    },
+    "wgs84": {
+      "latitude": 38.79353655,
+      "longitude": -0.02037598
+    },
+    "axes": {
+      "x": "UTM east",
+      "y": "UTM north",
+      "z": "up"
+    }
+  },
+  "agl_policy_m": [
+    3.5,
+    4.0
+  ],
+  "waypoint_count": 28,
+  "waypoints": [
+    {
+      "i": 0,
+      "local": {
+        "east": 23.254,
+        "north": -1.155,
+        "ground_z": 0.717
+      },
+      "wgs84": {
+        "latitude": 38.79352617450593,
+        "longitude": -0.02010796490720966
+      },
+      "target_agl_m": 3.75,
+      "camera_height_msl_proxy": 4.467
+    },
+    {
+      "i": 1,
+      "local": {
+        "east": 26.698,
+        "north": -2.496,
+        "ground_z": 0.677
+      },
+      "wgs84": {
+        "latitude": 38.79351412369293,
+        "longitude": -0.020068266506675987
+      },
+      "target_agl_m": 3.847,
+      "camera_height_msl_proxy": 4.524
+    },
+    {
+      "i": 2,
+      "local": {
+        "east": 30.143,
+        "north": -3.838,
+        "ground_z": 0.607
+      },
+      "wgs84": {
+        "latitude": 38.79350207287993,
+        "longitude": -0.020028568106142317
+      },
+      "target_agl_m": 3.929,
+      "camera_height_msl_proxy": 4.536
+    },
+    {
+      "i": 3,
+      "local": {
+        "east": 33.647,
+        "north": -4.81,
+        "ground_z": 0.517
+      },
+      "wgs84": {
+        "latitude": 38.79349333808529,
+        "longitude": -0.019988179966591177
+      },
+      "target_agl_m": 3.983,
+      "camera_height_msl_proxy": 4.5
+    },
+    {
+      "i": 4,
+      "local": {
+        "east": 37.325,
+        "north": -4.526,
+        "ground_z": 0.424
+      },
+      "wgs84": {
+        "latitude": 38.79349588810579,
+        "longitude": -0.019945786214188736
+      },
+      "target_agl_m": 4.0,
+      "camera_height_msl_proxy": 4.423
+    },
+    {
+      "i": 5,
+      "local": {
+        "east": 40.931,
+        "north": -3.715,
+        "ground_z": 0.327
+      },
+      "wgs84": {
+        "latitude": 38.79350317651482,
+        "longitude": -0.01990422210191306
+      },
+      "target_agl_m": 3.977,
+      "camera_height_msl_proxy": 4.304
+    },
+    {
+      "i": 6,
+      "local": {
+        "east": 44.538,
+        "north": -2.904,
+        "ground_z": 0.225
+      },
+      "wgs84": {
+        "latitude": 38.79351046492385,
+        "longitude": -0.01986265798963738
+      },
+      "target_agl_m": 3.919,
+      "camera_height_msl_proxy": 4.144
+    },
+    {
+      "i": 7,
+      "local": {
+        "east": 48.144,
+        "north": -2.092,
+        "ground_z": 0.127
+      },
+      "wgs84": {
+        "latitude": 38.79351775333288,
+        "longitude": -0.019821093877361706
+      },
+      "target_agl_m": 3.834,
+      "camera_height_msl_proxy": 3.961
+    },
+    {
+      "i": 8,
+      "local": {
+        "east": 51.799,
+        "north": -1.635,
+        "ground_z": 0.04
+      },
+      "wgs84": {
+        "latitude": 38.79352186420343,
+        "longitude": -0.019778973412772523
+      },
+      "target_agl_m": 3.735,
+      "camera_height_msl_proxy": 3.775
+    },
+    {
+      "i": 9,
+      "local": {
+        "east": 54.78,
+        "north": -0.116,
+        "ground_z": -0.022
+      },
+      "wgs84": {
+        "latitude": 38.793535508715564,
+        "longitude": -0.019744608905398125
+      },
+      "target_agl_m": 3.639,
+      "camera_height_msl_proxy": 3.618
+    },
+    {
+      "i": 10,
+      "local": {
+        "east": 56.995,
+        "north": 2.843,
+        "ground_z": -0.086
+      },
+      "wgs84": {
+        "latitude": 38.79356209237034,
+        "longitude": -0.01971908046778421
+      },
+      "target_agl_m": 3.561,
+      "camera_height_msl_proxy": 3.475
+    },
+    {
+      "i": 11,
+      "local": {
+        "east": 59.21,
+        "north": 5.803,
+        "ground_z": -0.165
+      },
+      "wgs84": {
+        "latitude": 38.79358867602511,
+        "longitude": -0.019693552030170296
+      },
+      "target_agl_m": 3.512,
+      "camera_height_msl_proxy": 3.347
+    },
+    {
+      "i": 12,
+      "local": {
+        "east": 61.671,
+        "north": 8.3,
+        "ground_z": -0.241
+      },
+      "wgs84": {
+        "latitude": 38.793611107573504,
+        "longitude": -0.019665188141814553
+      },
+      "target_agl_m": 3.501,
+      "camera_height_msl_proxy": 3.26
+    },
+    {
+      "i": 13,
+      "local": {
+        "east": 65.33,
+        "north": 8.331,
+        "ground_z": -0.23
+      },
+      "wgs84": {
+        "latitude": 38.7936113851708,
+        "longitude": -0.019623013265254178
+      },
+      "target_agl_m": 3.529,
+      "camera_height_msl_proxy": 3.299
+    },
+    {
+      "i": 14,
+      "local": {
+        "east": 68.63,
+        "north": 6.666,
+        "ground_z": -0.151
+      },
+      "wgs84": {
+        "latitude": 38.7935964288783,
+        "longitude": -0.01958497654763562
+      },
+      "target_agl_m": 3.592,
+      "camera_height_msl_proxy": 3.441
+    },
+    {
+      "i": 15,
+      "local": {
+        "east": 71.931,
+        "north": 5.001,
+        "ground_z": -0.061
+      },
+      "wgs84": {
+        "latitude": 38.79358147258581,
+        "longitude": -0.01954693983001706
+      },
+      "target_agl_m": 3.68,
+      "camera_height_msl_proxy": 3.62
+    },
+    {
+      "i": 16,
+      "local": {
+        "east": 75.356,
+        "north": 3.925,
+        "ground_z": 0.029
+      },
+      "wgs84": {
+        "latitude": 38.793571806714056,
+        "longitude": -0.01950746601378355
+      },
+      "target_agl_m": 3.779,
+      "camera_height_msl_proxy": 3.808
+    },
+    {
+      "i": 17,
+      "local": {
+        "east": 77.486,
+        "north": 3.544,
+        "ground_z": 0.083
+      },
+      "wgs84": {
+        "latitude": 38.79356838695967,
+        "longitude": -0.01948291247233083
+      },
+      "target_agl_m": 3.874,
+      "camera_height_msl_proxy": 3.957
+    },
+    {
+      "i": 18,
+      "local": {
+        "east": 74.532,
+        "north": 1.323,
+        "ground_z": 0.046
+      },
+      "wgs84": {
+        "latitude": 38.79354843108967,
+        "longitude": -0.019516963357544295
+      },
+      "target_agl_m": 3.948,
+      "camera_height_msl_proxy": 3.995
+    },
+    {
+      "i": 19,
+      "local": {
+        "east": 71.577,
+        "north": -0.899,
+        "ground_z": 0.006
+      },
+      "wgs84": {
+        "latitude": 38.79352847521967,
+        "longitude": -0.01955101424275776
+      },
+      "target_agl_m": 3.992,
+      "camera_height_msl_proxy": 3.998
+    },
+    {
+      "i": 20,
+      "local": {
+        "east": 68.623,
+        "north": -3.12,
+        "ground_z": -0.034
+      },
+      "wgs84": {
+        "latitude": 38.79350851934966,
+        "longitude": -0.019585065127971226
+      },
+      "target_agl_m": 3.997,
+      "camera_height_msl_proxy": 3.963
+    },
+    {
+      "i": 21,
+      "local": {
+        "east": 65.668,
+        "north": -5.342,
+        "ground_z": -0.073
+      },
+      "wgs84": {
+        "latitude": 38.793488563479656,
+        "longitude": -0.019619116013184692
+      },
+      "target_agl_m": 3.964,
+      "camera_height_msl_proxy": 3.89
+    },
+    {
+      "i": 22,
+      "local": {
+        "east": 67.191,
+        "north": -5.943,
+        "ground_z": -0.066
+      },
+      "wgs84": {
+        "latitude": 38.79348316638139,
+        "longitude": -0.01960157023020476
+      },
+      "target_agl_m": 3.896,
+      "camera_height_msl_proxy": 3.831
+    },
+    {
+      "i": 23,
+      "local": {
+        "east": 70.88,
+        "north": -5.712,
+        "ground_z": -0.017
+      },
+      "wgs84": {
+        "latitude": 38.79348523985411,
+        "longitude": -0.019559052642910777
+      },
+      "target_agl_m": 3.806,
+      "camera_height_msl_proxy": 3.789
+    },
+    {
+      "i": 24,
+      "local": {
+        "east": 74.567,
+        "north": -5.449,
+        "ground_z": 0.051
+      },
+      "wgs84": {
+        "latitude": 38.79348760180283,
+        "longitude": -0.01951655750327791
+      },
+      "target_agl_m": 3.706,
+      "camera_height_msl_proxy": 3.757
+    },
+    {
+      "i": 25,
+      "local": {
+        "east": 78.254,
+        "north": -5.186,
+        "ground_z": 0.129
+      },
+      "wgs84": {
+        "latitude": 38.79348996375156,
+        "longitude": -0.019474062363645045
+      },
+      "target_agl_m": 3.614,
+      "camera_height_msl_proxy": 3.743
+    },
+    {
+      "i": 26,
+      "local": {
+        "east": 81.941,
+        "north": -4.93,
+        "ground_z": 0.211
+      },
+      "wgs84": {
+        "latitude": 38.79349226694665,
+        "longitude": -0.019431562652118376
+      },
+      "target_agl_m": 3.543,
+      "camera_height_msl_proxy": 3.754
+    },
+    {
+      "i": 27,
+      "local": {
+        "east": 85.633,
+        "north": -4.745,
+        "ground_z": 0.287
+      },
+      "wgs84": {
+        "latitude": 38.79349392513475,
+        "longitude": -0.01938901274959512
+      },
+      "target_agl_m": 3.505,
+      "camera_height_msl_proxy": 3.792
+    }
+  ],
+  "houses": [
+    {
+      "spatialId": "A",
+      "unitId": "AUMARA-A",
+      "diameterMetres": 7,
+      "bookable": true,
+      "local": {
+        "east": 35.254,
+        "north": 0.845,
+        "ground_z": 0.5053484963445881
+      },
+      "wgs84": {
+        "latitude": 38.7935338083,
+        "longitude": -0.0199702712
+      },
+      "utm30n": {
+        "easting": 758819.5935,
+        "northing": 4298084.2755
+      }
+    },
+    {
+      "spatialId": "B",
+      "unitId": "AUMARA-B",
+      "diameterMetres": 9,
+      "bookable": true,
+      "local": {
+        "east": 52.215,
+        "north": 4.961,
+        "ground_z": -0.045514773423324655
+      },
+      "wgs84": {
+        "latitude": 38.7935658666,
+        "longitude": -0.0197736797
+      },
+      "utm30n": {
+        "easting": 758836.555,
+        "northing": 4298088.3909
+      }
+    },
+    {
+      "spatialId": "C",
+      "unitId": "AUMARA-C",
+      "diameterMetres": 7,
+      "bookable": true,
+      "local": {
+        "east": 63.556,
+        "north": 13.969,
+        "ground_z": -0.41804923169747144
+      },
+      "wgs84": {
+        "latitude": 38.7936436045,
+        "longitude": -0.0196398854
+      },
+      "utm30n": {
+        "easting": 758847.896,
+        "northing": 4298097.3989
+      }
+    },
+    {
+      "spatialId": "D",
+      "unitId": "AUMARA-D",
+      "diameterMetres": 9,
+      "bookable": true,
+      "local": {
+        "east": 67.204,
+        "north": 0.633,
+        "ground_z": -0.06340537769780225
+      },
+      "wgs84": {
+        "latitude": 38.7935225178,
+        "longitude": -0.019602944
+      },
+      "utm30n": {
+        "easting": 758851.5435,
+        "northing": 4298084.063
+      }
+    },
+    {
+      "spatialId": "E",
+      "unitId": "AUMARA-E",
+      "diameterMetres": 7,
+      "bookable": true,
+      "local": {
+        "east": 76.68,
+        "north": 9.566,
+        "ground_z": -0.06613453965845706
+      },
+      "wgs84": {
+        "latitude": 38.7936001295,
+        "longitude": -0.0194906232
+      },
+      "utm30n": {
+        "easting": 758861.0196,
+        "northing": 4298092.9962
+      }
+    },
+    {
+      "spatialId": "F",
+      "unitId": "AUMARA-F",
+      "diameterMetres": 7,
+      "bookable": true,
+      "local": {
+        "east": 84.133,
+        "north": 0.755,
+        "ground_z": 0.26670202002741006
+      },
+      "wgs84": {
+        "latitude": 38.7935186435,
+        "longitude": -0.0194082168
+      },
+      "utm30n": {
+        "easting": 758868.4732,
+        "northing": 4298084.1848
+      }
+    }
+  ],
+  "glb": "/aumara/world/aumara-site.glb",
+  "duration_s_default": 48
+}

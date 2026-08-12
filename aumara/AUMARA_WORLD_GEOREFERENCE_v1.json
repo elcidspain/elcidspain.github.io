@@ -1,0 +1,335 @@
+{
+  "schema": "aumara.world-georeference",
+  "version": "1.0.0",
+  "generatedAt": "2026-08-10T05:38:41Z",
+  "status": "AUTHORITATIVE_HORIZONTAL_GEOREFERENCE",
+  "coordinateConventions": {
+    "geographicCrs": "EPSG:4326",
+    "projectedCrs": "EPSG:25830",
+    "geoJsonPositionOrder": "longitude, latitude",
+    "namedPositionOrder": "latitude, longitude",
+    "linearUnit": "metre"
+  },
+  "site": {
+    "name": "AUMARA / Complejo El Cid",
+    "addressFromProject": "Complejo El Cid, Urbanización Rincón del Silencio, 2, Benidoleig, Alicante",
+    "addressFromCadastre": "LG RINCON SILENCIO 3, BENIDOLEIG (ALICANTE)",
+    "cadastralReference": "8982501YH5988S",
+    "officialParcelAreaSquareMetres": 8216,
+    "projectPlanAreaSquareMetres": 8211,
+    "areaDifferenceSquareMetres": 5,
+    "areaDifferencePercent": 0.0609
+  },
+  "controlPoint": {
+    "role": "verification-anchor",
+    "isLocalOrigin": false,
+    "preserveVerbatim": true,
+    "wgs84": {
+      "latitude": 38.7936312,
+      "longitude": -0.0194621
+    },
+    "utm30n": {
+      "easting": 758863.385,
+      "northing": 4298096.526
+    },
+    "insideOfficialParcel": true,
+    "nearestOfficialBoundaryDistanceMetres": 7.75,
+    "offsetFromLocalOriginMetres": {
+      "east": 79.045,
+      "north": 13.096
+    },
+    "interpretation": "Point lies in the wooded eastern glamping/action zone immediately south of CV-733; it is not the parcel centroid and not a house centre."
+  },
+  "localOrigin": {
+    "role": "stable-local-model-origin",
+    "source": "official-cadastral-reference-point",
+    "utm30n": {
+      "easting": 758784.34,
+      "northing": 4298083.43
+    },
+    "wgs84": {
+      "latitude": 38.79353655,
+      "longitude": -0.02037598
+    },
+    "axes": {
+      "x": "UTM east",
+      "y": "UTM north",
+      "z": "up"
+    }
+  },
+  "officialParcelBoundary": {
+    "type": "Feature",
+    "properties": {
+      "cadastralReference": "8982501YH5988S",
+      "areaSquareMetres": 8216,
+      "sourceCrs": "EPSG:25830",
+      "sourcePointCountIncludingClosure": 71
+    },
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [-0.02061589, 38.79387898],
+          [-0.02060832, 38.79388950],
+          [-0.02037032, 38.79383541],
+          [-0.02015917, 38.79378921],
+          [-0.02002501, 38.79376254],
+          [-0.02000443, 38.79375932],
+          [-0.01998394, 38.79375645],
+          [-0.01996332, 38.79375394],
+          [-0.01995565, 38.79375312],
+          [-0.01994751, 38.79375228],
+          [-0.01994246, 38.79375179],
+          [-0.01992170, 38.79375000],
+          [-0.01990093, 38.79374857],
+          [-0.01988002, 38.79374740],
+          [-0.01985922, 38.79374669],
+          [-0.01983840, 38.79374625],
+          [-0.01981745, 38.79374617],
+          [-0.01979672, 38.79374645],
+          [-0.01976093, 38.79374607],
+          [-0.01972507, 38.79374471],
+          [-0.01968925, 38.79374244],
+          [-0.01965370, 38.79373928],
+          [-0.01961818, 38.79373513],
+          [-0.01958282, 38.79373009],
+          [-0.01954785, 38.79372406],
+          [-0.01951303, 38.79371704],
+          [-0.01947859, 38.79370923],
+          [-0.01944454, 38.79370043],
+          [-0.01941098, 38.79369083],
+          [-0.01923589, 38.79362447],
+          [-0.01930258, 38.79340536],
+          [-0.01969037, 38.79342553],
+          [-0.01971232, 38.79342636],
+          [-0.01999923, 38.79343648],
+          [-0.02010523, 38.79344261],
+          [-0.02013670, 38.79344440],
+          [-0.02022431, 38.79344961],
+          [-0.02028069, 38.79345303],
+          [-0.02036613, 38.79345819],
+          [-0.02040779, 38.79320429],
+          [-0.02041552, 38.79315683],
+          [-0.02051878, 38.79316505],
+          [-0.02062574, 38.79317301],
+          [-0.02062556, 38.79317463],
+          [-0.02113632, 38.79320802],
+          [-0.02114162, 38.79320797],
+          [-0.02115353, 38.79320936],
+          [-0.02116248, 38.79321274],
+          [-0.02116869, 38.79321849],
+          [-0.02116971, 38.79322175],
+          [-0.02111814, 38.79349242],
+          [-0.02111681, 38.79350230],
+          [-0.02111302, 38.79350752],
+          [-0.02109751, 38.79355919],
+          [-0.02109011, 38.79358774],
+          [-0.02108670, 38.79360036],
+          [-0.02109673, 38.79360278],
+          [-0.02104224, 38.79380544],
+          [-0.02103970, 38.79381952],
+          [-0.02099796, 38.79389296],
+          [-0.02098543, 38.79389264],
+          [-0.02097991, 38.79389250],
+          [-0.02086387, 38.79388963],
+          [-0.02084392, 38.79388786],
+          [-0.02079493, 38.79389201],
+          [-0.02077866, 38.79389016],
+          [-0.02073181, 38.79387635],
+          [-0.02061189, 38.79386734],
+          [-0.02060868, 38.79386690],
+          [-0.02061094, 38.79387633],
+          [-0.02061589, 38.79387898]
+        ]
+      ]
+    }
+  },
+  "planGeoreference": {
+    "sourcePlan": {
+      "fileName": "240307_9-PLANOS_Glamping.pdf",
+      "sha256": "fa2e322a328827db2f6575ccd9ac19dbc43390964a3c3ccdcaaccdd9205847cb",
+      "page2": "Plano topográfico. Estado actual. Scale 1:500",
+      "page3": "Distribución parcela. Estado reformado. Scale 1:250",
+      "page4": "Secciones de parcela. Estado reformado"
+    },
+    "pdfCoordinateSystem": {
+      "origin": "top-left",
+      "xDirection": "right",
+      "yDirection": "down",
+      "unit": "PDF point"
+    },
+    "page2ToUtm30n": {
+      "calibrationFeature": "top edge of an existing building present in both the project plan and official cadastral building geometry",
+      "pdfPointA": [168.36, 311.96],
+      "utmPointA": [758730.10, 4298107.82],
+      "pdfPointB": [291.48, 320.48],
+      "utmPointB": [758751.83, 4298106.20],
+      "metresPerPdfPoint": 0.17656201589724238,
+      "pdfPointsPerMetre": 5.663732343099162,
+      "rotationDegrees": -0.3049865680891153,
+      "matrixForDxRightDyUp": [
+        [0.17655951450142793, 0.0009398386660135299],
+        [-0.0009398386660135299, 0.17655951450142793]
+      ],
+      "formula": {
+        "dxRight": "x - 168.36",
+        "dyUp": "311.96 - y",
+        "easting": "758730.10 + 0.17655951450142793 * dxRight + 0.0009398386660135299 * dyUp",
+        "northing": "4298107.82 - 0.0009398386660135299 * dxRight + 0.17655951450142793 * dyUp"
+      }
+    },
+    "page3ToPage2": {
+      "equation": "page3 = 2 * page2 + shift",
+      "scale": 2,
+      "shiftPdfPoints": [-1059.60, -482.24],
+      "inverseFormula": {
+        "page2X": "(page3X + 1059.60) / 2",
+        "page2Y": "(page3Y + 482.24) / 2"
+      },
+      "fitRmsPdfPoints": 0.077,
+      "fitMaxPdfPoints": 0.136,
+      "method": "automatic matching of repeated CAD vector geometry"
+    }
+  },
+  "houses": [
+    {
+      "spatialId": "A",
+      "unitId": "AUMARA-A",
+      "bookable": true,
+      "diameterMetres": 7,
+      "planPage3CentrePdf": [292.26, 402.98],
+      "utm30n": {"easting": 758819.5935, "northing": 4298084.2755},
+      "wgs84": {"latitude": 38.7935338083, "longitude": -0.0199702712},
+      "localMetres": {"east": 35.254, "north": 0.845}
+    },
+    {
+      "spatialId": "B",
+      "unitId": "AUMARA-B",
+      "bookable": true,
+      "diameterMetres": 9,
+      "planPage3CentrePdf": [484.14, 355.34],
+      "utm30n": {"easting": 758836.5550, "northing": 4298088.3909},
+      "wgs84": {"latitude": 38.7935658666, "longitude": -0.0197736797},
+      "localMetres": {"east": 52.215, "north": 4.961}
+    },
+    {
+      "spatialId": "C",
+      "unitId": "AUMARA-C",
+      "bookable": true,
+      "diameterMetres": 7,
+      "planPage3CentrePdf": [612.06, 252.62],
+      "utm30n": {"easting": 758847.8960, "northing": 4298097.3989},
+      "wgs84": {"latitude": 38.7936436045, "longitude": -0.0196398854},
+      "localMetres": {"east": 63.556, "north": 13.969}
+    },
+    {
+      "spatialId": "D",
+      "unitId": "AUMARA-D",
+      "bookable": true,
+      "diameterMetres": 9,
+      "planPage3CentrePdf": [654.18, 403.46],
+      "utm30n": {"easting": 758851.5435, "northing": 4298084.0630},
+      "wgs84": {"latitude": 38.7935225178, "longitude": -0.0196029440},
+      "localMetres": {"east": 67.204, "north": 0.633}
+    },
+    {
+      "spatialId": "E",
+      "unitId": "AUMARA-E",
+      "bookable": true,
+      "diameterMetres": 7,
+      "planPage3CentrePdf": [760.98, 301.70],
+      "utm30n": {"easting": 758861.0196, "northing": 4298092.9962},
+      "wgs84": {"latitude": 38.7936001295, "longitude": -0.0194906232},
+      "localMetres": {"east": 76.680, "north": 9.566}
+    },
+    {
+      "spatialId": "F",
+      "unitId": "AUMARA-F",
+      "bookable": true,
+      "diameterMetres": 7,
+      "planPage3CentrePdf": [845.94, 401.06],
+      "utm30n": {"easting": 758868.4732, "northing": 4298084.1848},
+      "wgs84": {"latitude": 38.7935186435, "longitude": -0.0194082168},
+      "localMetres": {"east": 84.133, "north": 0.755}
+    }
+  ],
+  "verticalPolicy": {
+    "projectReferenceElevationMslMetres": 91,
+    "projectReferenceSource": "Plan page 4 note: reference elevation 91 msnm according to topographic measurement",
+    "housePlacement": "Sample the production terrain/local terrain mesh at each georeferenced house centre; do not assign a fabricated absolute ellipsoid height.",
+    "guidedFlight": {
+      "altitudeMode": "AGL",
+      "targetMetres": 3.75,
+      "allowedRangeMetres": [3.5, 4.0],
+      "runtimeTerrainSampling": "Cesium.Scene.sampleHeightMostDetailed",
+      "constantEllipsoidHeightForbidden": true
+    }
+  },
+  "sourceEvidence": {
+    "cadastreCoordinateLookup": "https://ovc.catastro.meh.es/ovcservweb/OVCSWLocalizacionRC/OVCCoordenadas.asmx/Consulta_RCCOOR?SRS=EPSG%3A4326&Coordenada_X=-0.0194621&Coordenada_Y=38.7936312",
+    "officialParcelGml": "https://ovc.catastro.meh.es/INSPIRE/wfsCP.aspx?service=wfs&version=2.0.0&request=getfeature&StoredQuerie_id=GetParcel&refcat=8982501YH5988S&srsname=EPSG%3A25830",
+    "officialBuildingGml": "https://ovc.catastro.meh.es/INSPIRE/wfsBU.aspx?service=wfs&version=2.0.0&request=getfeature&StoredQuerie_id=GetBuildingByParcel&refcat=8982501YH5988S&srsname=EPSG%3A25830",
+    "googleSatelliteVerification": "https://www.google.com/maps/search/?api=1&query=38.7936312%2C-0.0194621",
+    "officialParcelGmlSha256AtRetrieval": "976c03b298cb1d5b865d7acd9de35abd7c509c9de7d7efda974447114e533c6b",
+    "officialParcelGmlTimeStamp": "2026-08-10T05:38:41"
+  },
+  "verification": {
+    "cadastreLookupResolvedControlPointToParcel": true,
+    "projectAreaMatchesCadastreWithinOneTenthPercent": true,
+    "officialParcelAndBuildingOverlayMatchesPlan": true,
+    "satelliteContextMatchesPlan": true,
+    "sixPlanHousesExtracted": true,
+    "allSixHousesBookable": true,
+    "horizontalUse": "approved for digital-twin/world alignment",
+    "constructionSetoutUse": "requires licensed survey control"
+  },
+  "quarantinedLegacyCoordinates": [
+    {
+      "source": "React Artifact3.html",
+      "sha256": "662396e6ef43f55a5e71062e23c76e056d43114fa93c888d2ec67063488800c3",
+      "coordinates": [38.79379, -0.02105],
+      "status": "INVALID_FOR_WORLD_ALIGNMENT"
+    },
+    {
+      "source": "React Artifact3.html",
+      "coordinates": [38.79405, -0.02145],
+      "status": "INVALID_INVENTED_HOUSE_MARKER"
+    },
+    {
+      "source": "React Artifact3.html",
+      "coordinates": [38.79422, -0.02085],
+      "status": "INVALID_INVENTED_HOUSE_MARKER"
+    },
+    {
+      "source": "React Artifact3.html",
+      "coordinates": [38.79362, -0.02055],
+      "status": "INVALID_INVENTED_HOUSE_MARKER"
+    },
+    {
+      "source": "React Artifact3.html",
+      "coordinates": [38.79318, -0.02125],
+      "status": "INVALID_INVENTED_HOUSE_MARKER"
+    },
+    {
+      "source": "React Artifact3.html",
+      "coordinates": [38.79395, -0.02035],
+      "status": "INVALID_INVENTED_HOUSE_MARKER"
+    },
+    {
+      "source": "React Artifact4.html",
+      "sha256": "69d1c95c734f77507a58d743f378d498f0a43a4de2750bd3cfba5d511867644e",
+      "coordinates": [38.79331, -0.02103],
+      "status": "INVALID_FOR_WORLD_ALIGNMENT"
+    }
+  ],
+  "truthLock": {
+    "controlPointMayNotBeSilentlyChanged": true,
+    "houseCoordinatesAreDerivedFromPlanAndCadastre": true,
+    "legacyArtifactCoordinatesMayNotReenterProduction": true,
+    "acceptableFutureCoordinateAuthority": [
+      "newer official cadastral geometry",
+      "licensed site survey control",
+      "revised stamped project plan tied to survey control"
+    ]
+  }
+}

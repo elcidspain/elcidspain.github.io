@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>AUMARA · World Twin</title>
+<link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.125/Build/Cesium/Widgets/widgets.css"/>
+<style>
+  html,body,#c{margin:0;height:100%;background:#0b100c;color:#f3efe6;font-family:system-ui,sans-serif}
+  #hud{position:absolute;left:12px;top:12px;z-index:2;background:#0008;padding:8px 12px;border-radius:12px;font:12px/1.4 ui-monospace,monospace}
+</style>
+</head>
+<body>
+<div id="c"></div>
+<div id="hud">Loading twin…</div>
+<script src="https://cesium.com/downloads/cesiumjs/releases/1.125/Build/Cesium/Cesium.js"></script>
+<script>
+(async () => {
+  window.CESIUM_BASE_URL = 'https://cesium.com/downloads/cesiumjs/releases/1.125/Build/Cesium/';
+  const C = window.Cesium;
+  const [geo, flight] = await Promise.all([
+    fetch('./AUMARA_WORLD_GEOREFERENCE_v1.json').then(r=>r.json()),
+    fetch('./world/flight-path.json').then(r=>r.json()),
+  ]);
+  const ref = geo.verticalPolicy.projectReferenceElevationMslMetres || 91;
+  const viewer = new C.Viewer('c', {
+    animation:false, timeline:false, baseLayerPicker:false, geocoder:false,
+    homeButton:false, sceneModePicker:false, navigationHelpButton:false,
+    fullscreenButton:false, infoBox:false, selectionIndicator:false,
+    terrainProvider: new C.EllipsoidTerrainProvider(),
+    baseLayer: false,
+  });
+  viewer.scene.globe.baseColor = C.Color.fromCssColorString('#243028');
+  viewer.scene.backgroundColor = C.Color.fromCssColorString('#0b100c');
+  const origin = C.Cartesian3.fromDegrees(geo.localOrigin.wgs84.longitude, geo.localOrigin.wgs84.latitude, ref);
+  const model = await C.Model.fromGltfAsync({
+    url: './world/aumara-site.glb',
+    modelMatrix: C.Transforms.eastNorthUpToFixedFrame(origin),
+  });
+  viewer.scene.primitives.add(model);
+  const wps = flight.waypoints;
+  const start = C.JulianDate.now();
+  const dur = flight.duration_s_default || 48;
+  const pos = new C.SampledPositionProperty();
+  pos.setInterpolationOptions({ interpolationDegree: 2, interpolationAlgorithm: C.HermitePolynomialApproximation });
+  wps.forEach((wp,i) => {
+    const t = C.JulianDate.addSeconds(start, (i/(wps.length-1))*dur, new C.JulianDate());
+    pos.addSample(t, C.Cartesian3.fromDegrees(wp.wgs84.longitude, wp.wgs84.latitude, ref + wp.local.ground_z + wp.target_agl_m));
+  });
+  viewer.clock.startTime = start.clone();
+  viewer.clock.stopTime = C.JulianDate.addSeconds(start, dur, new C.JulianDate());
+  viewer.clock.currentTime = start.clone();
+  viewer.clock.clockRange = C.ClockRange.LOOP_STOP;
+  viewer.clock.shouldAnimate = true;
+  viewer.clock.multiplier = 1;
+  const hud = document.getElementById('hud');
+  viewer.clock.onTick.addEventListener(() => {
+    const p = pos.getValue(viewer.clock.currentTime);
+    if (!p) return;
+    const t2 = C.JulianDate.addSeconds(viewer.clock.currentTime, 0.4, new C.JulianDate());
+    const n = pos.getValue(t2) || p;
+    const dir = C.Cartesian3.normalize(C.Cartesian3.subtract(n, p, new C.Cartesian3()), new C.Cartesian3());
+    const up = C.Ellipsoid.WGS84.geodeticSurfaceNormal(p, new C.Cartesian3());
+    const right = C.Cartesian3.normalize(C.Cartesian3.cross(dir, up, new C.Cartesian3()), new C.Cartesian3());
+    const look = C.Matrix3.multiplyByVector(C.Matrix3.fromQuaternion(C.Quaternion.fromAxisAngle(right, -0.38)), dir, new C.Cartesian3());
+    viewer.camera.setView({ destination: p, orientation: { direction: look, up } });
+    const carto = C.Cartographic.fromCartesian(p);
+    let ground = ref;
+    try {
+      const down = C.Cartesian3.negate(C.Ellipsoid.WGS84.geodeticSurfaceNormal(p, new C.Cartesian3()), new C.Cartesian3());
+      const ray = new C.Ray(C.Cartesian3.add(p, C.Cartesian3.multiplyByScalar(down, 0.15, new C.Cartesian3()), new C.Cartesian3()), down);
+      const hit = viewer.scene.pickFromRay(ray);
+      if (hit && hit.position) ground = C.Cartographic.fromCartesian(hit.position).height;
+    } catch {}
+    const elapsed = C.JulianDate.secondsDifference(viewer.clock.currentTime, start);
+    const wp = Math.min(27, Math.round((elapsed/dur)*27));
+    hud.textContent = `AUMARA  WP ${wp}  AGL ${(carto.height-ground).toFixed(2)} m  GLB on`;
+  });
+})().catch(e => { document.getElementById('hud').textContent = String(e); });
+</script>
+</body>
+</html>
