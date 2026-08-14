@@ -1,0 +1,51 @@
+{
+  "job_id": "AUMARA_WORLD_V2_GROK",
+  "status": "READY",
+  "executor": "grok",
+  "lead": "gpt",
+  "source_registry": "../world/AUMARA_SOURCE_REGISTRY.json",
+  "control_plane": "../AUMARA_CONTROL_PLANE.md",
+  "objective": "Build the next AUMARA spatial world from the canonical georeference and real media sources. Do not create a parallel landing page or a new coordinate system.",
+  "required_sequence": [
+    "Read AUMARA_CONTROL_PLANE.md and AUMARA_SOURCE_REGISTRY.json first.",
+    "Keep the existing guest route stable; do not expose internal EL CID portal UI.",
+    "Use AUMARA_WORLD_GEOREFERENCE_v1.json as the only horizontal geospatial truth.",
+    "Use all six house positions A-F and keep all six bookable.",
+    "Ingest/index real photos, videos, plans and existing world assets from the Drive source registry.",
+    "Reconstruct the local parcel: terrain, paths, vegetation, six houses and exterior spatial context. Real media is reconstruction input, not the final slider experience.",
+    "Load Google Photorealistic 3D Tiles as the global layer only when the authorized runtime key exists; never invent or expose credentials.",
+    "Blend the global layer into the local reconstructed twin at the AUMARA parcel.",
+    "Run one continuous local flight through waypoint 0-27 at measured 3.5-4.0 m AGL.",
+    "Add world-anchored AR house labels/cards synchronized from Cesium world coordinates.",
+    "Bind A-F to six guest content and booking interactions.",
+    "Verify mobile and desktop and return actual runtime evidence, not only a status message."
+  ],
+  "content_priority": [
+    "PHOTOS AUMARA",
+    "Катя в домике",
+    "AUMARA_DAY_WALK_001_EXPORT",
+    "AUMARA_OUTDOOR_AR_001",
+    "00_AUMARA_CONTENT_FACTORY",
+    "AUMARA Fotos AI Edited as visual reference only"
+  ],
+  "acceptance": {
+    "first_frame_rendered": true,
+    "six_houses_spatially_visible": true,
+    "waypoint_27_reached": true,
+    "raw_agl_range_metres": [3.5, 4.0],
+    "world_anchored_ar": true,
+    "six_booking_interactions": true,
+    "mobile": true,
+    "desktop": true,
+    "no_internal_portal_ui": true,
+    "no_fake_live_status": true
+  },
+  "do_not": [
+    "Do not use legacy React/L9 coordinates.",
+    "Do not create another standalone project or temporary product fork.",
+    "Do not replace the world with a video slider.",
+    "Do not call placeholder domes or flat terrain the final spatial twin.",
+    "Do not block guest entry on Cesium loading or Google key availability.",
+    "Do not publish or change DNS/domain routing without Ilia approval."
+  ]
+}
