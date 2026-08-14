@@ -1,7 +1,7 @@
 {
   "job": "AUMARA_WORLD_V2_1_REALITY_GROK",
   "run_id": "v21-mstl1tax",
-  "commit_sha": "fb53aa4d2aa4c587a3ddbca8bbe46c9465dca1c6",
+  "commit_sha": "40d14813c76dcabd9b47c93b49bebe69644b1bd3",
   "localTwinStatus": "READY",
   "globalTilesStatus": "BLOCKED",
   "firstFrameRendered": true,
@@ -28,5 +28,7 @@
     "telemetry": "aumara/world/AUMARA_RAW_AGL_TELEMETRY_V2_1.json",
     "desktop_mp4": "aumara/jobs/AUMARA_WORLD_V2_1_FLIGHT_DESKTOP.mp4",
     "mobile_mp4": "aumara/jobs/AUMARA_WORLD_V2_1_FLIGHT_MOBILE.mp4"
-  }
+  },
+  "terminology_lock": "aumara/jobs/AUMARA_REALITY_TERMINOLOGY_LOCK.json",
+  "manifest": "aumara/world/AUMARA_TWIN_SOURCE_MANIFEST.json"
 }
