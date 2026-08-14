@@ -1,0 +1,69 @@
+{
+  "job_id": "AUMARA_WORLD_V2_1_1_SOURCE_PURGE_GROK",
+  "priority": "P0",
+  "mode": "PATCH_CURRENT_BUILD_ONLY",
+  "base_head": "10578df196be4fbdfb32539b8db3fa48f405e652",
+  "objective": "Close V2.1 without another architecture cycle: remove unsupported universal architectural assumptions from the mesh builder and prove one live-browser runtime capture. Preserve the accepted flight/terrain scaffold.",
+  "read_first": [
+    "aumara/PROJECT.md",
+    "aumara/jobs/AUMARA_REALITY_TERMINOLOGY_LOCK.json",
+    "aumara/world/AUMARA_TWIN_SOURCE_MANIFEST.json",
+    "aumara/world/rebuild_twin_v21.py"
+  ],
+  "accepted_do_not_rebuild": [
+    "canonical georeference",
+    "A-F positions",
+    "current terrain mesh approach",
+    "current flight path WP0-WP27",
+    "AR/Booking wiring",
+    "current 10 Hz measurement architecture"
+  ],
+  "patch_geometry": {
+    "problem": "rebuild_twin_v21.py still creates universal door/windows/deck/glass geometry even when the manifest does not prove those exact features for each house.",
+    "actions": [
+      "Replace all product/code terminology 'tent' with 'geodesic house', 'geodesic dome' or 'membrane' where technically appropriate.",
+      "Do not create a mesh/material named glass unless transparent glazing is explicitly observed and cited for that exact house.",
+      "Represent a source-backed dark opening as opening_panel/opening_frame, not as glass by assumption.",
+      "Gate deck/platform geometry per house from AUMARA_TWIN_SOURCE_MANIFEST.json. If the house feature is not observed or plan-derived, omit it from truth geometry.",
+      "For house F, remove unsupported opening/deck/strut/facade completion from the truth mesh unless a direct source is found. Generated completion, if retained for visual continuity, must be a separately named generated_completion node and must never be described as observed reality.",
+      "Do not infer timber material globally from a local photo crop. Material names must follow per-feature evidence.",
+      "Vegetation may remain generated-completion/LOD where explicitly labeled; do not claim surveyed species or positions."
+    ]
+  },
+  "patch_runtime_evidence": {
+    "problem": "V2.1 telemetry file is structurally clean but contains dry/camBias metadata and must be tied to an actual live browser run rather than an offline generator.",
+    "actions": [
+      "Start a clean browser session on the current /aumara build after the corrected GLB is loaded.",
+      "Export telemetry directly from window.__AUMARA during/after the live run; do not synthesize or post-generate camera/ground values.",
+      "runtime run_id in telemetry must exactly match window.__AUMARA.run_id from that page session.",
+      "Add capture_mode=LIVE_BROWSER_RUNTIME, page_url, started_at, ended_at, user_agent and glb_sha to telemetry metadata.",
+      "Remove dry and camBias metadata from the final evidence file.",
+      "One uncut run only, WP0-WP27, waypoint/timestamp monotonic, >=450 samples, raw unclamped AGL 3.5-4.0 m.",
+      "Record desktop and mobile evidence only after firstFrameRendered=true."
+    ]
+  },
+  "required_outputs": [
+    "aumara/world/aumara-site-v2_1.glb updated in place",
+    "aumara/world/rebuild_twin_v21.py corrected",
+    "aumara/world/AUMARA_TWIN_SOURCE_MANIFEST.json corrected",
+    "aumara/world/AUMARA_RAW_AGL_TELEMETRY_V2_1_1.json",
+    "aumara/jobs/AUMARA_WORLD_V2_1_1_FLIGHT_DESKTOP.mp4",
+    "aumara/jobs/AUMARA_WORLD_V2_1_1_FLIGHT_MOBILE.mp4",
+    "aumara/jobs/AUMARA_WORLD_V2_1_1_RECEIPT.json"
+  ],
+  "acceptance": {
+    "unsupported_glass_meshes": 0,
+    "unsupported_universal_door_window_deck_generation": 0,
+    "terminology_tent_in_product_or_builder_claims": 0,
+    "capture_mode": "LIVE_BROWSER_RUNTIME",
+    "waypointReached": 27,
+    "rawSampleCount_min": 450,
+    "rawAglMin_gte": 3.5,
+    "rawAglMax_lte": 4.0,
+    "waypointsMonotonic": true,
+    "timestampsMonotonic": true,
+    "consoleErrors": [],
+    "failedRequiredRequests": []
+  },
+  "stop_rule": "This is a surgical closure job. Do not redesign, research new architecture, create a new project, or rebuild Earth-to-Spain. Patch -> run -> record -> commit -> receipt. After this passes, V2.1 local layer is CLOSED and the project advances to GLOBAL_DESCENT_AND_BLEND."
+}
