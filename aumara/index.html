@@ -15,7 +15,7 @@
   header{display:flex;justify-content:space-between;align-items:center;gap:12px;max-width:1100px;margin:0 auto;padding:18px 20px}
   .mark{width:36px;height:36px;border:1px solid rgba(255,255,255,.4);border-radius:999px;display:grid;place-items:center;letter-spacing:.12em}
   .row{display:flex;gap:8px;flex-wrap:wrap}
-  .btn{display:inline-flex;align-items:center;height:42px;padding:0 16px;border-radius:999px;font:600 11px/1 system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;background:transparent;color:inherit}
+  .btn{display:inline-flex;align-items:center;height:42px;padding:0 16px;border-radius:999px;font:600 11px/1 system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;background:transparent;color:inherit;border:0}
   .gold{background:var(--gold);color:#111}
   .ghost{border:1px solid rgba(255,255,255,.25)}
   .hero{max-width:1100px;margin:0 auto;padding:0 20px}
@@ -35,8 +35,18 @@
   #stage{display:none;position:fixed;inset:0;z-index:20;background:#000}
   #stage.on{display:block}
   #c{position:absolute;inset:0}
-  #hud{position:absolute;left:12px;top:12px;z-index:3;background:#0008;padding:8px 12px;border-radius:12px;font:12px/1.4 ui-monospace,monospace}
+  #overlay{position:absolute;inset:0;z-index:2;pointer-events:none}
+  .ar{position:absolute;left:0;top:0;pointer-events:auto;transform:translate(-50%,-130%);
+    border:0;border-radius:999px;padding:7px 11px;background:var(--gold);color:#111;
+    font:700 12px/1 system-ui,sans-serif;letter-spacing:.08em;cursor:pointer}
+  #hud{display:none;position:absolute;left:12px;top:12px;z-index:3;background:#0008;padding:8px 12px;border-radius:12px;font:12px/1.4 ui-monospace,monospace}
+  #hud.on{display:block}
   #close{position:absolute;right:12px;top:12px;z-index:3}
+  #sheet{display:none;position:absolute;left:12px;right:12px;bottom:12px;z-index:4;background:#0a1a14f2;border:1px solid var(--line);border-radius:18px;padding:12px;color:var(--cream);gap:12px;align-items:center}
+  #sheet.on{display:flex}
+  #sheet img{width:96px;height:72px;object-fit:cover;border-radius:10px}
+  #sheet h3{margin:0 0 4px;font-weight:400;font-size:22px}
+  #sheet p{margin:0 0 8px;font:13px/1.4 system-ui,sans-serif;color:rgba(243,236,222,.6)}
 </style>
 <script src="./ion.js"></script>
 </head>
@@ -54,7 +64,7 @@
   <img src="https://lh3.googleusercontent.com/d/1wdC_rqzts2T_PRgF3fNWdCOm_7pn3oRO=w2200" alt="AUMARA · Benidoleig"/>
   <p class="kicker">Glamping · Benidoleig</p>
   <h1>Casas privadas en el interior tranquilo de la Costa Blanca.</h1>
-  <p class="lead">Cinco casas para reservar. Una privada. Un paisaje. Cesium se abre solo si lo pides.</p>
+  <p class="lead">Seis casas. Un paisaje. El mundo 3D se abre solo si lo pides.</p>
   <div class="row" style="margin-top:18px">
     <a class="btn gold" href="https://www.booking.com/hotel/es/aumara.es.html" target="_blank" rel="noreferrer">Booking</a>
     <button class="btn ghost" id="flight" type="button">3D tour / FLIGHT</button>
@@ -70,39 +80,57 @@
 </section>
 <div id="stage">
   <div id="c"></div>
+  <div id="overlay"></div>
   <div id="hud">Earth…</div>
   <button class="btn gold" id="close" type="button">Cerrar</button>
+  <div id="sheet"></div>
 </div>
 <script>
-const PHOTO = {
-  A: "https://lh3.googleusercontent.com/d/1rDKUNOQxzJcxoGXy2eRQ5bKJedoOuaxI=w1600",
-  B: "https://lh3.googleusercontent.com/d/1uFRe8MsXd5IoiQT5Ph7jWaN2Ey_Fj2Vs=w1600",
-  C: "https://lh3.googleusercontent.com/d/1SQqw9ZAzOIag6wu6ME1Rr6mCu1hVpqCD=w1200",
-  D: "https://lh3.googleusercontent.com/d/1xauueEm6ahvJjRm2103AYmCZow45deQa=w1200",
-  E: "https://lh3.googleusercontent.com/d/1qAkaNt_W-ISyVfpU2IlN3r6_c60Ts5Mh=w1200",
-  F: "https://lh3.googleusercontent.com/d/1Dx3SLonThui5jca3C9fadr9RrboaBGdJ=w1600",
-};
 const BOOK = "https://www.booking.com/hotel/es/aumara.es.html";
 const CESIUM_JS = "https://cesium.com/downloads/cesiumjs/releases/1.134/Build/Cesium/Cesium.js";
 const CESIUM_CSS = "https://cesium.com/downloads/cesiumjs/releases/1.134/Build/Cesium/Widgets/widgets.css";
 const ESRI = "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer";
+const DEBUG = /(?:\?|&)debug=1(?:&|$)/.test(location.search);
+const pic = (id) => "https://lh3.googleusercontent.com/d/" + id + "=w1600";
 
 const housesEl = document.getElementById("houses");
-fetch("./AUMARA_WORLD_GEOREFERENCE_v1.json").then(r => r.json()).then(geo => {
-  geo.houses.forEach(h => {
-    const d = h.diameterMetres;
-    const r = (d / 2).toFixed(1);
-    const ht = d === 9 ? "5.5" : "4.86";
-    const isPriv = h.spatialId === "F";
-    const el = document.createElement(isPriv ? "div" : "a");
-    el.className = "card";
-    if (!isPriv) { el.href = BOOK; el.target = "_blank"; el.rel = "noreferrer"; }
-    el.innerHTML = `<img src="${PHOTO[h.spatialId]}" alt="${h.spatialId}"/><div>
-      <div class="meta">${isPriv ? "Ø7-adapt · privada" : `Ø${d} · r${r} · h${ht}`}</div>
-      <h2>${isPriv ? "Casa 6" : "Casa " + h.spatialId}</h2>
-      <p>${isPriv ? "Residencia del operador. Fuera de reserva." : (d === 9 ? "Superior · from €320 / noche" : "Chalet · from €200 / noche")}</p>
+const overlay = document.getElementById("overlay");
+const sheet = document.getElementById("sheet");
+const hud = document.getElementById("hud");
+if (DEBUG) hud.classList.add("on");
+
+let MEDIA = null;
+let GEO = null;
+
+function housePhoto(id) {
+  const m = MEDIA && MEDIA.houses && MEDIA.houses[id];
+  return m ? pic(m.id) : pic("1wdC_rqzts2T_PRgF3fNWdCOm_7pn3oRO");
+}
+function houseKind(h) {
+  return h.diameterMetres === 9 ? "Superior" : "Chalet";
+}
+function housePrice(h) {
+  return h.diameterMetres === 9 ? "from €320 / noche" : "from €200 / noche";
+}
+
+Promise.all([
+  fetch("./AUMARA_WORLD_GEOREFERENCE_v1.json").then((r) => r.json()),
+  fetch("./world/media-index.json").then((r) => r.json()).catch(() => ({ houses: {} })),
+]).then(([geo, media]) => {
+  GEO = geo;
+  MEDIA = media;
+  geo.houses.forEach((h) => {
+    const a = document.createElement("a");
+    a.className = "card";
+    a.href = BOOK;
+    a.target = "_blank";
+    a.rel = "noreferrer";
+    a.innerHTML = `<img src="${housePhoto(h.spatialId)}" alt="Casa ${h.spatialId}"/><div>
+      <div class="meta">Ø${h.diameterMetres} · ${houseKind(h)} · bookable</div>
+      <h2>Casa ${h.spatialId}</h2>
+      <p>${housePrice(h)}</p>
     </div>`;
-    housesEl.appendChild(el);
+    housesEl.appendChild(a);
   });
 });
 
@@ -125,44 +153,48 @@ function clampAgl(v) {
 }
 function lonLatToEn(lon, lat, oLon, oLat) {
   const k = Math.cos(oLat * Math.PI / 180);
-  return {
-    east: (lon - oLon) * 111320 * k,
-    north: (lat - oLat) * 110540,
-  };
+  return { east: (lon - oLon) * 111320 * k, north: (lat - oLat) * 110540 };
 }
 function sampleHM(hm, east, north) {
   if (!hm) return 1.5;
   const u = (east - hm.east0) / hm.cell;
   const v = (north - hm.north0) / hm.cell;
-  const c0 = Math.floor(u);
-  const r0 = Math.floor(v);
-  const tx = u - c0;
-  const ty = v - r0;
+  const c0 = Math.floor(u), r0 = Math.floor(v), tx = u - c0, ty = v - r0;
   function at(c, r) {
     const cc = Math.max(0, Math.min(hm.cols - 1, c));
     const rr = Math.max(0, Math.min(hm.rows - 1, r));
     return hm.heights_m[rr * hm.cols + cc];
   }
-  const h00 = at(c0, r0), h10 = at(c0 + 1, r0), h01 = at(c0, r0 + 1), h11 = at(c0 + 1, r0 + 1);
-  return h00 * (1 - tx) * (1 - ty) + h10 * tx * (1 - ty) + h01 * (1 - tx) * ty + h11 * tx * ty;
+  return at(c0, r0) * (1 - tx) * (1 - ty) + at(c0 + 1, r0) * tx * (1 - ty) + at(c0, r0 + 1) * (1 - tx) * ty + at(c0 + 1, r0 + 1) * tx * ty;
+}
+
+function openSheet(h) {
+  sheet.className = "on";
+  sheet.innerHTML = `<img src="${housePhoto(h.spatialId)}" alt=""/>
+    <div style="flex:1">
+      <h3>Casa ${h.spatialId}</h3>
+      <p>${houseKind(h)} · Ø${h.diameterMetres} · ${housePrice(h)}</p>
+      <a class="btn gold" href="${BOOK}" target="_blank" rel="noreferrer">Reservar</a>
+    </div>`;
 }
 
 let started = false;
 document.getElementById("flight").onclick = () => startFlight();
-document.getElementById("close").onclick = () => document.getElementById("stage").classList.remove("on");
+document.getElementById("close").onclick = () => {
+  document.getElementById("stage").classList.remove("on");
+  sheet.className = "";
+};
 document.getElementById("ionbtn").onclick = () => {
   const cur = (window.AUMARA_ION && window.AUMARA_ION.resolve()) || "";
   const next = prompt("Cesium ion token", cur || "");
   if (next) {
     try { localStorage.setItem("CESIUM_ION_TOKEN", next.trim()); } catch (e) {}
-    alert("Ion saved. Open FLIGHT.");
   }
 };
 if (location.hash === "#flight") startFlight();
 
 async function startFlight() {
   const stage = document.getElementById("stage");
-  const hud = document.getElementById("hud");
   stage.classList.add("on");
   if (started) return;
   started = true;
@@ -170,21 +202,22 @@ async function startFlight() {
   hud.textContent = "Loading Earth…";
   try {
     await loadScript(CESIUM_JS);
-    await runTwin(hud);
+    await runTwin();
   } catch (e) {
+    hud.classList.add("on");
     hud.textContent = String(e && e.message ? e.message : e);
   }
 }
 
-async function runTwin(hud) {
+async function runTwin() {
   const C = window.Cesium;
   window.CESIUM_BASE_URL = "https://cesium.com/downloads/cesiumjs/releases/1.134/Build/Cesium/";
   if (window.AUMARA_ION) window.AUMARA_ION.apply(C);
 
   const [geo, flight, hm] = await Promise.all([
-    fetch("./AUMARA_WORLD_GEOREFERENCE_v1.json").then(r => r.json()),
-    fetch("./world/flight-path.json").then(r => r.json()),
-    fetch("./world/heightmap.json").then(r => r.json()),
+    GEO ? Promise.resolve(GEO) : fetch("./AUMARA_WORLD_GEOREFERENCE_v1.json").then((r) => r.json()),
+    fetch("./world/flight-path.json").then((r) => r.json()),
+    fetch("./world/heightmap.json").then((r) => r.json()),
   ]);
   const lon = geo.localOrigin.wgs84.longitude;
   const lat = geo.localOrigin.wgs84.latitude;
@@ -225,7 +258,6 @@ async function runTwin(hud) {
     tuneTiles(tileset);
     viewer.scene.primitives.add(tileset);
     tilesOn = true;
-    hud.textContent = "Earth · heightmap physics";
   } catch (e) {
     try {
       tileset = await C.Cesium3DTileset.fromIonAssetId(
@@ -273,6 +305,28 @@ async function runTwin(hud) {
   if (glb.ready) hideGround(glb);
   else if (glb.readyEvent) glb.readyEvent.addEventListener(() => hideGround(glb));
 
+  const bills = viewer.scene.primitives.add(new C.BillboardCollection());
+  geo.houses.forEach((h) => {
+    bills.add({
+      position: C.Cartesian3.fromDegrees(h.wgs84.longitude, h.wgs84.latitude, originH + 5.2),
+      image: housePhoto(h.spatialId),
+      width: 64,
+      height: 48,
+      verticalOrigin: C.VerticalOrigin.BOTTOM,
+      disableDepthTestDistance: Number.POSITIVE_INFINITY,
+    });
+  });
+
+  const arNodes = geo.houses.map((h) => {
+    const el = document.createElement("button");
+    el.className = "ar";
+    el.type = "button";
+    el.textContent = h.spatialId;
+    el.onclick = () => openSheet(h);
+    overlay.appendChild(el);
+    return { h, el };
+  });
+
   function groundAt(lonX, latX) {
     const en = lonLatToEn(lonX, latX, lon, lat);
     const local = sampleHM(hm, en.east, en.north);
@@ -281,15 +335,6 @@ async function runTwin(hud) {
       const h = viewer.scene.sampleHeight(C.Cartographic.fromDegrees(lonX, latX), [glb]);
       if (typeof h === "number" && isFinite(h)) live = h;
     } catch (e) {}
-    if (live == null) {
-      try {
-        const startP = C.Cartesian3.fromDegrees(lonX, latX, originH + 80);
-        const nrm = C.Ellipsoid.WGS84.geodeticSurfaceNormal(startP, new C.Cartesian3());
-        const down = C.Cartesian3.negate(nrm, new C.Cartesian3());
-        const hit = viewer.scene.pickFromRay(new C.Ray(startP, down), [glb]);
-        if (hit && hit.position) live = C.Cartographic.fromCartesian(hit.position).height;
-      } catch (e) {}
-    }
     const baked = originH + local;
     if (live == null) return baked;
     if (Math.abs(live - baked) > 25) return baked;
@@ -318,6 +363,21 @@ async function runTwin(hud) {
   let py = originH + 40;
   let pvy = 0;
   let lastT = start.clone();
+  let firstFrameRendered = false;
+  let maxWp = 0;
+  const rawAgl = [];
+
+  viewer.scene.postRender.addEventListener(() => {
+    if (!firstFrameRendered) firstFrameRendered = true;
+    arNodes.forEach(({ h, el }) => {
+      const p = C.Cartesian3.fromDegrees(h.wgs84.longitude, h.wgs84.latitude, originH + 5.4);
+      const win = C.SceneTransforms.worldToWindowCoordinates(viewer.scene, p);
+      if (!win) { el.style.display = "none"; return; }
+      el.style.display = "block";
+      el.style.left = win.x + "px";
+      el.style.top = win.y + "px";
+    });
+  });
 
   viewer.clock.onTick.addEventListener(() => {
     const p = pos.getValue(viewer.clock.currentTime);
@@ -335,6 +395,7 @@ async function runTwin(hud) {
     const dt = Math.max(0.008, Math.min(0.05, C.JulianDate.secondsDifference(viewer.clock.currentTime, lastT)));
     lastT = viewer.clock.currentTime.clone();
     const wp = elapsed < intro ? 0 : Math.min(27, Math.round(((elapsed - intro) / dur) * 27));
+    if (wp > maxWp) maxWp = wp;
     const targetAgl = elapsed < intro
       ? 40 - (40 - 3.75) * Math.min(1, elapsed / intro)
       : clampAgl(wps[wp].target_agl_m);
@@ -349,7 +410,12 @@ async function runTwin(hud) {
     if (py > ceil) { py = ceil; pvy = Math.min(0, pvy); }
     const clamped = C.Cartesian3.fromRadians(carto.longitude, carto.latitude, py);
     viewer.camera.setView({ destination: clamped, orientation: { direction: look, up } });
-    hud.textContent = "AUMARA  WP " + wp + "/27  AGL " + (py - ground).toFixed(2) + " m  HM  " + (tilesOn ? "ION" : "ESRI");
+    const agl = py - ground;
+    if (elapsed >= intro && rawAgl.length < 28) rawAgl.push(agl);
+    if (DEBUG) {
+      hud.textContent = "AUMARA  WP " + wp + "/27  AGL " + agl.toFixed(2) + " m  " +
+        (firstFrameRendered ? "FRAME" : "…") + "  " + (tilesOn ? "ION" : "ESRI");
+    }
   });
 }
 </script>

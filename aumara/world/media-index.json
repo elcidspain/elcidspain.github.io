@@ -1,0 +1,13 @@
+{
+  "schema": "aumara.media-index",
+  "from": "PHOTOS AUMARA",
+  "folder_id": "1KrN5gmDnhmhvMTZt6s9CKBFCuAUoCGa2",
+  "houses": {
+    "A": {"file": "1B6A8852.JPEG", "id": "1kqkrNee01qgdmwpMVnVZtZbiDLF8k9td", "kind": "chalet"},
+    "B": {"file": "1B6A9875.JPEG", "id": "1psM9FIivd5bV32-Uf4pLRyIX4D6unVRD", "kind": "superior"},
+    "C": {"file": "1B6A8803.JPEG", "id": "1FxoqCE_VDf9t2rMXT0M3hvmIvE9eo3Um", "kind": "chalet"},
+    "D": {"file": "1B6A9866.JPEG", "id": "1aHUq9vyjNMukIgJutvUylzOMhmcesmkO", "kind": "superior"},
+    "E": {"file": "1B6A8857.JPEG", "id": "1ySxA72RMAl8NDVVEKDOAaG0PC1co16RA", "kind": "chalet"},
+    "F": {"file": "1B6A8816.JPEG", "id": "1IZnfpL_ohBC67-TqvVHA0nOZtM5BhqGu", "kind": "chalet"}
+  }
+}
