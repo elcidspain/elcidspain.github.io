@@ -1,59 +1,225 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>AUMARA · World Twin</title>
-<link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.125/Build/Cesium/Widgets/widgets.css"/>
+<title>AUMARA El Cid — Glamping Benidoleig</title>
+<meta name="description" content="AUMARA · casas privadas en Benidoleig, Costa Blanca. EL CID VENTURES BENIDOLEIG S.L. · CIF B53816989."/>
+<meta property="og:title" content="AUMARA El Cid — Glamping Benidoleig"/>
+<meta property="og:image" content="https://lh3.googleusercontent.com/d/1wdC_rqzts2T_PRgF3fNWdCOm_7pn3oRO=w1200"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
 <style>
-  html,body,#c{margin:0;height:100%;background:#0b100c;color:#f3efe6;font-family:system-ui,sans-serif}
-  #hud{position:absolute;left:12px;top:12px;z-index:2;background:#0008;padding:8px 12px;border-radius:12px;font:12px/1.4 ui-monospace,monospace}
+  :root{--ink:#0a1a14;--cream:#f3ecde;--gold:#c49a64;--line:rgba(255,255,255,.12)}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--ink);color:var(--cream);font-family:Georgia,"Times New Roman",serif}
+  a{color:inherit;text-decoration:none}
+  header{display:flex;justify-content:space-between;align-items:center;gap:12px;max-width:1100px;margin:0 auto;padding:18px 20px}
+  .mark{width:36px;height:36px;border:1px solid rgba(255,255,255,.4);border-radius:999px;display:grid;place-items:center;letter-spacing:.12em}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;height:42px;padding:0 16px;border-radius:999px;font:600 11px/1 system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase}
+  .gold{background:var(--gold);color:#111}
+  .ghost{border:1px solid rgba(255,255,255,.25)}
+  .hero{max-width:1100px;margin:0 auto;padding:0 20px}
+  .hero img,.hero video{width:100%;aspect-ratio:16/8;object-fit:cover;border-radius:28px;border:1px solid var(--line);background:#132018}
+  h1{font-weight:400;font-size:clamp(32px,6vw,52px);line-height:1.05;max-width:16ch;margin:28px 0 12px}
+  .lead{font:16px/1.5 system-ui,sans-serif;color:rgba(243,236,222,.62);max-width:46ch}
+  .kicker{font:600 11px/1 system-ui,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+  .grid{max-width:1100px;margin:0 auto;padding:28px 20px 64px;display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+  .card{overflow:hidden;border:1px solid var(--line);border-radius:22px;background:rgba(255,255,255,.03)}
+  .card img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+  .card div{padding:14px 16px 18px}
+  .meta{font:11px/1.3 system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+  .card h2{font-weight:400;font-size:28px;margin:6px 0 4px}
+  .card p{font:14px/1.45 system-ui,sans-serif;color:rgba(243,236,222,.55);margin:0}
+  .foot{max-width:1100px;margin:0 auto;padding:0 20px 48px;font:14px/1.6 system-ui,sans-serif;color:rgba(243,236,222,.45)}
+  .foot a{color:var(--gold)}
+  #stage{display:none;position:fixed;inset:0;z-index:20;background:#000}
+  #stage.on{display:block}
+  #c{position:absolute;inset:0}
+  #hud{position:absolute;left:12px;top:12px;z-index:3;background:#0008;padding:8px 12px;border-radius:12px;font:12px/1.4 ui-monospace,monospace}
+  #close{position:absolute;right:12px;top:12px;z-index:3}
 </style>
 </head>
 <body>
-<div id="c"></div>
-<div id="hud">Loading twin…</div>
-<script src="https://cesium.com/downloads/cesiumjs/releases/1.125/Build/Cesium/Cesium.js"></script>
+<header>
+  <a href="/aumara/" class="row" style="align-items:center;gap:10px;font:600 12px system-ui;letter-spacing:.18em">
+    <span class="mark">A</span> AUMARA
+  </a>
+  <div class="row">
+    <a class="btn ghost" href="https://wa.me/34663592733">WhatsApp</a>
+    <a class="btn gold" href="https://www.booking.com/hotel/es/aumara.es.html" target="_blank" rel="noreferrer">Fechas</a>
+  </div>
+</header>
+
+<section class="hero">
+  <img src="https://lh3.googleusercontent.com/d/1wdC_rqzts2T_PRgF3fNWdCOm_7pn3oRO=w2200" alt="AUMARA · Benidoleig"/>
+  <p class="kicker">Glamping · Benidoleig</p>
+  <h1>Casas privadas en el interior tranquilo de la Costa Blanca.</h1>
+  <p class="lead">Cinco casas para reservar. Una privada. Un paisaje. Cesium se abre solo si lo pides.</p>
+  <div class="row" style="margin-top:18px">
+    <a class="btn gold" href="https://www.booking.com/hotel/es/aumara.es.html" target="_blank" rel="noreferrer">Booking</a>
+    <button class="btn ghost" id="flight" type="button">3D tour / FLIGHT</button>
+  </div>
+</section>
+
+<section class="grid" id="houses"></section>
+
+<section class="foot">
+  Urb. Rincón del Silencio 3, 03759 Benidoleig<br/>
+  EL CID VENTURES BENIDOLEIG S.L. · CIF B53816989<br/>
+  <a href="mailto:elcidspain@gmail.com">elcidspain@gmail.com</a> ·
+  <a href="https://wa.me/34663592733">+34 663 592 733</a>
+</section>
+
+<div id="stage">
+  <div id="c"></div>
+  <div id="hud">Earth…</div>
+  <button class="btn gold" id="close" type="button">Cerrar</button>
+</div>
+
 <script>
-(async () => {
-  window.CESIUM_BASE_URL = 'https://cesium.com/downloads/cesiumjs/releases/1.125/Build/Cesium/';
-  const C = window.Cesium;
-  const [geo, flight] = await Promise.all([
-    fetch('./AUMARA_WORLD_GEOREFERENCE_v1.json').then(r=>r.json()),
-    fetch('./world/flight-path.json').then(r=>r.json()),
-  ]);
-  const ref = geo.verticalPolicy.projectReferenceElevationMslMetres || 91;
-  const viewer = new C.Viewer('c', {
-    animation:false, timeline:false, baseLayerPicker:false, geocoder:false,
-    homeButton:false, sceneModePicker:false, navigationHelpButton:false,
-    fullscreenButton:false, infoBox:false, selectionIndicator:false,
-    terrainProvider: new C.EllipsoidTerrainProvider(),
-    baseLayer: false,
+const PHOTO = {
+  A: "https://lh3.googleusercontent.com/d/1rDKUNOQxzJcxoGXy2eRQ5bKJedoOuaxI=w1600",
+  B: "https://lh3.googleusercontent.com/d/1uFRe8MsXd5IoiQT5Ph7jWaN2Ey_Fj2Vs=w1600",
+  C: "https://lh3.googleusercontent.com/d/1SQqw9ZAzOIag6wu6ME1Rr6mCu1hVpqCD=w1200",
+  D: "https://lh3.googleusercontent.com/d/1xauueEm6ahvJjRm2103AYmCZow45deQa=w1200",
+  E: "https://lh3.googleusercontent.com/d/1qAkaNt_W-ISyVfpU2IlN3r6_c60Ts5Mh=w1200",
+  F: "https://lh3.googleusercontent.com/d/1Dx3SLonThui5jca3C9fadr9RrboaBGdJ=w1600",
+};
+const BOOK = "https://www.booking.com/hotel/es/aumara.es.html";
+const CESIUM_JS = "https://cesium.com/downloads/cesiumjs/releases/1.125/Build/Cesium/Cesium.js";
+const CESIUM_CSS = "https://cesium.com/downloads/cesiumjs/releases/1.125/Build/Cesium/Widgets/widgets.css";
+const ESRI = "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer";
+
+const housesEl = document.getElementById("houses");
+fetch("./AUMARA_WORLD_GEOREFERENCE_v1.json").then(r => r.json()).then(geo => {
+  geo.houses.forEach(h => {
+    const d = h.diameterMetres;
+    const r = (d / 2).toFixed(1);
+    const ht = d === 9 ? "5.5" : "4.86";
+    const isPriv = h.spatialId === "F";
+    const el = document.createElement(isPriv ? "div" : "a");
+    el.className = "card";
+    if (!isPriv) { el.href = BOOK; el.target = "_blank"; el.rel = "noreferrer"; }
+    el.innerHTML = `<img src="${PHOTO[h.spatialId]}" alt="${h.spatialId}"/><div>
+      <div class="meta">${isPriv ? "Ø7-adapt · privada" : `Ø${d} · r${r} · h${ht}`}</div>
+      <h2>${isPriv ? "Casa 6" : "Casa " + h.spatialId}</h2>
+      <p>${isPriv ? "Residencia del operador. Fuera de reserva." : (d === 9 ? "Superior · from €320 / noche" : "Chalet · from €200 / noche")}</p>
+    </div>`;
+    housesEl.appendChild(el);
   });
-  viewer.scene.globe.baseColor = C.Color.fromCssColorString('#243028');
-  viewer.scene.backgroundColor = C.Color.fromCssColorString('#0b100c');
-  const origin = C.Cartesian3.fromDegrees(geo.localOrigin.wgs84.longitude, geo.localOrigin.wgs84.latitude, ref);
+});
+
+function loadScript(src) {
+  return new Promise((res, rej) => {
+    if (document.querySelector(`script[src="${src}"]`)) return res();
+    const s = document.createElement("script");
+    s.src = src; s.onload = res; s.onerror = rej; document.body.appendChild(s);
+  });
+}
+function loadCss(href) {
+  if (document.querySelector(`link[href="${href}"]`)) return;
+  const l = document.createElement("link");
+  l.rel = "stylesheet"; l.href = href; document.head.appendChild(l);
+}
+
+let started = false;
+document.getElementById("flight").onclick = () => startFlight();
+document.getElementById("close").onclick = () => {
+  document.getElementById("stage").classList.remove("on");
+};
+if (location.hash === "#flight") startFlight();
+
+async function startFlight() {
+  const stage = document.getElementById("stage");
+  const hud = document.getElementById("hud");
+  stage.classList.add("on");
+  if (started) return;
+  started = true;
+  loadCss(CESIUM_CSS);
+  hud.textContent = "Loading Earth…";
+  try {
+    await loadScript(CESIUM_JS);
+    await runTwin(hud);
+  } catch (e) {
+    hud.textContent = String(e && e.message ? e.message : e);
+  }
+}
+
+async function runTwin(hud) {
+  const C = window.Cesium;
+  window.CESIUM_BASE_URL = "https://cesium.com/downloads/cesiumjs/releases/1.125/Build/Cesium/";
+  const [geo, flight] = await Promise.all([
+    fetch("./AUMARA_WORLD_GEOREFERENCE_v1.json").then(r => r.json()),
+    fetch("./world/flight-path.json").then(r => r.json()),
+  ]);
+  const lon = geo.localOrigin.wgs84.longitude;
+  const lat = geo.localOrigin.wgs84.latitude;
+  const esri = await C.ArcGisMapServerImageryProvider.fromUrl(ESRI);
+  const viewer = new C.Viewer("c", {
+    animation: false, timeline: false, baseLayerPicker: false, geocoder: false,
+    homeButton: false, sceneModePicker: false, navigationHelpButton: false,
+    fullscreenButton: false, infoBox: false, selectionIndicator: false,
+    terrain: C.Terrain.fromWorldTerrain(),
+    baseLayer: new C.ImageryLayer(esri),
+  });
+  try {
+    const google = await C.createGooglePhotorealistic3DTileset();
+    viewer.scene.primitives.add(google);
+    hud.textContent = "Earth tiles on";
+  } catch (e) {
+    try {
+      const tiles = await C.Cesium3DTileset.fromIonAssetId(2275207);
+      viewer.scene.primitives.add(tiles);
+      hud.textContent = "Ion 2275207 on";
+    } catch (e2) {
+      hud.textContent = "ESRI world · Google tiles later";
+    }
+  }
+
+  const originCarto = C.Cartographic.fromDegrees(lon, lat);
+  try {
+    await C.sampleTerrainMostDetailed(viewer.terrainProvider, [originCarto]);
+  } catch {}
+  const origin = C.Cartesian3.fromRadians(
+    originCarto.longitude,
+    originCarto.latitude,
+    originCarto.height || 0
+  );
   const model = await C.Model.fromGltfAsync({
-    url: './world/aumara-site.glb',
+    url: "./world/aumara-site.glb",
     modelMatrix: C.Transforms.eastNorthUpToFixedFrame(origin),
+    scale: 1,
   });
   viewer.scene.primitives.add(model);
+
   const wps = flight.waypoints;
   const start = C.JulianDate.now();
+  const intro = 10;
   const dur = flight.duration_s_default || 48;
   const pos = new C.SampledPositionProperty();
-  pos.setInterpolationOptions({ interpolationDegree: 2, interpolationAlgorithm: C.HermitePolynomialApproximation });
-  wps.forEach((wp,i) => {
-    const t = C.JulianDate.addSeconds(start, (i/(wps.length-1))*dur, new C.JulianDate());
-    pos.addSample(t, C.Cartesian3.fromDegrees(wp.wgs84.longitude, wp.wgs84.latitude, ref + wp.local.ground_z + wp.target_agl_m));
+  pos.setInterpolationOptions({
+    interpolationDegree: 2,
+    interpolationAlgorithm: C.HermitePolynomialApproximation,
+  });
+  const earth = C.Cartesian3.fromDegrees(lon, lat, 2.4e6);
+  pos.addSample(start, earth);
+  wps.forEach((wp, i) => {
+    const t = C.JulianDate.addSeconds(start, intro + (i / (wps.length - 1)) * dur, new C.JulianDate());
+    const agl = Math.min(4, Math.max(3.5, wp.target_agl_m || 3.75));
+    pos.addSample(t, C.Cartesian3.fromDegrees(
+      wp.wgs84.longitude,
+      wp.wgs84.latitude,
+      (originCarto.height || 0) + (wp.local.ground_z || 0) + agl
+    ));
   });
   viewer.clock.startTime = start.clone();
-  viewer.clock.stopTime = C.JulianDate.addSeconds(start, dur, new C.JulianDate());
+  viewer.clock.stopTime = C.JulianDate.addSeconds(start, intro + dur, new C.JulianDate());
   viewer.clock.currentTime = start.clone();
   viewer.clock.clockRange = C.ClockRange.LOOP_STOP;
   viewer.clock.shouldAnimate = true;
-  viewer.clock.multiplier = 1;
-  const hud = document.getElementById('hud');
+
   viewer.clock.onTick.addEventListener(() => {
     const p = pos.getValue(viewer.clock.currentTime);
     if (!p) return;
@@ -62,21 +228,24 @@
     const dir = C.Cartesian3.normalize(C.Cartesian3.subtract(n, p, new C.Cartesian3()), new C.Cartesian3());
     const up = C.Ellipsoid.WGS84.geodeticSurfaceNormal(p, new C.Cartesian3());
     const right = C.Cartesian3.normalize(C.Cartesian3.cross(dir, up, new C.Cartesian3()), new C.Cartesian3());
-    const look = C.Matrix3.multiplyByVector(C.Matrix3.fromQuaternion(C.Quaternion.fromAxisAngle(right, -0.38)), dir, new C.Cartesian3());
+    const look = C.Matrix3.multiplyByVector(
+      C.Matrix3.fromQuaternion(C.Quaternion.fromAxisAngle(right, -0.38)),
+      dir,
+      new C.Cartesian3()
+    );
     viewer.camera.setView({ destination: p, orientation: { direction: look, up } });
     const carto = C.Cartographic.fromCartesian(p);
-    let ground = ref;
+    let ground = originCarto.height || 0;
     try {
-      const down = C.Cartesian3.negate(C.Ellipsoid.WGS84.geodeticSurfaceNormal(p, new C.Cartesian3()), new C.Cartesian3());
-      const ray = new C.Ray(C.Cartesian3.add(p, C.Cartesian3.multiplyByScalar(down, 0.15, new C.Cartesian3()), new C.Cartesian3()), down);
-      const hit = viewer.scene.pickFromRay(ray);
-      if (hit && hit.position) ground = C.Cartographic.fromCartesian(hit.position).height;
+      const sampled = viewer.scene.sampleHeight(carto);
+      if (typeof sampled === "number") ground = sampled;
     } catch {}
     const elapsed = C.JulianDate.secondsDifference(viewer.clock.currentTime, start);
-    const wp = Math.min(27, Math.round((elapsed/dur)*27));
-    hud.textContent = `AUMARA  WP ${wp}  AGL ${(carto.height-ground).toFixed(2)} m  GLB on`;
+    const wp = elapsed < intro ? 0 : Math.min(27, Math.round(((elapsed - intro) / dur) * 27));
+    const agl = carto.height - ground;
+    hud.textContent = `AUMARA  WP ${wp}/27  AGL ${agl.toFixed(2)} m  GLB on`;
   });
-})().catch(e => { document.getElementById('hud').textContent = String(e); });
+}
 </script>
 </body>
 </html>
