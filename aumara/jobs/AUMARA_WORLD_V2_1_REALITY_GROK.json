@@ -1,0 +1,110 @@
+{
+  "job_id": "AUMARA_WORLD_V2_1_REALITY_GROK",
+  "priority": "P0",
+  "mode": "PATCH_CURRENT_BUILD_ONLY",
+  "base_head": "08e3e1cfbf6a5a78027c1c7a0ca9fcdd311eeb86",
+  "objective": "Accept V2 as spatial scaffold, fix the measurement bug once, then replace schematic twin geometry with visibly reconstructed AUMARA reality from canonical sources.",
+  "freeze": [
+    "aumara landing HTML/CSS/copy",
+    "AUMARA_WORLD_GEOREFERENCE_v1.json",
+    "house A-F positions",
+    "Booking wiring",
+    "AUMARA_CONTROL_PLANE.md",
+    "AUMARA_SOURCE_REGISTRY.json"
+  ],
+  "known_v2_acceptance": {
+    "status": "SCAFFOLD_ACCEPTED_NOT_FINAL_TWIN",
+    "commits": [
+      "9bef020a1097f50b82df5c63e6e83b4176b8f3a6",
+      "08e3e1cfbf6a5a78027c1c7a0ca9fcdd311eeb86"
+    ],
+    "accepted": [
+      "current project tree",
+      "georeference",
+      "flight-path scaffold",
+      "world-anchored A-F AR wiring",
+      "six Booking interactions",
+      "local twin fallback when global tiles are blocked"
+    ],
+    "not_final": [
+      "house geometry",
+      "terrain realism",
+      "vegetation realism",
+      "raw AGL proof"
+    ]
+  },
+  "patch_1_measurement": {
+    "problem": "Current runtime passes [glb] as objectsToExclude in scene sampling/raycast while telemetry claims LOCAL_TERRAIN_RAYCAST.",
+    "actions": [
+      "Do not exclude the local twin from ground measurement. Remove glb from objectsToExclude for the local terrain query, or raycast directly against a dedicated terrain primitive/mesh.",
+      "ground_source=LOCAL_TERRAIN_RAYCAST is allowed only when the actual hit primitive is the local terrain mesh.",
+      "If no local mesh hit exists, record LOCAL_DEM; never relabel DEM as raycast.",
+      "Start every evidence run with a fresh telemetry array and unique run_id.",
+      "One run only: timestamps monotonically increase and waypoint never decreases from WP0 to WP27.",
+      "For the 48 second local run at target 10 Hz, require at least 450 raw samples. No clamp, no substituted target AGL."
+    ]
+  },
+  "patch_2_reality": {
+    "current_problem": "aumara-site-v2.glb uses generic frequency-2 geodesic hemispheres with photo albedo and schematic vegetation.",
+    "canonical_sources": [
+      "PHOTOS AUMARA",
+      "Katia house folders",
+      "AUMARA_DAY_WALK_001_EXPORT",
+      "AUMARA_OUTDOOR_AR_001",
+      "Puchol plans",
+      "cadastral/georeference",
+      "verified heightmap/PNOA terrain"
+    ],
+    "required_asset": "aumara/world/aumara-site-v2_1.glb",
+    "required_visible_improvements": [
+      "terrain follows verified parcel relief and uses real aerial/ground appearance",
+      "six houses remain plan-true in footprint/height but gain source-derived facade, door/window/deck orientation instead of a single generic hemisphere treatment",
+      "path network is spatially recognizable from real DAY_WALK/OUTDOOR_AR references",
+      "vegetation becomes source-guided canopy/trunk volumes around the real paths and houses; schematic proxies are allowed only at distance LOD",
+      "no photo billboards as substitute for geometry"
+    ],
+    "provenance": "Update AUMARA_TWIN_SOURCE_MANIFEST.json per mesh/material. Mark generated completion explicitly; never call it surveyed/real geometry."
+  },
+  "flight": {
+    "path": "existing WP0-WP27 continuous spline",
+    "agl_target_m": [3.5, 4.0],
+    "collision": "terrain + houses",
+    "ar": "world-anchored A-F labels/cards; declutter; Booking",
+    "global_tiles": "optional for this job; BLOCKED is acceptable and must not block local reality"
+  },
+  "evidence": [
+    "aumara/world/aumara-site-v2_1.glb",
+    "updated aumara/world/AUMARA_TWIN_SOURCE_MANIFEST.json",
+    "aumara/world/AUMARA_RAW_AGL_TELEMETRY_V2_1.json",
+    "one uncut desktop WP0-WP27 MP4",
+    "one uncut mobile WP0-WP27 MP4",
+    "aumara/jobs/AUMARA_WORLD_V2_1_RECEIPT.json"
+  ],
+  "receipt_required": {
+    "run_id": "string",
+    "commit_sha": "string",
+    "localTwinStatus": "READY|FAILED",
+    "globalTilesStatus": "READY|BLOCKED",
+    "firstFrameRendered": true,
+    "twinLoaded": true,
+    "sixHouseMeshesVisible": true,
+    "waypointReached": 27,
+    "rawSampleCount_min": 450,
+    "rawAglMin_gte": 3.5,
+    "rawAglMax_lte": 4.0,
+    "waypointsMonotonic": true,
+    "timestampsMonotonic": true,
+    "consoleErrors": [],
+    "failedRequiredRequests": []
+  },
+  "do_not": [
+    "rewrite full index.html",
+    "redesign landing",
+    "create another project/repository",
+    "create another dashboard/status UI",
+    "spend the job on Earth-to-Spain while local twin remains schematic",
+    "call generic hemispheres or billboards reconstructed reality",
+    "clamp or fabricate telemetry"
+  ],
+  "execution": "READ JOB -> PATCH MEASUREMENT -> BUILD V2.1 REALITY -> RUN ONE CLEAN FLIGHT -> RECORD -> COMMIT -> RECEIPT. Do not stop for prose updates."
+}
