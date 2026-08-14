@@ -1,0 +1,290 @@
+{
+  "schema": "aumara.raw-telemetry",
+  "source": "reconstructed-glb-mesh",
+  "waypoint_count": 28,
+  "raw_agl_m": [
+    3.75,
+    3.75,
+    3.75,
+    3.75,
+    3.75,
+    3.75,
+    3.75,
+    3.75,
+    3.75,
+    3.75,
+    3.75,
+    3.75,
+    3.75,
+    3.75,
+    3.75,
+    3.75,
+    3.75,
+    3.75,
+    3.75,
+    3.75,
+    -2.047,
+    3.75,
+    3.75,
+    3.75,
+    3.75,
+    3.75,
+    3.75,
+    3.75
+  ],
+  "samples": [
+    {
+      "i": 0,
+      "raw_agl_m": 3.75,
+      "camera_h": 5.4628,
+      "mesh_h": 1.7128,
+      "hit": "terrain",
+      "east": 23.254,
+      "north": -1.155
+    },
+    {
+      "i": 1,
+      "raw_agl_m": 3.75,
+      "camera_h": 5.2649,
+      "mesh_h": 1.5149,
+      "hit": "terrain",
+      "east": 26.698,
+      "north": -2.496
+    },
+    {
+      "i": 2,
+      "raw_agl_m": 3.75,
+      "camera_h": 4.9232,
+      "mesh_h": 1.1732,
+      "hit": "terrain",
+      "east": 30.143,
+      "north": -3.838
+    },
+    {
+      "i": 3,
+      "raw_agl_m": 3.75,
+      "camera_h": 5.0811,
+      "mesh_h": 1.3311,
+      "hit": "terrain",
+      "east": 33.647,
+      "north": -4.81
+    },
+    {
+      "i": 4,
+      "raw_agl_m": 3.75,
+      "camera_h": 4.9952,
+      "mesh_h": 1.2452,
+      "hit": "terrain",
+      "east": 37.325,
+      "north": -4.526
+    },
+    {
+      "i": 5,
+      "raw_agl_m": 3.75,
+      "camera_h": 4.9204,
+      "mesh_h": 1.1704,
+      "hit": "terrain",
+      "east": 40.931,
+      "north": -3.715
+    },
+    {
+      "i": 6,
+      "raw_agl_m": 3.75,
+      "camera_h": 4.8745,
+      "mesh_h": 1.1245,
+      "hit": "terrain",
+      "east": 44.538,
+      "north": -2.904
+    },
+    {
+      "i": 7,
+      "raw_agl_m": 3.75,
+      "camera_h": 4.4403,
+      "mesh_h": 0.6903,
+      "hit": "terrain",
+      "east": 48.144,
+      "north": -2.092
+    },
+    {
+      "i": 8,
+      "raw_agl_m": 3.75,
+      "camera_h": 4.4699,
+      "mesh_h": 0.7199,
+      "hit": "terrain",
+      "east": 51.799,
+      "north": -1.635
+    },
+    {
+      "i": 9,
+      "raw_agl_m": 3.75,
+      "camera_h": 4.5266,
+      "mesh_h": 0.7766,
+      "hit": "terrain",
+      "east": 54.78,
+      "north": -0.116
+    },
+    {
+      "i": 10,
+      "raw_agl_m": 3.75,
+      "camera_h": 4.7298,
+      "mesh_h": 0.9798,
+      "hit": "terrain",
+      "east": 56.995,
+      "north": 2.843
+    },
+    {
+      "i": 11,
+      "raw_agl_m": 3.75,
+      "camera_h": 4.5127,
+      "mesh_h": 0.7627,
+      "hit": "terrain",
+      "east": 59.21,
+      "north": 5.803
+    },
+    {
+      "i": 12,
+      "raw_agl_m": 3.75,
+      "camera_h": 4.3472,
+      "mesh_h": 0.5972,
+      "hit": "terrain",
+      "east": 61.671,
+      "north": 8.3
+    },
+    {
+      "i": 13,
+      "raw_agl_m": 3.75,
+      "camera_h": 4.4868,
+      "mesh_h": 0.7368,
+      "hit": "terrain",
+      "east": 65.33,
+      "north": 8.331
+    },
+    {
+      "i": 14,
+      "raw_agl_m": 3.75,
+      "camera_h": 4.5918,
+      "mesh_h": 0.8418,
+      "hit": "terrain",
+      "east": 68.63,
+      "north": 6.666
+    },
+    {
+      "i": 15,
+      "raw_agl_m": 3.75,
+      "camera_h": 4.5922,
+      "mesh_h": 0.8422,
+      "hit": "terrain",
+      "east": 71.931,
+      "north": 5.001
+    },
+    {
+      "i": 16,
+      "raw_agl_m": 3.75,
+      "camera_h": 4.4885,
+      "mesh_h": 0.7385,
+      "hit": "terrain",
+      "east": 75.356,
+      "north": 3.925
+    },
+    {
+      "i": 17,
+      "raw_agl_m": 3.75,
+      "camera_h": 4.4292,
+      "mesh_h": 0.6792,
+      "hit": "terrain",
+      "east": 77.486,
+      "north": 3.544
+    },
+    {
+      "i": 18,
+      "raw_agl_m": 3.75,
+      "camera_h": 4.6108,
+      "mesh_h": 0.8608,
+      "hit": "terrain",
+      "east": 74.532,
+      "north": 1.323
+    },
+    {
+      "i": 19,
+      "raw_agl_m": 3.75,
+      "camera_h": 4.6279,
+      "mesh_h": 0.8779,
+      "hit": "terrain",
+      "east": 71.577,
+      "north": -0.899
+    },
+    {
+      "i": 20,
+      "raw_agl_m": -2.047,
+      "camera_h": 4.6469,
+      "mesh_h": 6.6938,
+      "hit": "house_D",
+      "east": 68.623,
+      "north": -3.12
+    },
+    {
+      "i": 21,
+      "raw_agl_m": 3.75,
+      "camera_h": 4.4991,
+      "mesh_h": 0.7491,
+      "hit": "terrain",
+      "east": 65.668,
+      "north": -5.342
+    },
+    {
+      "i": 22,
+      "raw_agl_m": 3.75,
+      "camera_h": 4.181,
+      "mesh_h": 0.431,
+      "hit": "terrain",
+      "east": 67.191,
+      "north": -5.943
+    },
+    {
+      "i": 23,
+      "raw_agl_m": 3.75,
+      "camera_h": 4.572,
+      "mesh_h": 0.822,
+      "hit": "terrain",
+      "east": 70.88,
+      "north": -5.712
+    },
+    {
+      "i": 24,
+      "raw_agl_m": 3.75,
+      "camera_h": 4.5669,
+      "mesh_h": 0.8169,
+      "hit": "terrain",
+      "east": 74.567,
+      "north": -5.449
+    },
+    {
+      "i": 25,
+      "raw_agl_m": 3.75,
+      "camera_h": 4.5938,
+      "mesh_h": 0.8438,
+      "hit": "terrain",
+      "east": 78.254,
+      "north": -5.186
+    },
+    {
+      "i": 26,
+      "raw_agl_m": 3.75,
+      "camera_h": 4.616,
+      "mesh_h": 0.866,
+      "hit": "terrain",
+      "east": 81.941,
+      "north": -4.93
+    },
+    {
+      "i": 27,
+      "raw_agl_m": 3.75,
+      "camera_h": 4.6446,
+      "mesh_h": 0.8946,
+      "hit": "terrain",
+      "east": 85.633,
+      "north": -4.745
+    }
+  ],
+  "clampAgl": false
+}

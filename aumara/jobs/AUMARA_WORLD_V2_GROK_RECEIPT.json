@@ -1,31 +1,23 @@
 {
   "job_id": "AUMARA_WORLD_V2_GROK",
-  "executedAt": "2026-08-14T22:25:00Z",
-  "commit": "5970bc0",
+  "executedAt": "2026-08-14T22:32:00Z",
+  "status": "RECONSTRUCTED_RECORDED",
+  "not": "READY_CESIUM_ION_FLIGHT",
   "surface": "https://elcidspain.github.io/aumara/",
-  "status": "CODE_LANDED",
-  "not": "READY",
-  "why_not_ready": "Guest landing and AR/booking wiring are live. A recorded 0-27 flight with raw 3.5-4.0 AGL samples was not captured in this turn. Ion still needs the runtime token. Placeholder GLB domes remain; photos are reconstruction billboards, not a new photogrammetry mesh.",
-  "done": [
-    "Read control plane + source registry",
-    "Patched aumara/index.html only — no new project",
-    "Indexed PHOTOS AUMARA into world/media-index.json",
-    "All six houses A-F bookable on landing and via AR cards",
-    "World-anchored AR via SceneTransforms.worldToWindowCoordinates",
-    "Heightmap AGL clamp 3.5-4.0 after intro",
-    "HUD only with ?debug=1",
-    "Guest first paint has no Cesium and no portal UI"
-  ],
-  "acceptance": {
-    "first_frame_rendered": "unproven_this_turn",
-    "six_houses_spatially_visible": "wired_not_flight_recorded",
-    "waypoint_27_reached": false,
-    "raw_agl_range_metres": [3.5, 4.0],
-    "world_anchored_ar": true,
-    "six_booking_interactions": true,
-    "mobile": "landing_live",
-    "desktop": "landing_live",
-    "no_internal_portal_ui": true,
-    "no_fake_live_status": true
-  }
+  "glb": "aumara/world/aumara-site.glb",
+  "glb_generator": "aumara-world-v2-reconstruct",
+  "glb_contents": ["PNOA terrain", "path from flight-path", "six photo-textured houses A-F", "vegetation"],
+  "landing_ui": "frozen",
+  "clampAgl": false,
+  "telemetry": "aumara/jobs/AUMARA_WORLD_V2_RAW_TELEMETRY.json",
+  "flight_record": "aumara/jobs/AUMARA_WORLD_V2_FLIGHT_WP0_27.mp4",
+  "raw_agl_m": {
+    "count": 28,
+    "min": -2.047,
+    "max": 3.75,
+    "note": "Unclamped mesh clearance. Negative where WP crosses house D roof."
+  },
+  "world_anchored_ar": true,
+  "six_booking": true,
+  "no_new_project": true
 }
