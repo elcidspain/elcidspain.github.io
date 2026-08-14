@@ -258,16 +258,26 @@ async function runTwin(hud) {
     backFaceCulling: true,
   });
   viewer.scene.primitives.add(glb);
+  function hideGround(model) {
+    ["terrain", "path"].forEach((name) => {
+      try {
+        const n = model.getNode(name);
+        if (n) n.show = false;
+      } catch (e) {}
+    });
+  }
+  if (glb.ready) hideGround(glb);
+  else if (glb.readyEvent) glb.readyEvent.addEventListener(() => hideGround(glb));
 
   const start = C.JulianDate.now();
-  const intro = 8;
+  const intro = 2;
   const dur = flight.duration_s_default || 48;
   const pos = new C.SampledPositionProperty();
   pos.setInterpolationOptions({
     interpolationDegree: 2,
     interpolationAlgorithm: C.HermitePolynomialApproximation,
   });
-  pos.addSample(start, C.Cartesian3.fromDegrees(lon, lat, originH + 900));
+  pos.addSample(start, C.Cartesian3.fromDegrees(lon, lat, originH + 40));
   wps.forEach((wp, i) => {
     const t = C.JulianDate.addSeconds(start, intro + (i / (wps.length - 1)) * dur, new C.JulianDate());
     const ground = heights[i + 1];
