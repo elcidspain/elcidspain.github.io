@@ -1,0 +1,70 @@
+{
+  "schema": "aumara.source-registry",
+  "version": "2.0.0",
+  "status": "ACTIVE_CANON",
+  "product": {
+    "name": "AUMARA",
+    "objective": "Earth -> real 3D world -> AUMARA parcel -> local spatial twin -> 3.5-4.0 m AGL flight -> world-anchored AR -> six house content and booking interactions",
+    "physical_houses": 6,
+    "bookable_houses": 6,
+    "target_public_domain": "aumara.me"
+  },
+  "repository": {
+    "full_name": "elcidspain/elcidspain.github.io",
+    "branch": "main",
+    "guest_entry": "aumara/index.html",
+    "control_plane": "aumara/AUMARA_CONTROL_PLANE.md",
+    "georeference": "aumara/AUMARA_WORLD_GEOREFERENCE_v1.json",
+    "local_twin_glb": "aumara/world/aumara-site.glb",
+    "flight_path": "aumara/world/flight-path.json"
+  },
+  "geospatial_truth": {
+    "cadastral_reference": "8982501YH5988S",
+    "control_point": {
+      "latitude": 38.7936312,
+      "longitude": -0.0194621,
+      "role": "verification_anchor_not_origin"
+    },
+    "flight_agl_metres": {
+      "target": 3.75,
+      "allowed": [3.5, 4.0]
+    },
+    "legacy_coordinates_allowed": false
+  },
+  "drive_sources": [
+    {"role":"command_center","title":"00_AUMARA_COMMAND_CENTER","folder_id":"1z5oWIeRoyWT6YSw3_S73qxtcjmqfNOLv"},
+    {"role":"master_aumara_source","title":"AUMARA","folder_id":"14qJX_hy-4Jrj12_xWxSN5YctlEnK8Fzf"},
+    {"role":"primary_photos","title":"PHOTOS AUMARA","folder_id":"1KrN5gmDnhmhvMTZt6s9CKBFCuAUoCGa2"},
+    {"role":"house_photo_video_source","title":"Катя в домике.. - Katia Mir 2026-03-07","folder_id":"15ns7kKd5D4Ws5n940PZh-uM-gNPmhwsX"},
+    {"role":"house_photo_video_source_copy","title":"Катя в домике.. - Katia Mir 2026-03-07","folder_id":"1KvMJvnaMC466lKMs2NvE9RlJqvcKKBFl"},
+    {"role":"content_factory","title":"00_AUMARA_CONTENT_FACTORY","folder_id":"1j7AjGTjAsrxPoP5AOMYm4JZlV_dLk9be"},
+    {"role":"outdoor_ar","title":"AUMARA_OUTDOOR_AR_001","folder_id":"1HMqmvUEi51gzflKHpDCmaWmAca3AMNQz"},
+    {"role":"day_walk_export","title":"AUMARA_DAY_WALK_001_EXPORT","folder_id":"1IEBw2SHBEnxIraQV6vDykkSyLi5YLtOv"},
+    {"role":"ai_visual_reference_only","title":"AUMARA Fotos AI Edited","folder_id":"1Vm9kWSQZMHbAXEyRNB4Nww-KDNpPQbxO"}
+  ],
+  "content_factory_structure": {
+    "day_walk": "01_GROK_DAY_WALK",
+    "night": "02_GROK_NIGHT",
+    "source_qa": "03_GEMINI_SOURCE_QA",
+    "meta_reel": "04_META_REEL",
+    "outputs": "90_OUTPUTS"
+  },
+  "worker_roles": {
+    "gpt": "lead_architecture_truth_lock_qa",
+    "grok": "runtime_build_cesium_integration",
+    "meta_imagine": "reconstruction_textures_environmental_completion_content_derivatives"
+  },
+  "reconstruction_policy": {
+    "real_photos_videos_plans_cadastre_google": "source_truth",
+    "generated_material": "allowed_only_as_reconstruction_input_and_must_be_reconciled_to_spatial_truth",
+    "video_slider_as_final_world": false,
+    "flat_placeholder_domes_as_final_world": false
+  },
+  "next_build": {
+    "id": "AUMARA_WORLD_V2",
+    "goal": "Replace placeholder local geometry with a reconstructed real-looking parcel, six houses, paths, vegetation and spatial content; then run one continuous waypoint 0-27 flight with world-anchored AR and six booking interactions.",
+    "global_layer": "Google Photorealistic 3D Tiles when authorized runtime key is available",
+    "local_layer": "georeferenced reconstructed AUMARA twin",
+    "mobile_and_desktop": true
+  }
+}
