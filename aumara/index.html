@@ -221,12 +221,18 @@ async function runTwin() {
   }
   const until = Date.now() + 4000;
   while (Date.now() < until) { if (tileset && tileset.tilesLoaded) break; await new Promise((r) => setTimeout(r, 200)); }
-  const originProbe = C.Cartographic.fromDegrees(lon, lat);
-  let originH = refMsl;
-  try {
-    const sampled = await viewer.scene.sampleHeightMostDetailed([originProbe]);
-    if (sampled[0] && isFinite(sampled[0].height)) originH = sampled[0].height;
-  } catch (e) {}
+  let originH = 0;
+  if (tilesOn) {
+    try {
+      const originProbe = C.Cartographic.fromDegrees(lon, lat);
+      const sampled = await viewer.scene.sampleHeightMostDetailed([originProbe]);
+      if (sampled[0] && isFinite(sampled[0].height) && sampled[0].height > -50 && sampled[0].height < 500) {
+        originH = sampled[0].height;
+      } else originH = refMsl;
+    } catch (e) { originH = refMsl; }
+  } else {
+    viewer.scene.globe.show = false;
+  }
   const origin = C.Cartesian3.fromDegrees(lon, lat, originH);
   const glb = await C.Model.fromGltfAsync({
     url: "./world/aumara-site-v2.glb",
