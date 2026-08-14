@@ -1,0 +1,24 @@
+{
+  "schema": "aumara.source-manifest",
+  "version": "2.1.0",
+  "twin": "aumara/world/aumara-site.glb",
+  "generator": "aumara-geodesic-v2",
+  "georeference": "aumara/AUMARA_WORLD_GEOREFERENCE_v1.json",
+  "control_plane": "aumara/AUMARA_CONTROL_PLANE.md",
+  "registry": "aumara/world/AUMARA_SOURCE_REGISTRY.json",
+  "used": {
+    "plans": "240307_9-PLANOS_Glamping.pdf · Domo Ø7 h=4.86 · Domo Ø9 h=5.50",
+    "terrain": "PNOA 25cm + heightmap.json",
+    "path": "flight-path.json + path_day_v1.jpg",
+    "houses": {
+      "A": "PHOTOS AUMARA 1B6A8852 Ø7",
+      "B": "PHOTOS AUMARA 1B6A9875 Ø9",
+      "C": "PHOTOS AUMARA 1B6A8803 Ø7",
+      "D": "PHOTOS AUMARA 1B6A9866 Ø9",
+      "E": "PHOTOS AUMARA 1B6A8857 Ø7",
+      "F": "Katia/private-6 exterior Ø7"
+    }
+  },
+  "placement": "ENU east/north from GEOREFERENCE_v1 localMetres, 1U=1m",
+  "clampAgl": false
+}

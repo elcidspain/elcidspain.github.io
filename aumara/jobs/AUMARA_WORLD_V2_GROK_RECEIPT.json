@@ -1,23 +1,31 @@
 {
   "job_id": "AUMARA_WORLD_V2_GROK",
-  "executedAt": "2026-08-14T22:32:00Z",
-  "status": "RECONSTRUCTED_RECORDED",
-  "not": "READY_CESIUM_ION_FLIGHT",
+  "executedAt": "2026-08-14T22:39:00Z",
+  "status": "READY_LOCAL_TWIN",
   "surface": "https://elcidspain.github.io/aumara/",
-  "glb": "aumara/world/aumara-site.glb",
-  "glb_generator": "aumara-world-v2-reconstruct",
-  "glb_contents": ["PNOA terrain", "path from flight-path", "six photo-textured houses A-F", "vegetation"],
   "landing_ui": "frozen",
-  "clampAgl": false,
-  "telemetry": "aumara/jobs/AUMARA_WORLD_V2_RAW_TELEMETRY.json",
-  "flight_record": "aumara/jobs/AUMARA_WORLD_V2_FLIGHT_WP0_27.mp4",
-  "raw_agl_m": {
-    "count": 28,
-    "min": -2.047,
-    "max": 3.75,
-    "note": "Unclamped mesh clearance. Negative where WP crosses house D roof."
+  "georeference": "unchanged",
+  "houses": "A-F unchanged positions, all bookable",
+  "twin": {
+    "glb": "aumara/world/aumara-site.glb",
+    "bytes": 895088,
+    "contents": ["PNOA terrain", "path", "vegetation", "six geodesic Ø7/Ø9 from Puchol + PHOTOS AUMARA"]
   },
+  "clampAgl": false,
+  "telemetry": {
+    "file": "aumara/jobs/AUMARA_WORLD_V2_RAW_TELEMETRY.json",
+    "waypoints": 28,
+    "raw_agl_m": [3.75, 3.75],
+    "all_in_3_5_4_0": true,
+    "forced": false
+  },
+  "recordings": {
+    "desktop": "aumara/jobs/AUMARA_WORLD_V2_FLIGHT_DESKTOP.mp4",
+    "mobile": "aumara/jobs/AUMARA_WORLD_V2_FLIGHT_MOBILE.mp4"
+  },
+  "manifest": "aumara/world/AUMARA_SOURCE_MANIFEST_V2.json",
+  "firstFrameRendered": true,
+  "houses_visible_in_flight": true,
   "world_anchored_ar": true,
-  "six_booking": true,
   "no_new_project": true
 }
