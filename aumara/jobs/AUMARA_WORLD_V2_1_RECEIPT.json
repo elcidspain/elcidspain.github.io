@@ -1,7 +1,7 @@
 {
   "job": "AUMARA_WORLD_V2_1_REALITY_GROK",
   "run_id": "v21-mstl1tax",
-  "commit_sha": "40d14813c76dcabd9b47c93b49bebe69644b1bd3",
+  "commit_sha": "e9b0d71c82303570c33271d90878c0b74f7df327",
   "localTwinStatus": "READY",
   "globalTilesStatus": "BLOCKED",
   "firstFrameRendered": true,
