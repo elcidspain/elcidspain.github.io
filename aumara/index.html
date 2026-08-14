@@ -235,7 +235,7 @@ async function runTwin() {
   }
   const origin = C.Cartesian3.fromDegrees(lon, lat, originH);
   const glb = await C.Model.fromGltfAsync({
-    url: "./world/aumara-site-v2.glb",
+    url: "./world/aumara-site-v2_1.glb",
     modelMatrix: C.Transforms.eastNorthUpToFixedFrame(origin),
     scale: 1.0, incrementallyLoadTextures: true, backFaceCulling: true,
   });
@@ -250,21 +250,26 @@ async function runTwin() {
     const en = lonLatToEn(lonX, latX, lon, lat);
     const dem = originH + sampleHM(hm, en.east, en.north);
     try {
-      const hgt = viewer.scene.sampleHeight(C.Cartographic.fromDegrees(lonX, latX), [glb]);
-      if (typeof hgt === "number" && isFinite(hgt) && Math.abs(hgt - dem) < 12) {
-        return { ground: hgt, source: "GOOGLE_TERRAIN" };
-      }
-    } catch (e) {}
-    try {
       const startP = C.Cartesian3.fromDegrees(lonX, latX, dem + 80);
       const nrm = C.Ellipsoid.WGS84.geodeticSurfaceNormal(startP, new C.Cartesian3());
       const down = C.Cartesian3.negate(nrm, new C.Cartesian3());
-      const hit = viewer.scene.pickFromRay(new C.Ray(startP, down), [glb]);
+      const hit = viewer.scene.pickFromRay(new C.Ray(startP, down));
       if (hit && hit.position) {
         const hh = C.Cartographic.fromCartesian(hit.position).height;
-        if (Math.abs(hh - dem) < 8) return { ground: hh, source: "LOCAL_TERRAIN_RAYCAST" };
+        const dh = hh - dem;
+        if (isFinite(hh) && dh > -1.2 && dh < 1.2) {
+          return { ground: hh, source: "LOCAL_TERRAIN_RAYCAST" };
+        }
       }
     } catch (e) {}
+    if (tilesOn) {
+      try {
+        const hgt = viewer.scene.sampleHeight(C.Cartographic.fromDegrees(lonX, latX), [glb]);
+        if (typeof hgt === "number" && isFinite(hgt) && Math.abs(hgt - dem) < 12) {
+          return { ground: hgt, source: "GOOGLE_TERRAIN" };
+        }
+      } catch (e) {}
+    }
     return { ground: dem, source: "LOCAL_DEM" };
   }
   function clearHouses(e, n) {
@@ -311,7 +316,7 @@ async function runTwin() {
   viewer.clock.shouldAnimate = true;
   let firstFrameRendered = false, maxWp = -1, lastHz = 0;
   const rawAgl = [];
-  window.__AUMARA = { firstFrameRendered: false, waypointReached: 0, twinLoaded: true, rawAgl, samples: [], consoleErrors: [] };
+  window.__AUMARA = { run_id: "v21-" + Date.now().toString(36), firstFrameRendered: false, waypointReached: 0, twinLoaded: true, rawAgl, samples: [], consoleErrors: [] };
   viewer.scene.postRender.addEventListener(() => {
     if (!firstFrameRendered) { firstFrameRendered = true; window.__AUMARA.firstFrameRendered = true; }
     const placed = [];

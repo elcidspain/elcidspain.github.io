@@ -1,26 +1,28 @@
 {
   "schema": "aumara.twin-source-manifest",
-  "asset": "aumara/world/aumara-site-v2.glb",
+  "asset": "aumara/world/aumara-site-v2_1.glb",
+  "version": "2.1.0",
   "georeference": "aumara/AUMARA_WORLD_GEOREFERENCE_v1.json",
   "control_plane": "aumara/AUMARA_CONTROL_PLANE.md",
   "registry": "aumara/world/AUMARA_SOURCE_REGISTRY.json",
+  "builder": "aumara/world/rebuild_twin_v21.py",
   "meshes": [
     {
       "id": "terrain",
       "role": "parcel_terrain",
       "source_file": "aumara/world/heightmap.json + public/aumara/twin/pnoa_25cm.jpg",
       "drive_id": null,
-      "method": "resampled heightmap grid, PNOA albedo",
+      "method": "verified local ENU heightmap grid, PNOA 25cm albedo",
       "classification": "derived",
       "confidence": 0.86
     },
     {
       "id": "path",
       "role": "path_network",
-      "source_file": "aumara/world/flight-path.json + public/aumara/site/path_day_v1.jpg",
-      "method": "ribbon along verified waypoints",
+      "source_file": "aumara/world/flight-path.json + public/aumara/site/path_day_v1.jpg + AUMARA_DAY_WALK gravel walk",
+      "method": "2.3 m ribbon along verified waypoints; DAY_WALK / path_day appearance",
       "classification": "derived",
-      "confidence": 0.8
+      "confidence": 0.82
     },
     {
       "id": "house_A",
@@ -29,9 +31,9 @@
       "drive_id": "1kqkrNee01qgdmwpMVnVZtZbiDLF8k9td",
       "plan": "Puchol 240307 Domo Ø7 h=4.86",
       "georef": "AUMARA_WORLD_GEOREFERENCE_v1 houses[A].localMetres",
-      "method": "geodesic frequency-2 hemisphere scaled to plan Ø7/4.86, photo albedo",
+      "method": "freq-2 geodesic canvas panels + timber edge frame + path-facing glass door/windows + timber deck/rail oriented to nearest waypoint; membrane albedo cropped from tent fabric only (not full-photo wrap)",
       "classification": "derived",
-      "confidence": 0.78
+      "confidence": 0.8
     },
     {
       "id": "house_B",
@@ -40,9 +42,9 @@
       "drive_id": "1psM9FIivd5bV32-Uf4pLRyIX4D6unVRD",
       "plan": "Puchol 240307 Domo Ø9 h=5.50",
       "georef": "AUMARA_WORLD_GEOREFERENCE_v1 houses[B].localMetres",
-      "method": "geodesic frequency-2 hemisphere scaled to plan Ø9/5.50, photo albedo",
+      "method": "freq-2 geodesic canvas + timber frame + path-facing door/windows + deck/rail; fabric crop from 1B6A9875",
       "classification": "derived",
-      "confidence": 0.78
+      "confidence": 0.8
     },
     {
       "id": "house_C",
@@ -51,9 +53,9 @@
       "drive_id": "1FxoqCE_VDf9t2rMXT0M3hvmIvE9eo3Um",
       "plan": "Puchol 240307 Domo Ø7 h=4.86",
       "georef": "AUMARA_WORLD_GEOREFERENCE_v1 houses[C].localMetres",
-      "method": "geodesic frequency-2 hemisphere scaled to plan Ø7/4.86, photo albedo",
+      "method": "freq-2 geodesic canvas + timber frame + path-facing door/windows + deck/rail; fabric crop from 1B6A8803",
       "classification": "derived",
-      "confidence": 0.78
+      "confidence": 0.8
     },
     {
       "id": "house_D",
@@ -62,9 +64,9 @@
       "drive_id": "1aHUq9vyjNMukIgJutvUylzOMhmcesmkO",
       "plan": "Puchol 240307 Domo Ø9 h=5.50",
       "georef": "AUMARA_WORLD_GEOREFERENCE_v1 houses[D].localMetres",
-      "method": "geodesic frequency-2 hemisphere scaled to plan Ø9/5.50, photo albedo",
+      "method": "freq-2 geodesic canvas + timber frame + path-facing door/windows + deck/rail; fabric crop from 1B6A9866",
       "classification": "derived",
-      "confidence": 0.78
+      "confidence": 0.8
     },
     {
       "id": "house_E",
@@ -73,9 +75,9 @@
       "drive_id": "1ySxA72RMAl8NDVVEKDOAaG0PC1co16RA",
       "plan": "Puchol 240307 Domo Ø7 h=4.86",
       "georef": "AUMARA_WORLD_GEOREFERENCE_v1 houses[E].localMetres",
-      "method": "geodesic frequency-2 hemisphere scaled to plan Ø7/4.86, photo albedo",
+      "method": "freq-2 geodesic canvas + timber frame + path-facing door/windows + deck/rail; fabric crop from 1B6A8857",
       "classification": "derived",
-      "confidence": 0.78
+      "confidence": 0.8
     },
     {
       "id": "house_F",
@@ -84,19 +86,35 @@
       "drive_id": "1IZnfpL_ohBC67-TqvVHA0nOZtM5BhqGu",
       "plan": "Puchol 240307 Domo Ø7 h=4.86",
       "georef": "AUMARA_WORLD_GEOREFERENCE_v1 houses[F].localMetres",
-      "method": "geodesic frequency-2 hemisphere scaled to plan Ø7/4.86, photo albedo",
+      "method": "freq-2 geodesic canvas + timber frame + path-facing door/windows + deck/rail; fabric crop from operator-residence exterior",
       "classification": "derived",
       "confidence": 0.7,
       "note": "F photo is operator residence exterior; interior DAY_WALK not baked into mesh"
     },
     {
       "id": "veg",
-      "role": "vegetation_volumes",
-      "source_file": "PHOTOS AUMARA + OUTDOOR_AR canopy volumes (schematic)",
-      "method": "cone volumes outside house clearances; not individual surveyed trees",
+      "role": "vegetation_canopy",
+      "source_file": "PHOTOS AUMARA pine/canopy volumes along DAY_WALK path (1B6A8852, 1B6A8803, 1B6A8857)",
+      "method": "trunk + layered umbrella canopies placed along path offsets matching outdoor photos; not a surveyed tree inventory",
+      "classification": "derived",
+      "confidence": 0.58
+    },
+    {
+      "id": "bark",
+      "role": "vegetation_trunks",
+      "source_file": "PHOTOS AUMARA trunk/bark crops",
+      "method": "cylinders under canopy volumes",
+      "classification": "derived",
+      "confidence": 0.55
+    },
+    {
+      "id": "veg_lod",
+      "role": "vegetation_distant_lod",
+      "source_file": null,
+      "method": "schematic cones at parcel edge only",
       "classification": "generated",
-      "confidence": 0.35,
-      "incomplete": "No surveyed tree inventory. Volumes are spatial-perception only."
+      "confidence": 0.3,
+      "incomplete": "Distant LOD only. Not surveyed trees."
     }
   ]
 }
