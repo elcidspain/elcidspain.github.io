@@ -123,6 +123,29 @@ function clampAgl(v) {
   if (!isFinite(n)) return 3.75;
   return Math.min(4, Math.max(3.5, n));
 }
+function lonLatToEn(lon, lat, oLon, oLat) {
+  const k = Math.cos(oLat * Math.PI / 180);
+  return {
+    east: (lon - oLon) * 111320 * k,
+    north: (lat - oLat) * 110540,
+  };
+}
+function sampleHM(hm, east, north) {
+  if (!hm) return 1.5;
+  const u = (east - hm.east0) / hm.cell;
+  const v = (north - hm.north0) / hm.cell;
+  const c0 = Math.floor(u);
+  const r0 = Math.floor(v);
+  const tx = u - c0;
+  const ty = v - r0;
+  function at(c, r) {
+    const cc = Math.max(0, Math.min(hm.cols - 1, c));
+    const rr = Math.max(0, Math.min(hm.rows - 1, r));
+    return hm.heights_m[rr * hm.cols + cc];
+  }
+  const h00 = at(c0, r0), h10 = at(c0 + 1, r0), h01 = at(c0, r0 + 1), h11 = at(c0 + 1, r0 + 1);
+  return h00 * (1 - tx) * (1 - ty) + h10 * tx * (1 - ty) + h01 * (1 - tx) * ty + h11 * tx * ty;
+}
 
 let started = false;
 document.getElementById("flight").onclick = () => startFlight();
@@ -158,9 +181,10 @@ async function runTwin(hud) {
   window.CESIUM_BASE_URL = "https://cesium.com/downloads/cesiumjs/releases/1.134/Build/Cesium/";
   if (window.AUMARA_ION) window.AUMARA_ION.apply(C);
 
-  const [geo, flight] = await Promise.all([
+  const [geo, flight, hm] = await Promise.all([
     fetch("./AUMARA_WORLD_GEOREFERENCE_v1.json").then(r => r.json()),
     fetch("./world/flight-path.json").then(r => r.json()),
+    fetch("./world/heightmap.json").then(r => r.json()),
   ]);
   const lon = geo.localOrigin.wgs84.longitude;
   const lat = geo.localOrigin.wgs84.latitude;
@@ -173,9 +197,7 @@ async function runTwin(hud) {
     geocoder: C.IonGeocodeProviderType.GOOGLE,
     homeButton: false, sceneModePicker: false, navigationHelpButton: false,
     fullscreenButton: false, infoBox: false, selectionIndicator: false,
-    baseLayer: false,
-    shadows: false,
-    msaaSamples: 1,
+    baseLayer: false, shadows: false, msaaSamples: 1,
     targetFrameRate: mobile ? 30 : 60,
   });
   viewer.scene.globe.show = false;
@@ -190,7 +212,6 @@ async function runTwin(hud) {
     tiles.maximumScreenSpaceError = mobile ? 24 : 12;
     tiles.dynamicScreenSpaceError = true;
     tiles.skipLevelOfDetail = true;
-    tiles.cullRequestsWhileMoving = true;
     tiles.enableCollision = true;
     if (tiles.cacheBytes !== undefined) tiles.cacheBytes = mobile ? 256 * 1024 * 1024 : 768 * 1024 * 1024;
   }
@@ -200,31 +221,25 @@ async function runTwin(hud) {
   try {
     tileset = await C.createGooglePhotorealistic3DTileset({
       onlyUsingWithGoogleGeocoder: true,
-    }, {
-      maximumScreenSpaceError: mobile ? 24 : 12,
-      skipLevelOfDetail: true,
-      enableCollision: true,
-    });
+    }, { maximumScreenSpaceError: mobile ? 24 : 12, skipLevelOfDetail: true, enableCollision: true });
     tuneTiles(tileset);
     viewer.scene.primitives.add(tileset);
     tilesOn = true;
-    hud.textContent = "Earth tiles · collision on";
+    hud.textContent = "Earth · heightmap physics";
   } catch (e) {
     try {
       tileset = await C.Cesium3DTileset.fromIonAssetId(
         (window.AUMARA_ION && window.AUMARA_ION.asset) || 2275207,
-        { maximumScreenSpaceError: mobile ? 24 : 12, skipLevelOfDetail: true, enableCollision: true }
+        { maximumScreenSpaceError: mobile ? 24 : 12, enableCollision: true }
       );
       tuneTiles(tileset);
       viewer.scene.primitives.add(tileset);
       tilesOn = true;
-      hud.textContent = "Ion 2275207 · collision on";
     } catch (e2) {
       const esri = await C.ArcGisMapServerImageryProvider.fromUrl(ESRI);
       viewer.imageryLayers.addImageryProvider(esri);
       viewer.scene.globe.show = true;
       viewer.terrainProvider = await C.createWorldTerrainAsync();
-      hud.textContent = "ESRI · collision globe";
     }
   }
 
@@ -252,14 +267,34 @@ async function runTwin(hud) {
   viewer.scene.primitives.add(glb);
   function hideGround(model) {
     ["terrain", "path"].forEach((name) => {
-      try {
-        const n = model.getNode(name);
-        if (n) n.show = false;
-      } catch (e) {}
+      try { const n = model.getNode(name); if (n) n.show = false; } catch (e) {}
     });
   }
   if (glb.ready) hideGround(glb);
   else if (glb.readyEvent) glb.readyEvent.addEventListener(() => hideGround(glb));
+
+  function groundAt(lonX, latX) {
+    const en = lonLatToEn(lonX, latX, lon, lat);
+    const local = sampleHM(hm, en.east, en.north);
+    let live = null;
+    try {
+      const h = viewer.scene.sampleHeight(C.Cartographic.fromDegrees(lonX, latX), [glb]);
+      if (typeof h === "number" && isFinite(h)) live = h;
+    } catch (e) {}
+    if (live == null) {
+      try {
+        const startP = C.Cartesian3.fromDegrees(lonX, latX, originH + 80);
+        const nrm = C.Ellipsoid.WGS84.geodeticSurfaceNormal(startP, new C.Cartesian3());
+        const down = C.Cartesian3.negate(nrm, new C.Cartesian3());
+        const hit = viewer.scene.pickFromRay(new C.Ray(startP, down), [glb]);
+        if (hit && hit.position) live = C.Cartographic.fromCartesian(hit.position).height;
+      } catch (e) {}
+    }
+    const baked = originH + local;
+    if (live == null) return baked;
+    if (Math.abs(live - baked) > 25) return baked;
+    return live * 0.65 + baked * 0.35;
+  }
 
   const start = C.JulianDate.now();
   const intro = 2;
@@ -272,9 +307,7 @@ async function runTwin(hud) {
   pos.addSample(start, C.Cartesian3.fromDegrees(lon, lat, originH + 40));
   wps.forEach((wp, i) => {
     const t = C.JulianDate.addSeconds(start, intro + (i / (wps.length - 1)) * dur, new C.JulianDate());
-    pos.addSample(t, C.Cartesian3.fromDegrees(
-      wp.wgs84.longitude, wp.wgs84.latitude, originH + clampAgl(wp.target_agl_m)
-    ));
+    pos.addSample(t, C.Cartesian3.fromDegrees(wp.wgs84.longitude, wp.wgs84.latitude, originH + 4));
   });
   viewer.clock.startTime = start.clone();
   viewer.clock.stopTime = C.JulianDate.addSeconds(start, intro + dur, new C.JulianDate());
@@ -282,20 +315,9 @@ async function runTwin(hud) {
   viewer.clock.clockRange = C.ClockRange.LOOP_STOP;
   viewer.clock.shouldAnimate = true;
 
-  function liveGround(carto) {
-    try {
-      const h = viewer.scene.sampleHeight(carto, [glb]);
-      if (typeof h === "number" && isFinite(h)) return h;
-    } catch (e) {}
-    try {
-      const startP = C.Cartesian3.fromRadians(carto.longitude, carto.latitude, refMsl + 150);
-      const nrm = C.Ellipsoid.WGS84.geodeticSurfaceNormal(startP, new C.Cartesian3());
-      const down = C.Cartesian3.negate(nrm, new C.Cartesian3());
-      const hit = viewer.scene.pickFromRay(new C.Ray(startP, down), [glb]);
-      if (hit && hit.position) return C.Cartographic.fromCartesian(hit.position).height;
-    } catch (e) {}
-    return originH;
-  }
+  let py = originH + 40;
+  let pvy = 0;
+  let lastT = start.clone();
 
   viewer.clock.onTick.addEventListener(() => {
     const p = pos.getValue(viewer.clock.currentTime);
@@ -310,14 +332,24 @@ async function runTwin(hud) {
     );
     const carto = C.Cartographic.fromCartesian(p);
     const elapsed = C.JulianDate.secondsDifference(viewer.clock.currentTime, start);
+    const dt = Math.max(0.008, Math.min(0.05, C.JulianDate.secondsDifference(viewer.clock.currentTime, lastT)));
+    lastT = viewer.clock.currentTime.clone();
     const wp = elapsed < intro ? 0 : Math.min(27, Math.round(((elapsed - intro) / dur) * 27));
     const targetAgl = elapsed < intro
       ? 40 - (40 - 3.75) * Math.min(1, elapsed / intro)
       : clampAgl(wps[wp].target_agl_m);
-    const ground = liveGround(carto);
-    const clamped = C.Cartesian3.fromRadians(carto.longitude, carto.latitude, ground + targetAgl);
+    const ground = groundAt(carto.longitude * 180 / Math.PI, carto.latitude * 180 / Math.PI);
+    const desired = ground + targetAgl;
+    const floor = ground + (elapsed < intro ? targetAgl : 3.5);
+    const ceil = ground + (elapsed < intro ? Math.max(targetAgl, 4) : 4.0);
+    const acc = (desired - py) * 22 - pvy * 9;
+    pvy += acc * dt;
+    py += pvy * dt;
+    if (py < floor) { py = floor; pvy = Math.max(0, pvy); }
+    if (py > ceil) { py = ceil; pvy = Math.min(0, pvy); }
+    const clamped = C.Cartesian3.fromRadians(carto.longitude, carto.latitude, py);
     viewer.camera.setView({ destination: clamped, orientation: { direction: look, up } });
-    hud.textContent = "AUMARA  WP " + wp + "/27  AGL " + targetAgl.toFixed(2) + " m  " + (tilesOn ? "ION" : "ESRI") + "  GLB";
+    hud.textContent = "AUMARA  WP " + wp + "/27  AGL " + (py - ground).toFixed(2) + " m  HM  " + (tilesOn ? "ION" : "ESRI");
   });
 }
 </script>
