@@ -1,0 +1,102 @@
+{
+  "schema": "aumara.twin-source-manifest",
+  "asset": "aumara/world/aumara-site-v2.glb",
+  "georeference": "aumara/AUMARA_WORLD_GEOREFERENCE_v1.json",
+  "control_plane": "aumara/AUMARA_CONTROL_PLANE.md",
+  "registry": "aumara/world/AUMARA_SOURCE_REGISTRY.json",
+  "meshes": [
+    {
+      "id": "terrain",
+      "role": "parcel_terrain",
+      "source_file": "aumara/world/heightmap.json + public/aumara/twin/pnoa_25cm.jpg",
+      "drive_id": null,
+      "method": "resampled heightmap grid, PNOA albedo",
+      "classification": "derived",
+      "confidence": 0.86
+    },
+    {
+      "id": "path",
+      "role": "path_network",
+      "source_file": "aumara/world/flight-path.json + public/aumara/site/path_day_v1.jpg",
+      "method": "ribbon along verified waypoints",
+      "classification": "derived",
+      "confidence": 0.8
+    },
+    {
+      "id": "house_A",
+      "house": "A",
+      "source_file": "PHOTOS AUMARA/1B6A8852.JPEG",
+      "drive_id": "1kqkrNee01qgdmwpMVnVZtZbiDLF8k9td",
+      "plan": "Puchol 240307 Domo Ø7 h=4.86",
+      "georef": "AUMARA_WORLD_GEOREFERENCE_v1 houses[A].localMetres",
+      "method": "geodesic frequency-2 hemisphere scaled to plan Ø7/4.86, photo albedo",
+      "classification": "derived",
+      "confidence": 0.78
+    },
+    {
+      "id": "house_B",
+      "house": "B",
+      "source_file": "PHOTOS AUMARA/1B6A9875.JPEG",
+      "drive_id": "1psM9FIivd5bV32-Uf4pLRyIX4D6unVRD",
+      "plan": "Puchol 240307 Domo Ø9 h=5.50",
+      "georef": "AUMARA_WORLD_GEOREFERENCE_v1 houses[B].localMetres",
+      "method": "geodesic frequency-2 hemisphere scaled to plan Ø9/5.50, photo albedo",
+      "classification": "derived",
+      "confidence": 0.78
+    },
+    {
+      "id": "house_C",
+      "house": "C",
+      "source_file": "PHOTOS AUMARA/1B6A8803.JPEG",
+      "drive_id": "1FxoqCE_VDf9t2rMXT0M3hvmIvE9eo3Um",
+      "plan": "Puchol 240307 Domo Ø7 h=4.86",
+      "georef": "AUMARA_WORLD_GEOREFERENCE_v1 houses[C].localMetres",
+      "method": "geodesic frequency-2 hemisphere scaled to plan Ø7/4.86, photo albedo",
+      "classification": "derived",
+      "confidence": 0.78
+    },
+    {
+      "id": "house_D",
+      "house": "D",
+      "source_file": "PHOTOS AUMARA/1B6A9866.JPEG",
+      "drive_id": "1aHUq9vyjNMukIgJutvUylzOMhmcesmkO",
+      "plan": "Puchol 240307 Domo Ø9 h=5.50",
+      "georef": "AUMARA_WORLD_GEOREFERENCE_v1 houses[D].localMetres",
+      "method": "geodesic frequency-2 hemisphere scaled to plan Ø9/5.50, photo albedo",
+      "classification": "derived",
+      "confidence": 0.78
+    },
+    {
+      "id": "house_E",
+      "house": "E",
+      "source_file": "PHOTOS AUMARA/1B6A8857.JPEG",
+      "drive_id": "1ySxA72RMAl8NDVVEKDOAaG0PC1co16RA",
+      "plan": "Puchol 240307 Domo Ø7 h=4.86",
+      "georef": "AUMARA_WORLD_GEOREFERENCE_v1 houses[E].localMetres",
+      "method": "geodesic frequency-2 hemisphere scaled to plan Ø7/4.86, photo albedo",
+      "classification": "derived",
+      "confidence": 0.78
+    },
+    {
+      "id": "house_F",
+      "house": "F",
+      "source_file": "Katia/private-6 exterior.jpg",
+      "drive_id": "1IZnfpL_ohBC67-TqvVHA0nOZtM5BhqGu",
+      "plan": "Puchol 240307 Domo Ø7 h=4.86",
+      "georef": "AUMARA_WORLD_GEOREFERENCE_v1 houses[F].localMetres",
+      "method": "geodesic frequency-2 hemisphere scaled to plan Ø7/4.86, photo albedo",
+      "classification": "derived",
+      "confidence": 0.7,
+      "note": "F photo is operator residence exterior; interior DAY_WALK not baked into mesh"
+    },
+    {
+      "id": "veg",
+      "role": "vegetation_volumes",
+      "source_file": "PHOTOS AUMARA + OUTDOOR_AR canopy volumes (schematic)",
+      "method": "cone volumes outside house clearances; not individual surveyed trees",
+      "classification": "generated",
+      "confidence": 0.35,
+      "incomplete": "No surveyed tree inventory. Volumes are spatial-perception only."
+    }
+  ]
+}

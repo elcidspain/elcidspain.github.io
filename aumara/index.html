@@ -183,8 +183,7 @@ async function runTwin() {
   const mobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
   const viewer = new C.Viewer("c", {
     animation: false, timeline: false, baseLayerPicker: false,
-    geocoder: C.IonGeocodeProviderType.GOOGLE,
-    homeButton: false, sceneModePicker: false, navigationHelpButton: false,
+    geocoder: false, homeButton: false, sceneModePicker: false, navigationHelpButton: false,
     fullscreenButton: false, infoBox: false, selectionIndicator: false,
     baseLayer: false, shadows: false, msaaSamples: 1, targetFrameRate: mobile ? 30 : 60,
   });
@@ -211,10 +210,13 @@ async function runTwin() {
         { maximumScreenSpaceError: mobile ? 24 : 12, enableCollision: true });
       tuneTiles(tileset); viewer.scene.primitives.add(tileset); tilesOn = true;
     } catch (e2) {
-      const esri = await C.ArcGisMapServerImageryProvider.fromUrl(ESRI);
-      viewer.imageryLayers.addImageryProvider(esri);
-      viewer.scene.globe.show = true;
-      viewer.terrainProvider = await C.createWorldTerrainAsync();
+      try {
+        const esri = await C.ArcGisMapServerImageryProvider.fromUrl(ESRI);
+        viewer.imageryLayers.addImageryProvider(esri);
+        viewer.scene.globe.show = true;
+      } catch (e3) {
+        viewer.scene.globe.show = false;
+      }
     }
   }
   const until = Date.now() + 4000;
@@ -227,7 +229,7 @@ async function runTwin() {
   } catch (e) {}
   const origin = C.Cartesian3.fromDegrees(lon, lat, originH);
   const glb = await C.Model.fromGltfAsync({
-    url: "./world/aumara-site.glb",
+    url: "./world/aumara-site-v2.glb",
     modelMatrix: C.Transforms.eastNorthUpToFixedFrame(origin),
     scale: 1.0, incrementallyLoadTextures: true, backFaceCulling: true,
   });
@@ -238,24 +240,45 @@ async function runTwin() {
     el.onclick = () => openSheet(h); overlay.appendChild(el);
     return { h, el };
   });
-  function groundMesh(lonX, latX, camH) {
+  function groundSample(lonX, latX) {
     const en = lonLatToEn(lonX, latX, lon, lat);
-    const terrain = originH + sampleHM(hm, en.east, en.north);
+    const dem = originH + sampleHM(hm, en.east, en.north);
     try {
       const hgt = viewer.scene.sampleHeight(C.Cartographic.fromDegrees(lonX, latX), [glb]);
-      if (typeof hgt === "number" && isFinite(hgt) && Math.abs(hgt - terrain) < 8) return hgt;
+      if (typeof hgt === "number" && isFinite(hgt) && Math.abs(hgt - dem) < 12) {
+        return { ground: hgt, source: "GOOGLE_TERRAIN" };
+      }
     } catch (e) {}
     try {
-      const startP = C.Cartesian3.fromDegrees(lonX, latX, camH + 60);
+      const startP = C.Cartesian3.fromDegrees(lonX, latX, dem + 80);
       const nrm = C.Ellipsoid.WGS84.geodeticSurfaceNormal(startP, new C.Cartesian3());
       const down = C.Cartesian3.negate(nrm, new C.Cartesian3());
       const hit = viewer.scene.pickFromRay(new C.Ray(startP, down), [glb]);
       if (hit && hit.position) {
         const hh = C.Cartographic.fromCartesian(hit.position).height;
-        if (Math.abs(hh - terrain) < 8) return hh;
+        if (Math.abs(hh - dem) < 8) return { ground: hh, source: "LOCAL_TERRAIN_RAYCAST" };
       }
     } catch (e) {}
-    return terrain;
+    return { ground: dem, source: "LOCAL_DEM" };
+  }
+  function clearHouses(e, n) {
+    let ee = e, nn = n;
+    geo.houses.forEach((h) => {
+      const he = h.localMetres.east, hn = h.localMetres.north;
+      const need = h.diameterMetres / 2 + 1.4;
+      const dx = ee - he, dy = nn - hn;
+      const d = Math.hypot(dx, dy) || 0.001;
+      if (d < need) {
+        const k = need / d;
+        ee = he + dx * k;
+        nn = hn + dy * k;
+      }
+    });
+    return { east: ee, north: nn };
+  }
+  function enToLonLat(east, north) {
+    const k = Math.cos(lat * Math.PI / 180);
+    return { lon: lon + east / (111320 * k), lat: lat + north / 110540 };
   }
   const start = C.JulianDate.now();
   const intro = 2;
@@ -263,26 +286,40 @@ async function runTwin() {
   const pos = new C.SampledPositionProperty();
   pos.setInterpolationOptions({ interpolationDegree: 2, interpolationAlgorithm: C.HermitePolynomialApproximation });
   pos.addSample(start, C.Cartesian3.fromDegrees(lon, lat, originH + 40));
-  wps.forEach((wp, i) => {
-    const t = C.JulianDate.addSeconds(start, intro + (i / (wps.length - 1)) * dur, new C.JulianDate());
-    const en = lonLatToEn(wp.wgs84.longitude, wp.wgs84.latitude, lon, lat);
-    pos.addSample(t, C.Cartesian3.fromDegrees(wp.wgs84.longitude, wp.wgs84.latitude, originH + sampleHM(hm, en.east, en.north) + 3.75));
-  });
+  const dense = 80;
+  for (let s = 0; s < dense; s++) {
+    const u = s / (dense - 1);
+    const i = Math.min(wps.length - 2, Math.floor(u * (wps.length - 1)));
+    const f = u * (wps.length - 1) - i;
+    const a = wps[i].local, b = wps[i + 1].local;
+    const cleared = clearHouses(a.east + (b.east - a.east) * f, a.north + (b.north - a.north) * f);
+    const ll = enToLonLat(cleared.east, cleared.north);
+    const g = sampleHM(hm, cleared.east, cleared.north);
+    const t = C.JulianDate.addSeconds(start, intro + u * dur, new C.JulianDate());
+    pos.addSample(t, C.Cartesian3.fromDegrees(ll.lon, ll.lat, originH + g + 3.75));
+  }
   viewer.clock.startTime = start.clone();
   viewer.clock.stopTime = C.JulianDate.addSeconds(start, intro + dur, new C.JulianDate());
   viewer.clock.currentTime = start.clone();
   viewer.clock.clockRange = C.ClockRange.CLAMPED;
   viewer.clock.shouldAnimate = true;
-  let firstFrameRendered = false, maxWp = -1;
+  let firstFrameRendered = false, maxWp = -1, lastHz = 0;
   const rawAgl = [];
-  window.__AUMARA = { firstFrameRendered: false, waypointReached: 0, rawAgl, samples: [] };
+  window.__AUMARA = { firstFrameRendered: false, waypointReached: 0, twinLoaded: true, rawAgl, samples: [], consoleErrors: [] };
   viewer.scene.postRender.addEventListener(() => {
     if (!firstFrameRendered) { firstFrameRendered = true; window.__AUMARA.firstFrameRendered = true; }
+    const placed = [];
     arNodes.forEach(({ h, el }) => {
       const p = C.Cartesian3.fromDegrees(h.wgs84.longitude, h.wgs84.latitude, originH + 5.4);
       const win = C.SceneTransforms.worldToWindowCoordinates(viewer.scene, p);
       if (!win) { el.style.display = "none"; return; }
-      el.style.display = "block"; el.style.left = win.x + "px"; el.style.top = win.y + "px";
+      placed.push({ el, win, dist: C.Cartesian3.distance(viewer.camera.position, p) });
+    });
+    placed.sort((a, b) => a.dist - b.dist);
+    placed.forEach((a, i) => {
+      const clash = placed.slice(0, i).some((b) => Math.hypot(a.win.x - b.win.x, a.win.y - b.win.y) < 36);
+      a.el.style.display = clash ? "none" : "block";
+      if (!clash) { a.el.style.left = a.win.x + "px"; a.el.style.top = a.win.y + "px"; }
     });
   });
   viewer.clock.onTick.addEventListener(() => {
@@ -297,16 +334,21 @@ async function runTwin() {
     viewer.camera.setView({ destination: p, orientation: { direction: look, up } });
     const carto = C.Cartographic.fromCartesian(p);
     const lonX = carto.longitude * 180 / Math.PI, latX = carto.latitude * 180 / Math.PI;
-    const meshH = groundMesh(lonX, latX, carto.height);
-    const raw = carto.height - meshH;
     const elapsed = C.JulianDate.secondsDifference(viewer.clock.currentTime, start);
     const wp = elapsed < intro ? 0 : Math.min(27, Math.round(((elapsed - intro) / dur) * 27));
-    if (wp > maxWp) {
-      maxWp = wp; rawAgl.push(raw);
-      window.__AUMARA.samples.push({ i: wp, raw_agl_m: raw, camera_h: carto.height, mesh_h: meshH, lon: lonX, lat: latX });
-      window.__AUMARA.waypointReached = wp;
+    if (wp > maxWp) { maxWp = wp; window.__AUMARA.waypointReached = wp; }
+    if (elapsed - lastHz >= 0.1) {
+      lastHz = elapsed;
+      const gs = groundSample(lonX, latX);
+      const raw = carto.height - gs.ground;
+      rawAgl.push(raw);
+      window.__AUMARA.samples.push({
+        timestamp: Date.now(), waypoint: wp,
+        camera_msl: carto.height, sampled_ground_msl: gs.ground,
+        raw_agl_m: raw, ground_source: gs.source
+      });
     }
-    if (DEBUG) hud.textContent = "AUMARA  WP " + wp + "/27  RAW " + raw.toFixed(3) + " m  " + (firstFrameRendered ? "FRAME" : "…") + "  " + (tilesOn ? "ION" : "ESRI");
+    if (DEBUG) hud.textContent = "AUMARA  WP " + wp + "/27  RAW " + (rawAgl[rawAgl.length - 1] || 0).toFixed(3) + " m  " + (firstFrameRendered ? "FRAME" : "…") + "  " + (tilesOn ? "ION" : "LOCAL");
   });
 }
 </script>
