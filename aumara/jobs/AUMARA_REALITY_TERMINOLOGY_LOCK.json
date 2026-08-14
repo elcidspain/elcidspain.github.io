@@ -1,0 +1,23 @@
+{
+  "status": "ACTIVE_OVERRIDE",
+  "scope": "AUMARA_WORLD_V2_1 and all reconstruction jobs",
+  "terminology": {
+    "canonical": ["geodesic house", "geodesic dome", "AUMARA house", "Casa A-F"],
+    "forbidden_as_product_truth": ["tent", "tents", "glamping tent", "timber frame", "glass door", "glass doors"]
+  },
+  "source_claim_rule": "No architectural feature, material, opening, facade element, deck, door, window, frame, glazing, canopy, vegetation species or construction detail may be asserted or modeled as truth unless it is supported by an explicit source reference for that exact house/region.",
+  "required_provenance_for_each_feature": [
+    "source file or Drive ID",
+    "house A-F or parcel region",
+    "visible/plan evidence",
+    "confidence",
+    "classification: observed|plan-derived|generated-completion"
+  ],
+  "generated_completion_rule": "Generated completion may fill unseen geometry only when labeled generated-completion in AUMARA_TWIN_SOURCE_MANIFEST.json. It must not be described as existing reality.",
+  "current_correction": {
+    "statement": "Houses are geodesic tents with timber frames, decks, and glass doors.",
+    "verdict": "REJECTED_UNSUPPORTED",
+    "reason": "The current manifest supports plan-true geodesic dome/house geometry and source photos. It does not establish those material/door claims for all houses."
+  },
+  "execution": "Before building V2.1, read this lock. Use source-backed geometry only. If a detail is not evidenced, omit it or mark it generated-completion; never silently invent it."
+}
