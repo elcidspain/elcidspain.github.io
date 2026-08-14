@@ -118,6 +118,11 @@ function loadCss(href) {
   const l = document.createElement("link");
   l.rel = "stylesheet"; l.href = href; document.head.appendChild(l);
 }
+function clampAgl(v) {
+  const n = Number(v);
+  if (!isFinite(n)) return 3.75;
+  return Math.min(4, Math.max(3.5, n));
+}
 
 let started = false;
 document.getElementById("flight").onclick = () => startFlight();
@@ -146,12 +151,6 @@ async function startFlight() {
   } catch (e) {
     hud.textContent = String(e && e.message ? e.message : e);
   }
-}
-
-function clampAgl(v) {
-  const n = Number(v);
-  if (!isFinite(n)) return 3.75;
-  return Math.min(4, Math.max(3.5, n));
 }
 
 async function runTwin(hud) {
@@ -185,16 +184,14 @@ async function runTwin(hud) {
   viewer.scene.fxaa = false;
   viewer.resolutionScale = mobile ? 0.7 : 1;
   viewer.scene.light = new C.SunLight({ intensity: 1.4 });
-  viewer.camera.setView({
-    destination: C.Cartesian3.fromDegrees(lon, lat, refMsl + 600),
-  });
+  viewer.camera.setView({ destination: C.Cartesian3.fromDegrees(lon, lat, refMsl + 80) });
 
   function tuneTiles(tiles) {
     tiles.maximumScreenSpaceError = mobile ? 24 : 12;
     tiles.dynamicScreenSpaceError = true;
     tiles.skipLevelOfDetail = true;
     tiles.cullRequestsWhileMoving = true;
-    tiles.preloadWhenHidden = false;
+    tiles.enableCollision = true;
     if (tiles.cacheBytes !== undefined) tiles.cacheBytes = mobile ? 256 * 1024 * 1024 : 768 * 1024 * 1024;
   }
 
@@ -206,48 +203,43 @@ async function runTwin(hud) {
     }, {
       maximumScreenSpaceError: mobile ? 24 : 12,
       skipLevelOfDetail: true,
-      enableCollision: false,
+      enableCollision: true,
     });
     tuneTiles(tileset);
     viewer.scene.primitives.add(tileset);
     tilesOn = true;
-    hud.textContent = "Earth tiles · sampling ground…";
+    hud.textContent = "Earth tiles · collision on";
   } catch (e) {
     try {
       tileset = await C.Cesium3DTileset.fromIonAssetId(
         (window.AUMARA_ION && window.AUMARA_ION.asset) || 2275207,
-        { maximumScreenSpaceError: mobile ? 24 : 12, skipLevelOfDetail: true }
+        { maximumScreenSpaceError: mobile ? 24 : 12, skipLevelOfDetail: true, enableCollision: true }
       );
       tuneTiles(tileset);
       viewer.scene.primitives.add(tileset);
       tilesOn = true;
-      hud.textContent = "Ion 2275207 · sampling ground…";
+      hud.textContent = "Ion 2275207 · collision on";
     } catch (e2) {
       const esri = await C.ArcGisMapServerImageryProvider.fromUrl(ESRI);
       viewer.imageryLayers.addImageryProvider(esri);
       viewer.scene.globe.show = true;
       viewer.terrainProvider = await C.createWorldTerrainAsync();
-      hud.textContent = "ESRI · sampling ground…";
+      hud.textContent = "ESRI · collision globe";
     }
   }
 
-  const until = Date.now() + 5000;
+  const until = Date.now() + 4000;
   while (Date.now() < until) {
     if (tileset && tileset.tilesLoaded) break;
     await new Promise((r) => setTimeout(r, 200));
   }
 
-  const cartos = [C.Cartographic.fromDegrees(lon, lat)].concat(
-    wps.map((wp) => C.Cartographic.fromDegrees(wp.wgs84.longitude, wp.wgs84.latitude))
-  );
-  let heights = cartos.map(() => refMsl);
+  const originProbe = C.Cartographic.fromDegrees(lon, lat);
+  let originH = refMsl;
   try {
-    const sampled = await viewer.scene.sampleHeightMostDetailed(cartos);
-    heights = sampled.map((c) =>
-      c && typeof c.height === "number" && isFinite(c.height) ? c.height : refMsl
-    );
+    const sampled = await viewer.scene.sampleHeightMostDetailed([originProbe]);
+    if (sampled[0] && isFinite(sampled[0].height)) originH = sampled[0].height;
   } catch (e) {}
-  const originH = heights[0];
 
   const origin = C.Cartesian3.fromDegrees(lon, lat, originH);
   const glb = await C.Model.fromGltfAsync({
@@ -280,15 +272,30 @@ async function runTwin(hud) {
   pos.addSample(start, C.Cartesian3.fromDegrees(lon, lat, originH + 40));
   wps.forEach((wp, i) => {
     const t = C.JulianDate.addSeconds(start, intro + (i / (wps.length - 1)) * dur, new C.JulianDate());
-    const ground = heights[i + 1];
-    const agl = clampAgl(wp.target_agl_m);
-    pos.addSample(t, C.Cartesian3.fromDegrees(wp.wgs84.longitude, wp.wgs84.latitude, ground + agl));
+    pos.addSample(t, C.Cartesian3.fromDegrees(
+      wp.wgs84.longitude, wp.wgs84.latitude, originH + clampAgl(wp.target_agl_m)
+    ));
   });
   viewer.clock.startTime = start.clone();
   viewer.clock.stopTime = C.JulianDate.addSeconds(start, intro + dur, new C.JulianDate());
   viewer.clock.currentTime = start.clone();
   viewer.clock.clockRange = C.ClockRange.LOOP_STOP;
   viewer.clock.shouldAnimate = true;
+
+  function liveGround(carto) {
+    try {
+      const h = viewer.scene.sampleHeight(carto, [glb]);
+      if (typeof h === "number" && isFinite(h)) return h;
+    } catch (e) {}
+    try {
+      const startP = C.Cartesian3.fromRadians(carto.longitude, carto.latitude, refMsl + 150);
+      const nrm = C.Ellipsoid.WGS84.geodeticSurfaceNormal(startP, new C.Cartesian3());
+      const down = C.Cartesian3.negate(nrm, new C.Cartesian3());
+      const hit = viewer.scene.pickFromRay(new C.Ray(startP, down), [glb]);
+      if (hit && hit.position) return C.Cartographic.fromCartesian(hit.position).height;
+    } catch (e) {}
+    return originH;
+  }
 
   viewer.clock.onTick.addEventListener(() => {
     const p = pos.getValue(viewer.clock.currentTime);
@@ -301,13 +308,16 @@ async function runTwin(hud) {
     const look = C.Matrix3.multiplyByVector(
       C.Matrix3.fromQuaternion(C.Quaternion.fromAxisAngle(right, -0.38)), dir, new C.Cartesian3()
     );
-    viewer.camera.setView({ destination: p, orientation: { direction: look, up } });
     const carto = C.Cartographic.fromCartesian(p);
     const elapsed = C.JulianDate.secondsDifference(viewer.clock.currentTime, start);
     const wp = elapsed < intro ? 0 : Math.min(27, Math.round(((elapsed - intro) / dur) * 27));
-    const ground = elapsed < intro ? originH : heights[wp + 1];
-    const agl = carto.height - ground;
-    hud.textContent = "AUMARA  WP " + wp + "/27  AGL " + agl.toFixed(2) + " m  " + (tilesOn ? "ION" : "ESRI") + "  GLB";
+    const targetAgl = elapsed < intro
+      ? 40 - (40 - 3.75) * Math.min(1, elapsed / intro)
+      : clampAgl(wps[wp].target_agl_m);
+    const ground = liveGround(carto);
+    const clamped = C.Cartesian3.fromRadians(carto.longitude, carto.latitude, ground + targetAgl);
+    viewer.camera.setView({ destination: clamped, orientation: { direction: look, up } });
+    hud.textContent = "AUMARA  WP " + wp + "/27  AGL " + targetAgl.toFixed(2) + " m  " + (tilesOn ? "ION" : "ESRI") + "  GLB";
   });
 }
 </script>
