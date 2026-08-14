@@ -57,6 +57,7 @@
   <div class="row" style="margin-top:18px">
     <a class="btn gold" href="https://www.booking.com/hotel/es/aumara.es.html" target="_blank" rel="noreferrer">Booking</a>
     <button class="btn ghost" id="flight" type="button">3D tour / FLIGHT</button>
+    <button class="btn ghost" id="ionbtn" type="button">Ion</button>
   </div>
 </section>
 <section class="grid" id="houses"></section>
@@ -71,6 +72,7 @@
   <div id="hud">Earth…</div>
   <button class="btn gold" id="close" type="button">Cerrar</button>
 </div>
+<script src="./ion.js"></script>
 <script>
 const PHOTO = {
   A: "https://lh3.googleusercontent.com/d/1rDKUNOQxzJcxoGXy2eRQ5bKJedoOuaxI=w1600",
@@ -81,8 +83,8 @@ const PHOTO = {
   F: "https://lh3.googleusercontent.com/d/1Dx3SLonThui5jca3C9fadr9RrboaBGdJ=w1600",
 };
 const BOOK = "https://www.booking.com/hotel/es/aumara.es.html";
-const CESIUM_JS = "https://cesium.com/downloads/cesiumjs/releases/1.125/Build/Cesium/Cesium.js";
-const CESIUM_CSS = "https://cesium.com/downloads/cesiumjs/releases/1.125/Build/Cesium/Widgets/widgets.css";
+const CESIUM_JS = "https://cesium.com/downloads/cesiumjs/releases/1.134/Build/Cesium/Cesium.js";
+const CESIUM_CSS = "https://cesium.com/downloads/cesiumjs/releases/1.134/Build/Cesium/Widgets/widgets.css";
 const ESRI = "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer";
 
 const housesEl = document.getElementById("houses");
@@ -120,6 +122,14 @@ function loadCss(href) {
 let started = false;
 document.getElementById("flight").onclick = () => startFlight();
 document.getElementById("close").onclick = () => document.getElementById("stage").classList.remove("on");
+document.getElementById("ionbtn").onclick = () => {
+  const cur = (window.AUMARA_ION && window.AUMARA_ION.resolve()) || "";
+  const next = prompt("Cesium ion token", cur || "");
+  if (next) {
+    try { localStorage.setItem("CESIUM_ION_TOKEN", next.trim()); } catch (e) {}
+    alert("Ion saved for this browser. Open FLIGHT.");
+  }
+};
 if (location.hash === "#flight") startFlight();
 
 async function startFlight() {
@@ -140,12 +150,9 @@ async function startFlight() {
 
 async function runTwin(hud) {
   const C = window.Cesium;
-  window.CESIUM_BASE_URL = "https://cesium.com/downloads/cesiumjs/releases/1.125/Build/Cesium/";
-  const ion = new URLSearchParams(location.search).get("ion") || localStorage.getItem("CESIUM_ION_TOKEN");
-  if (ion) {
-    C.Ion.defaultAccessToken = ion;
-    localStorage.setItem("CESIUM_ION_TOKEN", ion);
-  }
+  window.CESIUM_BASE_URL = "https://cesium.com/downloads/cesiumjs/releases/1.134/Build/Cesium/";
+  const ionReady = window.AUMARA_ION ? window.AUMARA_ION.apply(C) : false;
+  hud.textContent = ionReady ? "Ion token on · Earth…" : "Ion token missing · Earth fallback…";
 
   const [geo, flight] = await Promise.all([
     fetch("./AUMARA_WORLD_GEOREFERENCE_v1.json").then(r => r.json()),
@@ -189,7 +196,9 @@ async function runTwin(hud) {
     hud.textContent = "Earth tiles on";
   } catch (e) {
     try {
-      const tiles = await C.Cesium3DTileset.fromIonAssetId(2275207);
+      const tiles = await C.Cesium3DTileset.fromIonAssetId(
+        (window.AUMARA_ION && window.AUMARA_ION.asset) || 2275207
+      );
       viewer.scene.primitives.add(tiles);
       tilesOn = true;
       hud.textContent = "Ion 2275207 on";
