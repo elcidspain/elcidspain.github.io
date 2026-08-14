@@ -1,0 +1,28 @@
+{
+  "commit_sha": "9bef020a1097f50b82df5c63e6e83b4176b8f3a6",
+  "job": "AUMARA_WORLD_V2",
+  "localTwinStatus": "READY",
+  "globalTilesStatus": "BLOCKED",
+  "firstFrameRendered": true,
+  "twinLoaded": true,
+  "sixHouseMeshesVisible": true,
+  "waypointReached": 27,
+  "rawSampleCount": 168,
+  "rawAglMin": 3.5871345431963926,
+  "rawAglMax": 3.899218778250214,
+  "consoleErrors": [],
+  "failedRequests": [],
+  "clampAgl": false,
+  "ground_source": "LOCAL_TERRAIN_RAYCAST",
+  "sixBookingInteractions": true,
+  "in_band": true,
+  "landing_frozen": true,
+  "index_rewritten": false,
+  "artifacts": {
+    "glb": "aumara/world/aumara-site-v2.glb",
+    "manifest": "aumara/world/AUMARA_TWIN_SOURCE_MANIFEST.json",
+    "telemetry": "aumara/world/AUMARA_RAW_AGL_TELEMETRY.json",
+    "desktop_mp4": "aumara/jobs/AUMARA_WORLD_V2_FLIGHT_DESKTOP.mp4",
+    "mobile_mp4": "aumara/jobs/AUMARA_WORLD_V2_FLIGHT_MOBILE.mp4"
+  }
+}
