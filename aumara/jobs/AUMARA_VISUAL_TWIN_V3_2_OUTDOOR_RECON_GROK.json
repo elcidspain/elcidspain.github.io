@@ -1,0 +1,38 @@
+{
+  "job_id":"AUMARA_VISUAL_TWIN_V3_2_OUTDOOR_RECON_GROK",
+  "priority":"P0_VISUAL_REALITY",
+  "mode":"SANDBOX_ONLY",
+  "owner_verdict":"V3.1 REJECTED: interior imagery and stretched photo projections are visible in the outdoor scene.",
+  "objective":"Rebuild the local visual layer from outdoor AUMARA media only, using genuine multi-view geometry where available. Do not use visible photo cards as scene geometry.",
+  "freeze":["public runtime","Google approach","handoff","WP27 fix","georeference","A-F positions","Booking","landing","Ion path"],
+  "sources":{
+    "allow":[
+      {"name":"PHOTOS AUMARA","id":"1KrN5gmDnhmhvMTZt6s9CKBFCuAUoCGa2"},
+      {"name":"AUMARA_OUTDOOR_AR_001","id":"1HMqmvUEi51gzflKHpDCmaWmAca3AMNQz"},
+      {"name":"AUMARA_DAY_WALK_001_EXPORT","id":"1IEBw2SHBEnxIraQV6vDykkSyLi5YLtOv"}
+    ],
+    "exclude":[
+      {"name":"Katia interior 1","id":"15ns7kKd5D4Ws5n940PZh-uM-gNPmhwsX"},
+      {"name":"Katia interior 2","id":"1KvMJvnaMC466lKMs2NvE9RlJqvcKKBFl"}
+    ],
+    "classify_each_file_as":["OUTDOOR_PATH","OUTDOOR_HOUSE_EXTERIOR","OUTDOOR_VEGETATION","AERIAL_PLAN","INTERIOR","DETAIL","DUPLICATE","REJECT"],
+    "rule":"INTERIOR, DETAIL and REJECT files must never be used by the outdoor visible scene. Produce AUMARA_V3_2_MEDIA_CLASSIFICATION.json."
+  },
+  "reconstruction":[
+    "Extract sharp overlapping outdoor keyframes from video.",
+    "Group images by path corridor and house neighborhood.",
+    "Run a real multi-view pose/depth reconstruction. Prefer MASt3R if COLMAP/OpenMVG are unavailable; DUSt3R is an acceptable fallback.",
+    "Fuse solved outdoor geometry into local ENU and align to canonical georeference/plan constraints.",
+    "Reject floaters and regions unsupported by multiple views.",
+    "Use V2.1 only as hidden collision/alignment scaffold.",
+    "Near-path ground must come from outdoor source imagery; PNOA is distant context only.",
+    "Near vegetation must come from outdoor source reconstruction or source-derived alpha/splat representation."
+  ],
+  "forbidden_visible_methods":["photo_plane","poster","billboard_house","interior_projection","generic_texture_wrap","procedural_foreground_tree"],
+  "engine_failure_rule":"If genuine multi-view reconstruction cannot execute, return BLOCKED_RECON_ENGINE with a clean outdoor source pack and command pack. Do not substitute photo posters or generic procedural scenery.",
+  "camera":{"reuse_current_smooth_route":true,"heading":"path_tangent","lookahead_m":"6-8","roll_deg":0,"agl_m":"3.5-4.0"},
+  "proof":{"route":"/v3-2-proof","no_chat_attachments":true,"show":["WP0-WP10 mobile video","WP0 still","WP5 still","WP10 still","classification JSON","source manifest","reconstruction stats"]},
+  "pass_bar":["no interior imagery","no stretched photo cards","real path/ground recognizable","real vegetation recognizable","at least one house reads as spatial exterior geometry","no giant gray/warped surfaces","stable camera"],
+  "publish_to_main_runtime":false,
+  "return":"absolute /v3-2-proof URL + reconstruction status + short stats only"
+}
