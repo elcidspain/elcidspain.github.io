@@ -1,0 +1,32 @@
+{
+  "proof_id": "AUMARA_OWNER_RUNTIME_PROOF_20260815",
+  "captured_at_local": "2026-08-15T03:16:00+02:00",
+  "surface": "https://elcidspain.github.io/aumara/",
+  "status": "PARTIAL_PASS",
+  "observed_from_owner_browser": {
+    "provider": "GOOGLE_PHOTOREALISTIC_3D_TILES",
+    "firstGoogleTileRendered": true,
+    "attributionVisible": true,
+    "googleAttributionPanelVisible": true,
+    "cesiumIonAttributionVisible": true,
+    "worldAnchoredHouseLabelsVisible": true
+  },
+  "accepted": [
+    "GOOGLE_TILE_FIRST_RENDER",
+    "Google/Cesium attribution path",
+    "owner Ion authorization works on elcidspain.github.io/aumara"
+  ],
+  "not_yet_accepted": [
+    "mobile visual quality of photorealistic tiles near parcel",
+    "parcel clipping correctness",
+    "z-fighting/overlap-free local twin blend",
+    "AR label timing/declutter during blend",
+    "continuous Earth-to-WP27 visual proof"
+  ],
+  "visual_findings": [
+    "near-parcel Google geometry is visibly coarse/blocky on mobile",
+    "local terrain/twin surface appears to overlap or visually compete with Google geometry",
+    "A-F labels become visible while the underlying blend is not yet visually stable"
+  ],
+  "security_note": "Owner supplied a URL containing an ion query parameter. The current main runtime does not consume ?ion=; token should remain in localStorage/runtime and the query parameter must be stripped/ignored. Rotate the exposed client token after stabilization if desired; keep Allowed URLs/minimal scope restrictions."
+}
