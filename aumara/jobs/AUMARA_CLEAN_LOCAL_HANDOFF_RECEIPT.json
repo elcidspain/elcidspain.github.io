@@ -1,6 +1,6 @@
 {
   "job": "AUMARA_CLEAN_LOCAL_HANDOFF_GROK",
-  "commit_sha": "PENDING",
+  "commit_sha": "8d422951dea53efb7c0b0d0666239a55e5cc0e0b",
   "verification_status": "HANDOFF_COMMITTED_AWAITING_OWNER_VISUAL",
   "tilesetPolicyUnchanged": true,
   "v21GeometryUnchanged": true,
