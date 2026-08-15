@@ -1,27 +1,30 @@
 {
   "project":"AUMARA",
-  "status":"P0_VISUAL_TWIN_V3_2_OUTDOOR_RECON",
+  "status":"P0_VISUAL_TWIN_V3_3_CLASSICAL_SFM",
   "accepted":[
     "GOOGLE_TILE_FIRST_RENDER",
     "owner Ion authorization works",
     "V2.1 georeference/A-F/collision scaffold",
     "mobile render crash fixed",
     "WP27 end-stop fixed",
-    "clean Google-to-local handoff implemented"
+    "clean Google-to-local handoff implemented",
+    "V3.1 visual method rejected",
+    "Meta BLOCKED_RECON_ENGINE report rejected as ingestion/runtime-local",
+    "primary outdoor day-walk source verified",
+    "classical CPU sparse SfM proven feasible: 32 frames / 25700 source-derived 3D points"
   ],
-  "owner_visual_verdict":"V3.1 REJECTED: indoor imagery and stretched source projections contaminate the outdoor twin; result is not recognizable AUMARA.",
-  "active_job":"aumara/jobs/AUMARA_VISUAL_TWIN_V3_2_OUTDOOR_RECON_GROK.json",
+  "owner_visual_verdict":"V3.1 REJECTED. Interior imagery was stretched into outdoor geometry. Outdoor reconstruction must be source-derived and spatial, with no photo posters.",
+  "active_job":"aumara/jobs/AUMARA_VISUAL_TWIN_V3_3_CLASSICAL_SFM_GROK.json",
   "execution_order":[
     "read aumara/PROJECT.md",
     "read aumara/ACTIVE_JOB.json",
     "read active_job",
-    "quarantine/classify all candidate media",
-    "exclude all interior/detail/reject files from outdoor visible scene",
-    "extract sharp overlapping outdoor video keyframes",
-    "run genuine multi-view pose/depth reconstruction (MASt3R preferred; DUSt3R fallback)",
-    "align solved geometry to canonical ENU/georeference and plan constraints",
-    "build sandbox-only V3.2 visual asset",
-    "serve proof at /v3-2-proof",
+    "quarantine verified interior 1B6A files",
+    "ingest AUMARA_DAY_MASTER_C_CALM_PACE_v01.mp4 as primary near-field truth",
+    "run/improve CPU classical SfM and colored point reconstruction",
+    "register reconstruction to canonical path/plan/GML",
+    "build hybrid local visible layer: source-derived splats + plan-true spatial houses/path",
+    "serve sandbox proof at /v3-3-proof",
     "stop for owner visual QA"
   ],
   "hard_freeze":[
@@ -37,12 +40,13 @@
     "Ion credential path"
   ],
   "forbidden":[
-    "publishing V3.2 before owner sandbox proof",
+    "publishing V3.3 before owner sandbox proof",
     "visible photo planes/posters/billboards",
     "interior imagery in outdoor scene",
-    "generic texture wrapping as final reality",
+    "generic whole-photo texture wrapping",
     "procedural foreground vegetation",
     "fake Earth player",
-    "credential investigation"
+    "credential investigation",
+    "claiming reconstruction is blocked merely because MASt3R/DUSt3R GPU is unavailable"
   ]
 }
