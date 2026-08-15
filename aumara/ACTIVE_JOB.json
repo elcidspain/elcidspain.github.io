@@ -1,43 +1,48 @@
 {
   "project": "AUMARA",
-  "status": "P0_RENDER_HOTFIX",
+  "status": "P0_WP27_ENDSTOP_HOTFIX",
   "accepted_owner_proof": "aumara/jobs/AUMARA_OWNER_RUNTIME_PROOF_20260815.json",
   "accepted": [
     "GOOGLE_TILE_FIRST_RENDER",
     "Google/Cesium attribution visible",
     "owner browser Ion authorization works",
-    "V2.1 local twin CLOSED"
+    "V2.1 local twin CLOSED",
+    "mobile Google tileset crash policy restored in 1bdeb96a4354858986eab1e38d58bc165ab009e3",
+    "owner run reaches READY_GOOGLE and WP 27/27 before current crash"
   ],
-  "regression": {
-    "commit": "782d271d9bf83d94a205dd136c3661352e7d585c",
-    "symptom": "iPhone Safari Cesium RangeError: Invalid array length; rendering stopped"
+  "root_cause": {
+    "symptom": "iPhone Safari reaches WP27 then Cesium RangeError: Invalid array length",
+    "code_path": "sampleOnce() asks SampledPositionProperty for currentTime+0.55 after stopTime; fallback n=p creates zero direction vector and invalid camera orientation",
+    "active_job": "aumara/jobs/AUMARA_WP27_ENDSTOP_HOTFIX_GROK.json"
   },
-  "active_job": "aumara/jobs/AUMARA_MOBILE_RENDER_HOTFIX_GROK.json",
+  "active_job": "aumara/jobs/AUMARA_WP27_ENDSTOP_HOTFIX_GROK.json",
   "execution_order": [
     "read aumara/PROJECT.md",
     "read aumara/ACTIVE_JOB.json",
     "read active_job",
-    "restore last owner-proven Google tile render policy",
-    "guard clipping with ClippingPolygonCollection.isSupported(scene)",
-    "keep ion query stripping",
-    "keep local twin and landing frozen",
-    "owner iPhone proof: >=20 seconds crash-free Google render",
+    "patch only end-of-flight camera tangent and tick lifecycle",
+    "keep Google tileset policy/clipping/GLB/AR/georef/UI frozen",
     "commit hotfix + receipt",
-    "only then resume global blend stabilization"
+    "owner iPhone proof: WP27 then >=30 seconds crash-free static render",
+    "only after PASS resume global blend stabilization"
   ],
   "hard_freeze": [
+    "Google tileset policy from 1bdeb96a4354858986eab1e38d58bc165ab009e3",
+    "clipping guard",
     "local V2.1 geometry",
     "landing HTML/CSS/copy",
     "A-F coordinates",
     "Booking wiring",
+    "AR gating",
     "source manifests",
     "Ion credential path"
   ],
   "forbidden": [
-    "tile-quality optimization before crash is fixed",
+    "any LOD/SSE/cache tuning",
     "credential search",
     "another project",
     "reopening V2.1 geometry",
-    "calling stabilization READY while Safari render crashes"
+    "changing blend/clipping behavior in this hotfix",
+    "calling hotfix PASS before owner survives 30 seconds after WP27"
   ]
 }
