@@ -1,0 +1,38 @@
+{
+  "job_id": "AUMARA_WP27_ENDSTOP_HOTFIX_GROK",
+  "priority": "P0_CRASH",
+  "mode": "SURGICAL_RUNTIME_PATCH",
+  "symptom": "Owner iPhone Safari reaches READY_GOOGLE / WP 27/27, then Cesium throws RangeError: Invalid array length and rendering stops.",
+  "root_cause": "At stopTime sampleOnce() requests pos.getValue(currentTime + 0.55). Beyond the final SampledPositionProperty sample this returns undefined, code falls back to n=p, producing a zero forward vector. Normalizing that zero vector creates an invalid camera orientation at the exact end of flight.",
+  "evidence_path": "aumara/index.html sampleOnce(): const t2 = currentTime + 0.55; const n = pos.getValue(t2) || p; normalize(n-p). ClockRange is CLAMPED at intro+dur, so this is reproducible at WP27.",
+  "freeze": [
+    "Google tileset policy from commit 1bdeb96a4354858986eab1e38d58bc165ab009e3",
+    "clipping guard",
+    "landing",
+    "V2.1 local GLB",
+    "georeference",
+    "A-F/Booking/AR gating",
+    "Ion credential path"
+  ],
+  "exact_patch": [
+    "Introduce const flightEnd = intro + dur and let tickHandler = null before sampleOnce().",
+    "Inside sampleOnce compute atEnd = elapsed >= flightEnd - 0.02.",
+    "For camera tangent: if not atEnd, use future position at min(elapsed+0.55, flightEnd). If atEnd, use previous position at max(elapsed-0.55, 0) and set direction = p - prev. Never normalize a vector with magnitudeSquared < 1e-12 or non-finite components.",
+    "Only call viewer.camera.setView when direction/up/right/look are finite and direction magnitudeSquared >= 1e-12. Otherwise leave the previous valid camera orientation unchanged.",
+    "When WP27/atEnd is reached the first time: set ended_at, viewer.clock.shouldAnimate=false, clamp currentTime=stopTime, remove tickHandler from viewer.clock.onTick, and set window.__AUMARA.flightComplete=true.",
+    "Register tickHandler as a named function/reference instead of anonymous onTick lambda so it can be removed cleanly.",
+    "Do not change any Cesium tile LOD, SSE, clipping, blend, GLB, AR, georef or UI logic in this patch."
+  ],
+  "acceptance": {
+    "owner_iPhone": "Google render survives through WP27 and stays rendered for >=30 seconds after WP27",
+    "waypointReached": 27,
+    "flightComplete": true,
+    "fatalRenderError": false,
+    "renderError": null,
+    "firstGoogleTileRendered": true,
+    "attributionVisible": true,
+    "no_RangeError_Invalid_array_length": true
+  },
+  "receipt": "aumara/jobs/AUMARA_WP27_ENDSTOP_HOTFIX_RECEIPT.json",
+  "stop_rule": "Patch only the end-of-flight tangent/tick lifecycle. Commit and stop for owner proof."
+}
