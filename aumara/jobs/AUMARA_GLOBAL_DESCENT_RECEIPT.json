@@ -1,6 +1,6 @@
 {
   "job": "AUMARA_GLOBAL_DESCENT_AND_BLEND_GROK",
-  "commit_sha": "PENDING",
+  "commit_sha": "9a292dc0584c139df45d7c50556812b8d423d5d4",
   "verification_status": "AWAITING_OWNER_RUNTIME_PROOF",
   "provider": "GOOGLE_PHOTOREALISTIC_3D_TILES",
   "public_url": "https://elcidspain.github.io/aumara/?debug=1#flight",
