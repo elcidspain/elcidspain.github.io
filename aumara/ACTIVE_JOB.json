@@ -1,6 +1,6 @@
 {
   "project": "AUMARA",
-  "status": "ACTIVE",
+  "status": "P0_RENDER_HOTFIX",
   "accepted_owner_proof": "aumara/jobs/AUMARA_OWNER_RUNTIME_PROOF_20260815.json",
   "accepted": [
     "GOOGLE_TILE_FIRST_RENDER",
@@ -8,31 +8,36 @@
     "owner browser Ion authorization works",
     "V2.1 local twin CLOSED"
   ],
-  "active_job": "aumara/jobs/AUMARA_GLOBAL_BLEND_STABILIZATION_GROK.json",
+  "regression": {
+    "commit": "782d271d9bf83d94a205dd136c3661352e7d585c",
+    "symptom": "iPhone Safari Cesium RangeError: Invalid array length; rendering stopped"
+  },
+  "active_job": "aumara/jobs/AUMARA_MOBILE_RENDER_HOTFIX_GROK.json",
   "execution_order": [
     "read aumara/PROJECT.md",
     "read aumara/ACTIVE_JOB.json",
     "read active_job",
-    "patch current aumara runtime only",
-    "verify mobile Google tile refinement",
-    "verify cadastral parcel clipping",
-    "delay local twin reveal until blend window",
-    "gate A-F AR until blendComplete",
-    "strip ion query parameter without reload",
-    "record Earth-to-WP27 mobile and desktop",
-    "commit runtime JSON and receipt"
+    "restore last owner-proven Google tile render policy",
+    "guard clipping with ClippingPolygonCollection.isSupported(scene)",
+    "keep ion query stripping",
+    "keep local twin and landing frozen",
+    "owner iPhone proof: >=20 seconds crash-free Google render",
+    "commit hotfix + receipt",
+    "only then resume global blend stabilization"
   ],
   "hard_freeze": [
     "local V2.1 geometry",
     "landing HTML/CSS/copy",
     "A-F coordinates",
     "Booking wiring",
-    "source manifests"
+    "source manifests",
+    "Ion credential path"
   ],
   "forbidden": [
+    "tile-quality optimization before crash is fixed",
     "credential search",
     "another project",
     "reopening V2.1 geometry",
-    "calling first Google tile alone GLOBAL_DESCENT_READY"
+    "calling stabilization READY while Safari render crashes"
   ]
 }
