@@ -1,0 +1,37 @@
+{
+  "job": "AUMARA_WORLD_V2_1_1_SOURCE_PURGE_GROK",
+  "run_id": "v211-mstmcuh3",
+  "commit_sha": "a6b065057e2d51cef028045b00d34a358a0b007d",
+  "localTwinStatus": "READY",
+  "globalTilesStatus": "BLOCKED",
+  "v21_local_layer": "CLOSED",
+  "next": "GLOBAL_DESCENT_AND_BLEND",
+  "unsupported_glass_meshes": 0,
+  "unsupported_universal_door_window_deck_generation": 0,
+  "terminology_tent_in_product_or_builder_claims": 0,
+  "capture_mode": "LIVE_BROWSER_RUNTIME",
+  "firstFrameRendered": true,
+  "twinLoaded": true,
+  "sixHouseMeshesVisible": true,
+  "waypointReached": 27,
+  "rawSampleCount": 481,
+  "rawAglMin": 3.5594831222734724,
+  "rawAglMax": 3.972185296614522,
+  "waypointsMonotonic": true,
+  "timestampsMonotonic": true,
+  "clampAgl": false,
+  "ground_source": [
+    "LOCAL_DEM"
+  ],
+  "glb_sha": "fe1b7501b2fafb80cd182736ae1421eb70510deed5a3a0480e46eca49c106919",
+  "consoleErrors": [],
+  "failedRequiredRequests": [],
+  "landing_frozen": true,
+  "artifacts": {
+    "glb": "aumara/world/aumara-site-v2_1.glb",
+    "manifest": "aumara/world/AUMARA_TWIN_SOURCE_MANIFEST.json",
+    "telemetry": "aumara/world/AUMARA_RAW_AGL_TELEMETRY_V2_1_1.json",
+    "desktop_mp4": "aumara/jobs/AUMARA_WORLD_V2_1_1_FLIGHT_DESKTOP.mp4",
+    "mobile_mp4": "aumara/jobs/AUMARA_WORLD_V2_1_1_FLIGHT_MOBILE.mp4"
+  }
+}
