@@ -45,17 +45,16 @@ Accepted:
 
 Not final yet:
 
-- mobile Google tile refinement, parcel clip orientation, delayed local-twin blend, and AR gating
-  (`aumara/jobs/AUMARA_GLOBAL_BLEND_STABILIZATION_GROK.json`).
-  Owner Google first-tile proof is ACCEPTED. Do not reopen V2.1 geometry.
+- P0 mobile Safari render hotfix (`aumara/jobs/AUMARA_MOBILE_RENDER_HOTFIX_GROK.json`).
+  Restore last owner-proven Google tile policy. Do not optimize quality until iPhone render is crash-free.
 
 ## Active job
 
 Current execution job:
 
-`aumara/jobs/AUMARA_GLOBAL_BLEND_STABILIZATION_GROK.json`
+`aumara/jobs/AUMARA_MOBILE_RENDER_HOTFIX_GROK.json`
 
-Owner Google Photorealistic proof is ACCEPTED. Stabilize mobile tiles, parcel clipping, local-twin blend and AR gating. Do not reopen house-feature invention.
+Restore the last owner-proven Google Photorealistic render policy on iPhone Safari. Do not optimize tile quality until the crash is gone.
 
 Use:
 
@@ -107,9 +106,9 @@ Do not create parallel truth folders unless explicitly instructed.
 
 Current execution job:
 
-`aumara/jobs/AUMARA_GLOBAL_BLEND_STABILIZATION_GROK.json`
+`aumara/jobs/AUMARA_MOBILE_RENDER_HOTFIX_GROK.json`
 
-Owner Google Photorealistic proof is ACCEPTED. Stabilize mobile tiles, parcel clipping, local-twin blend and AR gating. Do not reopen unsupported house-feature invention.
+Restore the last owner-proven Google Photorealistic render policy on iPhone Safari. Do not optimize tile quality until the crash is gone.
 
 ## Hard freezes
 

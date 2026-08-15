@@ -48,6 +48,7 @@
   #sheet h3{margin:0 0 4px;font-weight:400;font-size:22px}
   #sheet p{margin:0 0 8px;font:13px/1.4 system-ui,sans-serif;color:rgba(243,236,222,.6)}
   .cesium-widget-credits,.cesium-credit-lightbox-overlay{display:block!important;visibility:visible!important;z-index:6}
+  #stage:not(.dbg) .cesium-widget-errorPanel{display:none!important}
 </style>
 <script src="./ion.js"></script>
 </head>
@@ -105,7 +106,7 @@ const housesEl = document.getElementById("houses");
 const overlay = document.getElementById("overlay");
 const sheet = document.getElementById("sheet");
 const hud = document.getElementById("hud");
-if (DEBUG) hud.classList.add("on");
+if (DEBUG) { hud.classList.add("on"); document.getElementById("stage").classList.add("dbg"); }
 let MEDIA = null, GEO = null;
 function housePhoto(id) {
   const m = MEDIA && MEDIA.houses && MEDIA.houses[id];
@@ -207,6 +208,22 @@ async function runTwin() {
   viewer.scene.light = new C.SunLight({ intensity: 1.35 });
   try { viewer.scene.rethrowRenderErrors = false; } catch (e) {}
   try {
+    viewer.scene.renderError.addEventListener(function (scene, error) {
+      const msg = String(error && (error.message || error)).slice(0, 240);
+      if (window.__AUMARA) {
+        window.__AUMARA.renderError = msg;
+        window.__AUMARA.fatalRenderError = true;
+      }
+    });
+  } catch (e) {}
+  window.addEventListener("error", function (ev) {
+    const msg = String((ev && ev.message) || ev || "");
+    if (/RangeError|Invalid array length|RenderLoop/i.test(msg) && window.__AUMARA) {
+      window.__AUMARA.renderError = msg.slice(0, 240);
+      window.__AUMARA.fatalRenderError = true;
+    }
+  });
+  try {
     const cc = viewer.cesiumWidget.creditContainer;
     cc.style.cssText = "display:block;visibility:visible;position:absolute;left:6px;bottom:6px;z-index:6;";
   } catch (e) {}
@@ -220,16 +237,11 @@ async function runTwin() {
   let tilesOn = false, tileset = null, firstGoogleTileRendered = false, tilesStatus = "AWAITING_OWNER_RUNTIME_PROOF";
   try {
     tileset = await C.createGooglePhotorealistic3DTileset();
-    tileset.skipLevelOfDetail = false;
-    tileset.immediatelyLoadDesiredLevelOfDetail = true;
+    tileset.maximumScreenSpaceError = mobile ? 16 : 8;
+    tileset.skipLevelOfDetail = true;
+    tileset.immediatelyLoadDesiredLevelOfDetail = false;
     tileset.dynamicScreenSpaceError = true;
-    try {
-      tileset.dynamicScreenSpaceErrorFactor = 24;
-      tileset.dynamicScreenSpaceErrorDensity = 0.0002;
-      tileset.dynamicScreenSpaceErrorHeightFalloff = 0.25;
-    } catch (e) {}
-    tileset.maximumScreenSpaceError = mobile ? 10 : 6;
-    if (tileset.cacheBytes !== undefined) tileset.cacheBytes = mobile ? 384 * 1024 * 1024 : 768 * 1024 * 1024;
+    if (tileset.cacheBytes !== undefined) tileset.cacheBytes = mobile ? 256 * 1024 * 1024 : 768 * 1024 * 1024;
     viewer.scene.primitives.add(tileset);
     tilesOn = true;
     tilesStatus = "LOADING";
@@ -270,25 +282,18 @@ async function runTwin() {
       if (sampled[0] && isFinite(sampled[0].height) && sampled[0].height > -50 && sampled[0].height < 500) originH = sampled[0].height;
     } catch (e) {}
   }
-  let parcelClippingActive = false;
-  if (tilesOn && tileset && C.ClippingPolygon && geo.officialParcelBoundary) {
+  let parcelClippingActive = false, clipSupported = false;
+  const clipOk = !!(C.ClippingPolygonCollection && C.ClippingPolygonCollection.isSupported && C.ClippingPolygonCollection.isSupported(viewer.scene));
+  clipSupported = clipOk;
+  if (tilesOn && tileset && C.ClippingPolygon && geo.officialParcelBoundary && clipOk) {
     try {
-      const ring = geo.officialParcelBoundary.geometry.coordinates[0].slice();
-      if (ring.length > 1) {
-        const a0 = ring[0], aN = ring[ring.length - 1];
-        if (a0[0] !== aN[0] || a0[1] !== aN[1]) ring.push(a0);
-      }
-      let area = 0;
-      for (let i = 0; i < ring.length - 1; i++) area += (ring[i + 1][0] - ring[i][0]) * (ring[i + 1][1] + ring[i][1]);
-      if (area > 0) ring.reverse();
+      const ring = geo.officialParcelBoundary.geometry.coordinates[0];
       const clipPos = ring.map((p) => C.Cartesian3.fromDegrees(p[0], p[1]));
-      const collection = new C.ClippingPolygonCollection({
+      tileset.clippingPolygons = new C.ClippingPolygonCollection({
         polygons: [new C.ClippingPolygon({ positions: clipPos })],
         enabled: true,
-        inverse: false,
       });
-      tileset.clippingPolygons = collection;
-      parcelClippingActive = !!(tileset.clippingPolygons && tileset.clippingPolygons.enabled && tileset.clippingPolygons.length);
+      parcelClippingActive = true;
     } catch (e) { parcelClippingActive = false; }
   }
   const origin = C.Cartesian3.fromDegrees(lon, lat, originH);
@@ -393,16 +398,6 @@ async function runTwin() {
   let firstFrameRendered = false, maxWp = -1, lastHz = -0.1;
   let blendComplete = false, localTwinVisible = false;
   let localTwinVisibleBeforeBlend = false, labelsVisibleBeforeBlend = false, zFightingObserved = false;
-  let parcelTilesRefined = !tilesOn, refineWait0 = 0;
-  function tuneTilesForAlt(alt) {
-    if (!tileset) return;
-    let sse;
-    if (alt > 3000) sse = mobile ? 10 : 6;
-    else if (alt > 800) sse = mobile ? 6 : 3;
-    else if (alt > 200) sse = mobile ? 3 : 2;
-    else sse = mobile ? 2 : 1;
-    if (tileset.maximumScreenSpaceError !== sse) tileset.maximumScreenSpaceError = sse;
-  }
   const rawAgl = [];
   const startedMs = Date.now();
   const RUN_ID = "gd-" + startedMs.toString(36);
@@ -420,7 +415,9 @@ async function runTwin() {
     firstGoogleTileRendered, attributionVisible: !!(creditsEl && creditsEl.offsetParent !== null || (creditsEl && creditsEl.childNodes.length)),
     continuousCamera: true, parcelClippingActive, localTwinLoaded: true, blendComplete,
     localTwinVisible: false, localTwinVisibleBeforeBlend: false,
-    labelsVisibleBeforeBlend: false, zFightingObserved: false, parcelTilesRefined: !tilesOn,
+    labelsVisibleBeforeBlend: false, zFightingObserved: false,
+    clipSupported: clipSupported, renderError: null, fatalRenderError: false,
+    ionQueryRemoved: !new URL(location.href).searchParams.has("ion"),
     stage: tilesOn ? "EARTH" : "LOCAL_FALLBACK",
     verification_status: tilesOn && firstGoogleTileRendered ? "READY" : "AWAITING_OWNER_RUNTIME_PROOF",
     required_events: ["GOOGLE_TILE_FIRST_RENDER","EARTH_STAGE","IBERIA_STAGE","COSTA_BLANCA_STAGE","PARCEL_APPROACH","LOCAL_TWIN_VISIBLE","BLEND_COMPLETE","WP0","WP27"],
@@ -439,7 +436,10 @@ async function runTwin() {
         localTwinVisibleBeforeBlend: a.localTwinVisibleBeforeBlend,
         labelsVisibleBeforeBlend: a.labelsVisibleBeforeBlend,
         zFightingObserved: a.zFightingObserved,
-        parcelTilesRefined: a.parcelTilesRefined,
+        clipSupported: a.clipSupported,
+        renderError: a.renderError,
+        fatalRenderError: a.fatalRenderError,
+        ionQueryRemoved: a.ionQueryRemoved,
         blendComplete: a.blendComplete,
         waypointReached: a.waypointReached,
         stage: a.stage,
@@ -487,23 +487,12 @@ async function runTwin() {
       if (st === "LOCAL_BLEND") emit("LOCAL_BLEND");
       if (st === "WP0" || (elapsed >= intro && maxWp < 0)) emit("WP0");
     }
-    if (tilesOn) tuneTilesForAlt(alt);
-    if (tilesOn && alt < 300 && !parcelTilesRefined) {
-      if (!refineWait0) refineWait0 = performance.now();
-      if ((tileset && tileset.tilesLoaded) || performance.now() - refineWait0 > 3500) {
-        parcelTilesRefined = true;
-        window.__AUMARA.parcelTilesRefined = true;
-        viewer.clock.shouldAnimate = true;
-      } else if (!measureOnly) {
-        viewer.clock.shouldAnimate = false;
-      }
-    }
     const inBlendWindow = alt < 160;
     const inLocalEnvelope = alt < 70 && (function () {
       const en = lonLatToEn(carto.longitude * 180 / Math.PI, carto.latitude * 180 / Math.PI, lon, lat);
       return Math.hypot(en.east, en.north) < 180;
     })();
-    if (!localTwinVisible && ((tilesOn && inBlendWindow && parcelClippingActive && parcelTilesRefined) || (!tilesOn && alt < 80))) {
+    if (!localTwinVisible && ((tilesOn && inBlendWindow && (parcelClippingActive || !clipSupported)) || (!tilesOn && alt < 80))) {
       glb.show = true;
       localTwinVisible = true;
       emit("LOCAL_TWIN_VISIBLE");

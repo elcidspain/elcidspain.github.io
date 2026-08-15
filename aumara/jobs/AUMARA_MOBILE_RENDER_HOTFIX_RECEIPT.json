@@ -1,0 +1,13 @@
+{
+  "job": "AUMARA_MOBILE_RENDER_HOTFIX_GROK",
+  "commit_sha": "PENDING",
+  "verification_status": "HOTFIX_COMMITTED_AWAITING_OWNER_IPHONE_20S",
+  "fatalRenderError": false,
+  "renderError": null,
+  "attributionVisible": true,
+  "ionQueryRemoved": true,
+  "landingUnchanged": true,
+  "localTwinUnchanged": true,
+  "restored_render_base": "9a292dc0584c139df45d7c50556812b8d423d5d4",
+  "public_url": "https://elcidspain.github.io/aumara/?debug=1#flight"
+}

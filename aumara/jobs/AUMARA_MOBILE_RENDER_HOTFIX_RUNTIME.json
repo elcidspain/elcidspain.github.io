@@ -1,0 +1,31 @@
+{
+  "schema": "aumara.mobile-render-hotfix-runtime",
+  "job": "AUMARA_MOBILE_RENDER_HOTFIX_GROK",
+  "restored_from": "9a292dc0584c139df45d7c50556812b8d423d5d4",
+  "regression_commit": "782d271d9bf83d94a205dd136c3661352e7d585c",
+  "tileset_policy": {
+    "skipLevelOfDetail": true,
+    "immediatelyLoadDesiredLevelOfDetail": false,
+    "maximumScreenSpaceError_mobile": 16,
+    "maximumScreenSpaceError_desktop": 8,
+    "cacheBytes_mobile_MiB": 256,
+    "cacheBytes_desktop_MiB": 768,
+    "dynamicScreenSpaceError": true,
+    "dynamicScreenSpaceError_overrides": false,
+    "per_frame_sse_ramp": false
+  },
+  "clipping": "ClippingPolygonCollection.isSupported(scene) then simple canonical ring; no reverse/close-vertex",
+  "ion_query_stripped": true,
+  "glb_geometry": "UNCHANGED",
+  "landing": "UNCHANGED",
+  "this_session_20s": {
+    "fatalRenderError": false,
+    "renderError": null,
+    "pageErrors": [],
+    "ionQueryRemoved": true,
+    "attributionVisible": true,
+    "google_tiles": "not in this session; owner iPhone required"
+  },
+  "public_url": "https://elcidspain.github.io/aumara/?debug=1#flight",
+  "owner_console": "copy(JSON.stringify(window.__AUMARA.ownerProof(), null, 2))"
+}
