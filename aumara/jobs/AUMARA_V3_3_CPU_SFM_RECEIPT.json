@@ -1,0 +1,24 @@
+{
+  "receipt_id":"AUMARA_V3_3_CPU_SFM_RECEIPT",
+  "status":"SPARSE_SFM_PASS",
+  "primary_source":{
+    "title":"AUMARA_DAY_MASTER_C_CALM_PACE_v01.mp4",
+    "drive_id":"1aG4Sgez6tvkwDdnXDX8l7QVoN2Dct783",
+    "duration_s":8.0
+  },
+  "pipeline":"OpenCV SIFT + RANSAC essential matrix + recoverPose + triangulation + voxel dedup",
+  "gpu_required":false,
+  "run":{
+    "sample_fps":4.0,
+    "frames_sampled":32,
+    "source_derived_points":25700,
+    "status":"SPARSE_SFM_PASS"
+  },
+  "truth_corrections":[
+    "The Meta sandbox BLOCKED_RECON_ENGINE status was a local ingestion/runtime failure, not evidence that AUMARA had zero outdoor sources.",
+    "The inspected PHOTOS AUMARA 1B6A9861/9866/9867/9873/9875 and 1B6A8803/8852/8857 files are interior imagery and are quarantined from the outdoor twin.",
+    "ground_real.jpg is an aerial/satellite context texture, not eye-level ground truth.",
+    "AUMARA_DAY_MASTER_C_CALM_PACE_v01.mp4 is the verified near-field outdoor sequence used for reconstruction."
+  ],
+  "next":"Register sparse SfM to canonical path/plan/GML, densify source-derived local geometry, build V3.3 sandbox hybrid twin, serve /v3-3-proof. Public guest runtime remains frozen."
+}
