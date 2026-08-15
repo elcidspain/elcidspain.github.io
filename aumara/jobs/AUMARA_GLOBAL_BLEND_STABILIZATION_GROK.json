@@ -1,0 +1,62 @@
+{
+  "job_id": "AUMARA_GLOBAL_BLEND_STABILIZATION_GROK",
+  "priority": "P0",
+  "mode": "PATCH_CURRENT_BUILD_ONLY",
+  "depends_on": "AUMARA_OWNER_RUNTIME_PROOF_20260815",
+  "objective": "Keep the proven Google Photorealistic tile path and stabilize the parcel approach/blend on mobile without reopening local V2.1 geometry or landing UI.",
+  "freeze": [
+    "landing HTML/CSS/copy",
+    "AUMARA_WORLD_GEOREFERENCE_v1.json",
+    "A-F house positions",
+    "aumara-site-v2_1.glb geometry",
+    "Booking wiring",
+    "owner-proven Google tile authorization path"
+  ],
+  "accepted_proof": [
+    "GOOGLE_TILE_FIRST_RENDER",
+    "Google attribution visible",
+    "Cesium ion authorization works in owner browser"
+  ],
+  "patches": {
+    "mobile_tile_quality": [
+      "Do not set skipLevelOfDetail=true on mobile if it produces coarse blocky parcel geometry; prefer progressive refinement.",
+      "At altitudes below 3000 m, lower maximumScreenSpaceError progressively toward a parcel-quality target instead of keeping a coarse mobile value.",
+      "Do not start LOCAL_BLEND until required visible Google tiles around the parcel have refined to the chosen quality threshold or a bounded timeout is reached.",
+      "Keep memory bounded; quality may ramp only near the parcel."
+    ],
+    "blend": [
+      "Verify ClippingPolygonCollection uses the canonical parcel polygon with the correct interior/exterior orientation.",
+      "Prevent Google geometry from rendering through the local twin footprint.",
+      "Do not show local GLB at 2500 m. Preload it hidden; reveal only during parcel approach after clipping is confirmed active.",
+      "Use a short altitude/distance blend window around the parcel, not a global crossfade.",
+      "Ensure no z-fighting or double-ground surface remains after blendComplete=true."
+    ],
+    "ar_gating": [
+      "Keep A-F labels hidden until localTwinVisible=true AND blendComplete=true AND camera is inside the local interaction envelope.",
+      "Declutter labels after blend using screen-space collision; never show labels over unstable/coarse Google tiles.",
+      "Engineering HUD remains debug-only."
+    ],
+    "token_url_hygiene": [
+      "Ignore any ?ion= query parameter completely.",
+      "On page load, if the URL contains ion=, remove only that query parameter with history.replaceState without reloading.",
+      "Use CESIUM_ION_TOKEN from localStorage/runtime only. Never print or serialize it into runtime JSON/receipt."
+    ]
+  },
+  "runtime_gates": {
+    "firstGoogleTileRendered": true,
+    "attributionVisible": true,
+    "parcelClippingActive": true,
+    "localTwinVisibleBeforeBlend": false,
+    "blendComplete": true,
+    "labelsVisibleBeforeBlend": false,
+    "zFightingObserved": false,
+    "waypointReached": 27
+  },
+  "evidence": [
+    "one uncut mobile Earth-to-WP27 MP4 from owner-authorized runtime",
+    "one desktop Earth-to-WP27 MP4",
+    "AUMARA_GLOBAL_BLEND_STABILIZATION_RUNTIME.json",
+    "AUMARA_GLOBAL_BLEND_STABILIZATION_RECEIPT.json"
+  ],
+  "stop_rule": "Do not rebuild V2.1, do not redesign landing, do not search for credentials. Patch mobile Google tile refinement -> verify parcel clipping -> delay local twin reveal -> gate AR -> record -> commit -> receipt."
+}
