@@ -1,0 +1,32 @@
+{
+  "job_id": "AUMARA_GLOBAL_DESCENT_AND_BLEND_GROK",
+  "priority": "P0",
+  "mode": "PATCH_CURRENT_BUILD_ONLY",
+  "depends_on": "AUMARA_WORLD_V2_1_1_SOURCE_PURGE_GROK CLOSED",
+  "objective": "One continuous Earth/Spain/Benidoleig descent that blends into the accepted V2.1.1 local twin and then flies WP0-WP27 at 3.5-4.0 m AGL. Do not reopen house-feature invention.",
+  "freeze": [
+    "landing HTML/CSS/copy",
+    "AUMARA_WORLD_GEOREFERENCE_v1.json",
+    "house A-F positions",
+    "aumara-site-v2_1.glb feature purge",
+    "Booking/AR wiring"
+  ],
+  "when_tiles_ready": {
+    "path": "Earth view -> Iberia -> Costa Blanca -> Benidoleig parcel -> local twin WP0-27",
+    "blend": "local GLB remains georeferenced; do not hide it under a buried globe"
+  },
+  "when_tiles_blocked": {
+    "status": "BLOCKED is valid",
+    "path": "high local approach over the parcel -> WP0-27",
+    "do_not": "block descent work on missing Ion/Google keys"
+  },
+  "local_flight": {
+    "agl_m": [3.5, 4.0],
+    "waypoints": "existing WP0-27",
+    "measurement": "keep live 10 Hz unclamped sampler"
+  },
+  "required_outputs": [
+    "patched aumara/index.html descent keyframes",
+    "aumara/jobs/AUMARA_GLOBAL_DESCENT_RECEIPT.json"
+  ]
+}

@@ -29,7 +29,9 @@ These files are the project truth. Do not replace them with chat assumptions.
 
 ## Current project state
 
-Accepted as scaffold:
+V2.1 local layer: CLOSED (see `aumara/jobs/AUMARA_WORLD_V2_1_1_RECEIPT.json`).
+
+Accepted:
 
 - current `aumara/` project tree;
 - canonical georeference and parcel;
@@ -37,17 +39,21 @@ Accepted as scaffold:
 - current flight-path scaffold;
 - world-anchored A–F AR wiring;
 - six Booking interactions;
-- local-twin fallback when global Google/Ion tiles are unavailable.
+- local-twin fallback when global Google/Ion tiles are unavailable;
+- source-purged local twin `aumara-site-v2_1.glb`;
+- live-browser raw AGL 3.5–4.0 m on WP0–27.
 
 Not final yet:
 
-- house geometry realism;
-- terrain realism;
-- vegetation realism;
-- clean raw AGL runtime proof;
-- global Earth-to-AUMARA cinematic descent.
+- global Earth-to-AUMARA cinematic descent and blend with the local twin.
 
-## Terminology truth
+## Active job
+
+Current execution job:
+
+`aumara/jobs/AUMARA_GLOBAL_DESCENT_AND_BLEND_GROK.json`
+
+Close the local V2.1 layer. Advance to Earth → Spain → Benidoleig → parcel descent and blend into the accepted local twin. Do not reopen house-feature invention.
 
 Use:
 
@@ -99,12 +105,9 @@ Do not create parallel truth folders unless explicitly instructed.
 
 Current execution job:
 
-`aumara/jobs/AUMARA_WORLD_V2_1_REALITY_GROK.json`
+`aumara/jobs/AUMARA_GLOBAL_DESCENT_AND_BLEND_GROK.json`
 
-It has two goals only:
-
-1. fix raw terrain/mesh measurement and produce one clean monotonic WP0→WP27 flight with unclamped raw AGL;
-2. replace schematic twin geometry with a visibly reconstructed AUMARA reality using the canonical sources.
+V2.1 local layer is CLOSED. Advance to Earth → Spain → Benidoleig → parcel descent and blend into the accepted local twin. Do not reopen unsupported house-feature invention.
 
 ## Hard freezes
 

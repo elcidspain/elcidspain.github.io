@@ -292,11 +292,19 @@ async function runTwin() {
     return { lon: lon + east / (111320 * k), lat: lat + north / 110540 };
   }
   const start = C.JulianDate.now();
-  const intro = 2;
+  let intro = 2;
   const dur = flight.duration_s_default || 48;
   const pos = new C.SampledPositionProperty();
   pos.setInterpolationOptions({ interpolationDegree: 1, interpolationAlgorithm: C.LinearApproximation });
-  pos.addSample(start, C.Cartesian3.fromDegrees(lon, lat, originH + 40));
+  if (tilesOn) {
+    intro = 12;
+    pos.addSample(start, C.Cartesian3.fromDegrees(-3.7, 40.2, 1.8e7));
+    pos.addSample(C.JulianDate.addSeconds(start, 3.2, new C.JulianDate()), C.Cartesian3.fromDegrees(-0.4, 39.6, 6.5e5));
+    pos.addSample(C.JulianDate.addSeconds(start, 6.5, new C.JulianDate()), C.Cartesian3.fromDegrees(lon, lat, originH + 2200));
+    pos.addSample(C.JulianDate.addSeconds(start, 9.5, new C.JulianDate()), C.Cartesian3.fromDegrees(lon, lat, originH + 140));
+  } else {
+    pos.addSample(start, C.Cartesian3.fromDegrees(lon, lat, originH + 55));
+  }
   const dense = 80;
   for (let s = 0; s < dense; s++) {
     const u = s / (dense - 1);
