@@ -1,48 +1,45 @@
 {
   "project": "AUMARA",
-  "status": "P0_WP27_ENDSTOP_HOTFIX",
+  "status": "P1_VISUAL_CLEAN_LOCAL_HANDOFF",
   "accepted_owner_proof": "aumara/jobs/AUMARA_OWNER_RUNTIME_PROOF_20260815.json",
   "accepted": [
     "GOOGLE_TILE_FIRST_RENDER",
     "Google/Cesium attribution visible",
     "owner browser Ion authorization works",
     "V2.1 local twin CLOSED",
-    "mobile Google tileset crash policy restored in 1bdeb96a4354858986eab1e38d58bc165ab009e3",
-    "owner run reaches READY_GOOGLE and WP 27/27 before current crash"
+    "mobile Google tileset crash policy restored",
+    "WP27 end-stop crash fixed in 6bbcfd94c58045f9c09ae58e91c0048af0a154b1",
+    "owner run reaches WP27 without previous render crash"
   ],
-  "root_cause": {
-    "symptom": "iPhone Safari reaches WP27 then Cesium RangeError: Invalid array length",
-    "code_path": "sampleOnce() asks SampledPositionProperty for currentTime+0.55 after stopTime; fallback n=p creates zero direction vector and invalid camera orientation",
-    "active_job": "aumara/jobs/AUMARA_WP27_ENDSTOP_HOTFIX_GROK.json"
-  },
-  "active_job": "aumara/jobs/AUMARA_WP27_ENDSTOP_HOTFIX_GROK.json",
+  "active_job": "aumara/jobs/AUMARA_CLEAN_LOCAL_HANDOFF_GROK.json",
   "execution_order": [
     "read aumara/PROJECT.md",
     "read aumara/ACTIVE_JOB.json",
     "read active_job",
-    "patch only end-of-flight camera tangent and tick lifecycle",
-    "keep Google tileset policy/clipping/GLB/AR/georef/UI frozen",
-    "commit hotfix + receipt",
-    "owner iPhone proof: WP27 then >=30 seconds crash-free static render",
-    "only after PASS resume global blend stabilization"
+    "keep Google as Earth-to-parcel context only",
+    "handoff to local twin before low-altitude WP0 flight",
+    "hide Google tiles inside mobile local envelope",
+    "gate A-F AR until handoff complete",
+    "keep local raw AGL sampling on local terrain",
+    "commit runtime patch + receipt",
+    "owner iPhone visual proof"
   ],
   "hard_freeze": [
-    "Google tileset policy from 1bdeb96a4354858986eab1e38d58bc165ab009e3",
-    "clipping guard",
+    "Google tileset LOD/SSE/cache policy from 1bdeb96a4354858986eab1e38d58bc165ab009e3",
+    "WP27 end-stop patch from 6bbcfd94c58045f9c09ae58e91c0048af0a154b1",
     "local V2.1 geometry",
     "landing HTML/CSS/copy",
     "A-F coordinates",
     "Booking wiring",
-    "AR gating",
     "source manifests",
     "Ion credential path"
   ],
   "forbidden": [
-    "any LOD/SSE/cache tuning",
+    "any new LOD/SSE/cache tuning",
     "credential search",
     "another project",
     "reopening V2.1 geometry",
-    "changing blend/clipping behavior in this hotfix",
-    "calling hotfix PASS before owner survives 30 seconds after WP27"
+    "showing Google close-range photogrammetry during WP0-WP27 on mobile",
+    "showing AR labels before local handoff completes"
   ]
 }
