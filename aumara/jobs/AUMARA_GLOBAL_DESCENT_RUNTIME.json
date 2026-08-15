@@ -1,0 +1,22 @@
+{
+  "schema": "aumara.global-descent-runtime",
+  "capture_mode": "LIVE_BROWSER_RUNTIME",
+  "provider": "GOOGLE_PHOTOREALISTIC_3D_TILES",
+  "globalTilesStatus": "BLOCKED_GOOGLE_KEY",
+  "firstGoogleTileRendered": false,
+  "attributionVisible": true,
+  "continuousCamera": true,
+  "parcelClippingActive": false,
+  "localTwinLoaded": true,
+  "blendComplete": false,
+  "waypointReached": null,
+  "reason": "Cesium createGooglePhotorealistic3DTileset returned 401. No Google Maps Photorealistic 3D Tiles key and no authorized Cesium Ion token are present in this runtime. Esri/keyframes were not used as a substitute.",
+  "runtime_ready_when_key_present": [
+    "Google Photorealistic 3D Tiles via createGooglePhotorealistic3DTileset or tile.googleapis.com",
+    "wait for first visible tile before descent clock",
+    "eased Earth->Iberia->Costa Blanca->Benidoleig->parcel->blend->WP0-27 spline",
+    "cadastral ClippingPolygonCollection hole in Google tiles",
+    "local aumara-site-v2_1.glb inset, shown at parcel approach"
+  ],
+  "how_to_authorize": "Use the existing Ion button. A Google Maps key (AIza...) is stored as AUMARA_GOOGLE_MAPS_KEY; a Cesium Ion token is stored as CESIUM_ION_TOKEN. Never put the key in the page URL."
+}

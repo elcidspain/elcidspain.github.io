@@ -47,6 +47,7 @@
   #sheet img{width:96px;height:72px;object-fit:cover;border-radius:10px}
   #sheet h3{margin:0 0 4px;font-weight:400;font-size:22px}
   #sheet p{margin:0 0 8px;font:13px/1.4 system-ui,sans-serif;color:rgba(243,236,222,.6)}
+  .cesium-widget-credits,.cesium-credit-lightbox-overlay{display:block!important;visibility:visible!important;z-index:6}
 </style>
 <script src="./ion.js"></script>
 </head>
@@ -89,7 +90,6 @@
 const BOOK = "https://www.booking.com/hotel/es/aumara.es.html";
 const CESIUM_JS = "https://cesium.com/downloads/cesiumjs/releases/1.134/Build/Cesium/Cesium.js";
 const CESIUM_CSS = "https://cesium.com/downloads/cesiumjs/releases/1.134/Build/Cesium/Widgets/widgets.css";
-const ESRI = "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer";
 const DEBUG = /(?:\?|&)debug=1(?:&|$)/.test(location.search);
 const pic = (id) => "https://lh3.googleusercontent.com/d/" + id + "=w1600";
 const housesEl = document.getElementById("houses");
@@ -154,9 +154,13 @@ let started = false;
 document.getElementById("flight").onclick = () => startFlight();
 document.getElementById("close").onclick = () => { document.getElementById("stage").classList.remove("on"); sheet.className = ""; };
 document.getElementById("ionbtn").onclick = () => {
-  const cur = (window.AUMARA_ION && window.AUMARA_ION.resolve()) || "";
-  const next = prompt("Cesium ion token", cur || "");
-  if (next) { try { localStorage.setItem("CESIUM_ION_TOKEN", next.trim()); } catch (e) {} }
+  const next = prompt("Cesium ion / Google Maps key", "");
+  if (!next) return;
+  const v = next.trim();
+  try {
+    if (v.indexOf("AIza") === 0) localStorage.setItem("AUMARA_GOOGLE_MAPS_KEY", v);
+    else localStorage.setItem("CESIUM_ION_TOKEN", v);
+  } catch (e) {}
 };
 if (location.hash === "#flight") startFlight();
 async function startFlight() {
@@ -172,6 +176,14 @@ async function runTwin() {
   const C = window.Cesium;
   window.CESIUM_BASE_URL = "https://cesium.com/downloads/cesiumjs/releases/1.134/Build/Cesium/";
   if (window.AUMARA_ION) window.AUMARA_ION.apply(C);
+  function resolveGoogleKey() {
+    try {
+      if (window.AUMARA_GOOGLE_MAPS_KEY) return String(window.AUMARA_GOOGLE_MAPS_KEY);
+      return localStorage.getItem("AUMARA_GOOGLE_MAPS_KEY") || "";
+    } catch (e) { return ""; }
+  }
+  const gKey = resolveGoogleKey();
+  if (gKey && C.GoogleMaps) C.GoogleMaps.defaultApiKey = gKey;
   const [geo, flight, hm] = await Promise.all([
     GEO ? Promise.resolve(GEO) : fetch("./AUMARA_WORLD_GEOREFERENCE_v1.json").then((r) => r.json()),
     fetch("./world/flight-path.json").then((r) => r.json()),
@@ -186,52 +198,87 @@ async function runTwin() {
     geocoder: false, homeButton: false, sceneModePicker: false, navigationHelpButton: false,
     fullscreenButton: false, infoBox: false, selectionIndicator: false,
     baseLayer: false, shadows: false, msaaSamples: 1, targetFrameRate: mobile ? 30 : 60,
+    requestRenderMode: false,
   });
   viewer.scene.globe.show = false;
-  viewer.scene.skyAtmosphere.show = !mobile;
+  viewer.scene.skyAtmosphere.show = true;
   viewer.scene.fog.enabled = false;
   viewer.scene.fxaa = false;
-  viewer.resolutionScale = mobile ? 0.7 : 1;
-  viewer.scene.light = new C.SunLight({ intensity: 1.4 });
-  viewer.camera.setView({ destination: C.Cartesian3.fromDegrees(lon, lat, refMsl + 80) });
-  function tuneTiles(tiles) {
-    tiles.maximumScreenSpaceError = mobile ? 24 : 12;
-    tiles.dynamicScreenSpaceError = true; tiles.skipLevelOfDetail = true; tiles.enableCollision = true;
-    if (tiles.cacheBytes !== undefined) tiles.cacheBytes = mobile ? 256 * 1024 * 1024 : 768 * 1024 * 1024;
-  }
-  let tilesOn = false, tileset = null;
+  viewer.resolutionScale = mobile ? 0.75 : 1;
+  viewer.scene.light = new C.SunLight({ intensity: 1.35 });
+  try { viewer.scene.rethrowRenderErrors = false; } catch (e) {}
   try {
-    tileset = await C.createGooglePhotorealistic3DTileset({ onlyUsingWithGoogleGeocoder: true },
-      { maximumScreenSpaceError: mobile ? 24 : 12, skipLevelOfDetail: true, enableCollision: true });
-    tuneTiles(tileset); viewer.scene.primitives.add(tileset); tilesOn = true;
-  } catch (e) {
-    try {
-      tileset = await C.Cesium3DTileset.fromIonAssetId((window.AUMARA_ION && window.AUMARA_ION.asset) || 2275207,
-        { maximumScreenSpaceError: mobile ? 24 : 12, enableCollision: true });
-      tuneTiles(tileset); viewer.scene.primitives.add(tileset); tilesOn = true;
-    } catch (e2) {
-      try {
-        const esri = await C.ArcGisMapServerImageryProvider.fromUrl(ESRI);
-        viewer.imageryLayers.addImageryProvider(esri);
-        viewer.scene.globe.show = true;
-      } catch (e3) {
-        viewer.scene.globe.show = false;
+    const cc = viewer.cesiumWidget.creditContainer;
+    cc.style.cssText = "display:block;visibility:visible;position:absolute;left:6px;bottom:6px;z-index:6;";
+  } catch (e) {}
+  viewer.camera.setView({ destination: C.Cartesian3.fromDegrees(lon, lat, 1.8e7) });
+  const events = [];
+  function emit(name, extra) {
+    if (events.length && events[events.length - 1].name === name) return;
+    events.push({ name, t: Date.now(), extra: extra || null });
+    if (window.__AUMARA) window.__AUMARA.events = events;
+  }
+  let tilesOn = false, tileset = null, firstGoogleTileRendered = false, tilesStatus = "BLOCKED_GOOGLE_KEY";
+  try {
+    const opts = { maximumScreenSpaceError: mobile ? 16 : 8, skipLevelOfDetail: true, enableCollision: true };
+    if (gKey) {
+      tileset = await C.Cesium3DTileset.fromUrl("https://tile.googleapis.com/v1/3dtiles/root.json?key=" + encodeURIComponent(gKey), opts);
+    } else {
+      tileset = await C.createGooglePhotorealistic3DTileset({ onlyUsingWithGoogleGeocoder: true }, opts);
+    }
+    if (tileset.cacheBytes !== undefined) tileset.cacheBytes = mobile ? 256 * 1024 * 1024 : 768 * 1024 * 1024;
+    tileset.dynamicScreenSpaceError = true;
+    viewer.scene.primitives.add(tileset);
+    tilesOn = true;
+    tilesStatus = "LOADING";
+    const markTile = () => {
+      if (firstGoogleTileRendered) return;
+      firstGoogleTileRendered = true;
+      tilesStatus = "READY";
+      emit("GOOGLE_TILE_FIRST_RENDER");
+      if (window.__AUMARA) {
+        window.__AUMARA.firstGoogleTileRendered = true;
+        window.__AUMARA.globalTilesStatus = "READY";
       }
+    };
+    tileset.tileVisible.addEventListener(markTile);
+    if (tileset.initialTilesLoaded) tileset.initialTilesLoaded.addEventListener(markTile);
+  } catch (e) {
+    tilesOn = false;
+    tileset = null;
+    tilesStatus = /401|403|key|token|denied|unauthorized/i.test(String(e && e.message ? e.message : e)) ? "BLOCKED_GOOGLE_KEY" : "FAILED";
+    try { window.__AUMARA_TILES_ERROR = String(e && e.message ? e.message : e).slice(0, 240); } catch (e2) {}
+    viewer.scene.globe.show = false;
+  }
+  if (tilesOn) {
+    const waitUntil = Date.now() + 14000;
+    while (!firstGoogleTileRendered && Date.now() < waitUntil) {
+      await new Promise((r) => setTimeout(r, 200));
+    }
+    if (!firstGoogleTileRendered) {
+      tilesStatus = "FAILED";
+      tilesOn = false;
     }
   }
-  const until = Date.now() + 4000;
-  while (Date.now() < until) { if (tileset && tileset.tilesLoaded) break; await new Promise((r) => setTimeout(r, 200)); }
-  let originH = 0;
+  let originH = tilesOn ? refMsl : 0;
   if (tilesOn) {
     try {
       const originProbe = C.Cartographic.fromDegrees(lon, lat);
       const sampled = await viewer.scene.sampleHeightMostDetailed([originProbe]);
-      if (sampled[0] && isFinite(sampled[0].height) && sampled[0].height > -50 && sampled[0].height < 500) {
-        originH = sampled[0].height;
-      } else originH = refMsl;
-    } catch (e) { originH = refMsl; }
-  } else {
-    viewer.scene.globe.show = false;
+      if (sampled[0] && isFinite(sampled[0].height) && sampled[0].height > -50 && sampled[0].height < 500) originH = sampled[0].height;
+    } catch (e) {}
+  }
+  let parcelClippingActive = false;
+  if (tilesOn && tileset && C.ClippingPolygon && geo.officialParcelBoundary) {
+    try {
+      const ring = geo.officialParcelBoundary.geometry.coordinates[0];
+      const clipPos = ring.map((p) => C.Cartesian3.fromDegrees(p[0], p[1]));
+      tileset.clippingPolygons = new C.ClippingPolygonCollection({
+        polygons: [new C.ClippingPolygon({ positions: clipPos })],
+        enabled: true,
+      });
+      parcelClippingActive = true;
+    } catch (e) { parcelClippingActive = false; }
   }
   const origin = C.Cartesian3.fromDegrees(lon, lat, originH);
   const glb = await C.Model.fromGltfAsync({
@@ -240,6 +287,7 @@ async function runTwin() {
     scale: 1.0, incrementallyLoadTextures: true, backFaceCulling: true,
   });
   viewer.scene.primitives.add(glb);
+  glb.show = !tilesOn;
   const arNodes = geo.houses.map((h) => {
     const el = document.createElement("button");
     el.className = "ar"; el.type = "button"; el.textContent = h.spatialId;
@@ -253,21 +301,17 @@ async function runTwin() {
       const startP = C.Cartesian3.fromDegrees(lonX, latX, dem + 80);
       const nrm = C.Ellipsoid.WGS84.geodeticSurfaceNormal(startP, new C.Cartesian3());
       const down = C.Cartesian3.negate(nrm, new C.Cartesian3());
-      const hit = viewer.scene.pickFromRay(new C.Ray(startP, down));
+      const hit = viewer.scene.pickFromRay(new C.Ray(startP, down), tilesOn ? [tileset] : []);
       if (hit && hit.position) {
         const hh = C.Cartographic.fromCartesian(hit.position).height;
         const dh = hh - dem;
-        if (isFinite(hh) && dh > -0.4 && dh < 0.45) {
-          return { ground: hh, source: "LOCAL_TERRAIN_RAYCAST" };
-        }
+        if (isFinite(hh) && dh > -0.4 && dh < 0.45) return { ground: hh, source: "LOCAL_TERRAIN_RAYCAST" };
       }
     } catch (e) {}
     if (tilesOn) {
       try {
         const hgt = viewer.scene.sampleHeight(C.Cartographic.fromDegrees(lonX, latX), [glb]);
-        if (typeof hgt === "number" && isFinite(hgt) && Math.abs(hgt - dem) < 12) {
-          return { ground: hgt, source: "GOOGLE_TERRAIN" };
-        }
+        if (typeof hgt === "number" && isFinite(hgt) && Math.abs(hgt - dem) < 12) return { ground: hgt, source: "GOOGLE_TERRAIN" };
       } catch (e) {}
     }
     return { ground: dem, source: "LOCAL_DEM" };
@@ -279,11 +323,7 @@ async function runTwin() {
       const need = h.diameterMetres / 2 + 1.4;
       const dx = ee - he, dy = nn - hn;
       const d = Math.hypot(dx, dy) || 0.001;
-      if (d < need) {
-        const k = need / d;
-        ee = he + dx * k;
-        nn = hn + dy * k;
-      }
+      if (d < need) { const k = need / d; ee = he + dx * k; nn = hn + dy * k; }
     });
     return { east: ee, north: nn };
   }
@@ -291,17 +331,33 @@ async function runTwin() {
     const k = Math.cos(lat * Math.PI / 180);
     return { lon: lon + east / (111320 * k), lat: lat + north / 110540 };
   }
+  function ease(t) { return t * t * (3 - 2 * t); }
   const start = C.JulianDate.now();
-  let intro = 2;
   const dur = flight.duration_s_default || 48;
   const pos = new C.SampledPositionProperty();
   pos.setInterpolationOptions({ interpolationDegree: 1, interpolationAlgorithm: C.LinearApproximation });
+  let intro = 2;
   if (tilesOn) {
-    intro = 12;
-    pos.addSample(start, C.Cartesian3.fromDegrees(-3.7, 40.2, 1.8e7));
-    pos.addSample(C.JulianDate.addSeconds(start, 3.2, new C.JulianDate()), C.Cartesian3.fromDegrees(-0.4, 39.6, 6.5e5));
-    pos.addSample(C.JulianDate.addSeconds(start, 6.5, new C.JulianDate()), C.Cartesian3.fromDegrees(lon, lat, originH + 2200));
-    pos.addSample(C.JulianDate.addSeconds(start, 9.5, new C.JulianDate()), C.Cartesian3.fromDegrees(lon, lat, originH + 140));
+    intro = 22;
+    const stages = [
+      { lon: lon, lat: lat, h: 18000000 },
+      { lon: -2.8, lat: 40.15, h: 650000 },
+      { lon: -0.18, lat: 38.70, h: 30000 },
+      { lon: lon, lat: lat, h: originH + 2200 },
+      { lon: lon, lat: lat, h: originH + 140 },
+      { lon: wps[0].wgs84.longitude, lat: wps[0].wgs84.latitude, h: originH + 40 },
+    ];
+    const ts = [0, 5.2, 10.4, 14.6, 18.2, 22];
+    for (let s = 0; s < stages.length - 1; s++) {
+      const a = stages[s], b = stages[s + 1], t0 = ts[s], t1 = ts[s + 1], n = 10;
+      for (let i = 0; i < n; i++) {
+        const u = ease(i / n);
+        const t = C.JulianDate.addSeconds(start, t0 + (t1 - t0) * (i / n), new C.JulianDate());
+        pos.addSample(t, C.Cartesian3.fromDegrees(a.lon + (b.lon - a.lon) * u, a.lat + (b.lat - a.lat) * u, a.h + (b.h - a.h) * u));
+      }
+    }
+    pos.addSample(C.JulianDate.addSeconds(start, intro, new C.JulianDate()), C.Cartesian3.fromDegrees(wps[0].wgs84.longitude, wps[0].wgs84.latitude, originH + 40));
+    emit("EARTH_STAGE");
   } else {
     pos.addSample(start, C.Cartesian3.fromDegrees(lon, lat, originH + 55));
   }
@@ -322,38 +378,75 @@ async function runTwin() {
   viewer.clock.currentTime = start.clone();
   viewer.clock.clockRange = C.ClockRange.CLAMPED;
   viewer.clock.shouldAnimate = true;
-  try { viewer.scene.rethrowRenderErrors = false; } catch (e) {}
-  let firstFrameRendered = false, maxWp = -1, lastHz = -0.1;
+  let firstFrameRendered = false, maxWp = -1, lastHz = -0.1, blendComplete = !tilesOn, localTwinVisible = !tilesOn;
   const rawAgl = [];
   const startedMs = Date.now();
-  const RUN_ID = "v211-" + startedMs.toString(36);
+  const RUN_ID = "gd-" + startedMs.toString(36);
+  const creditsEl = viewer.cesiumWidget && viewer.cesiumWidget.creditContainer;
   window.__AUMARA = {
     run_id: RUN_ID, capture_mode: "LIVE_BROWSER_RUNTIME",
     page_url: location.href, started_at: new Date(startedMs).toISOString(), ended_at: null,
     user_agent: navigator.userAgent, glb_sha: null,
     firstFrameRendered: false, waypointReached: 0, twinLoaded: true,
-    rawAgl, samples: [], consoleErrors: []
+    rawAgl, samples: [], consoleErrors: [], events,
+    globalTilesStatus: tilesOn && firstGoogleTileRendered ? "READY" : tilesStatus,
+    provider: "GOOGLE_PHOTOREALISTIC_3D_TILES",
+    firstGoogleTileRendered, attributionVisible: !!(creditsEl && creditsEl.offsetParent !== null || (creditsEl && creditsEl.childNodes.length)),
+    continuousCamera: true, parcelClippingActive, localTwinLoaded: true, blendComplete,
+    stage: tilesOn ? "EARTH" : "LOCAL_FALLBACK",
   };
   fetch("./world/aumara-site-v2_1.glb").then((r) => r.arrayBuffer()).then((buf) => crypto.subtle.digest("SHA-256", buf)).then((h) => {
     window.__AUMARA.glb_sha = Array.from(new Uint8Array(h)).map((b) => b.toString(16).padStart(2, "0")).join("");
   }).catch(() => {});
+  function stageOf(alt, elapsed) {
+    if (!tilesOn) return "LOCAL_FALLBACK";
+    if (elapsed >= intro) return elapsed < intro + 0.3 ? "WP0" : "WP0_27";
+    if (alt > 4e6) return "EARTH";
+    if (alt > 1.2e5) return "IBERIA";
+    if (alt > 8e3) return "COSTA_BLANCA";
+    if (alt > 600) return "BENIDOLEIG";
+    if (alt > 70) return "PARCEL_APPROACH";
+    return "LOCAL_BLEND";
+  }
   function sampleOnce(measureOnly) {
     const p = pos.getValue(viewer.clock.currentTime);
     if (!p) return;
+    const elapsed = C.JulianDate.secondsDifference(viewer.clock.currentTime, start);
+    const t2 = C.JulianDate.addSeconds(viewer.clock.currentTime, 0.55, new C.JulianDate());
+    const n = pos.getValue(t2) || p;
+    const carto = C.Cartographic.fromCartesian(p);
+    const alt = carto.height;
     if (!measureOnly) {
-      const t2 = C.JulianDate.addSeconds(viewer.clock.currentTime, 0.4, new C.JulianDate());
-      const n = pos.getValue(t2) || p;
       const dir = C.Cartesian3.normalize(C.Cartesian3.subtract(n, p, new C.Cartesian3()), new C.Cartesian3());
       const up = C.Ellipsoid.WGS84.geodeticSurfaceNormal(p, new C.Cartesian3());
       const right = C.Cartesian3.normalize(C.Cartesian3.cross(dir, up, new C.Cartesian3()), new C.Cartesian3());
-      const look = C.Matrix3.multiplyByVector(C.Matrix3.fromQuaternion(C.Quaternion.fromAxisAngle(right, -0.38)), dir, new C.Cartesian3());
+      const pitch = alt > 1e6 ? -0.12 : alt > 2e4 ? -0.22 : alt > 400 ? -0.30 : -0.38;
+      const look = C.Matrix3.multiplyByVector(C.Matrix3.fromQuaternion(C.Quaternion.fromAxisAngle(right, pitch)), dir, new C.Cartesian3());
       viewer.camera.setView({ destination: p, orientation: { direction: look, up } });
     }
-    const carto = C.Cartographic.fromCartesian(p);
+    const st = stageOf(alt, elapsed);
+    if (window.__AUMARA.stage !== st) {
+      window.__AUMARA.stage = st;
+      if (st === "EARTH") emit("EARTH_STAGE");
+      if (st === "IBERIA") emit("IBERIA_STAGE");
+      if (st === "COSTA_BLANCA") emit("COSTA_BLANCA_STAGE");
+      if (st === "BENIDOLEIG") emit("BENIDOLEIG");
+      if (st === "PARCEL_APPROACH") emit("PARCEL_APPROACH");
+      if (st === "LOCAL_BLEND") emit("LOCAL_BLEND");
+      if (st === "WP0" || (elapsed >= intro && maxWp < 0)) emit("WP0");
+    }
+    if (tilesOn && alt < 2500 && !localTwinVisible) {
+      glb.show = true; localTwinVisible = true; emit("LOCAL_TWIN_VISIBLE");
+      window.__AUMARA.localTwinLoaded = true;
+    }
+    if (tilesOn && alt < 80 && !blendComplete) {
+      blendComplete = true; glb.show = true;
+      emit("BLEND_COMPLETE");
+      window.__AUMARA.blendComplete = true;
+    }
     const lonX = carto.longitude * 180 / Math.PI, latX = carto.latitude * 180 / Math.PI;
-    const elapsed = C.JulianDate.secondsDifference(viewer.clock.currentTime, start);
     const wp = elapsed < intro ? 0 : Math.min(27, Math.round(((elapsed - intro) / dur) * 27));
-    if (wp > maxWp) { maxWp = wp; window.__AUMARA.waypointReached = wp; }
+    if (wp > maxWp) { maxWp = wp; window.__AUMARA.waypointReached = wp; if (wp === 27) emit("WP27"); }
     if (elapsed >= intro && elapsed - lastHz >= 0.1) {
       lastHz = elapsed;
       const gs = groundSample(lonX, latX);
@@ -362,23 +455,23 @@ async function runTwin() {
       window.__AUMARA.samples.push({
         timestamp: startedMs + Math.round(elapsed * 1000), waypoint: wp,
         camera_msl: carto.height, sampled_ground_msl: gs.ground,
-        raw_agl_m: raw, ground_source: gs.source
+        raw_agl_m: raw, ground_source: gs.source, stage: st
       });
     }
     if (wp === 27 && !window.__AUMARA.ended_at) window.__AUMARA.ended_at = new Date().toISOString();
-    if (DEBUG) hud.textContent = "AUMARA  WP " + wp + "/27  RAW " + (rawAgl[rawAgl.length - 1] || 0).toFixed(3) + " m  " + (firstFrameRendered ? "FRAME" : "…") + "  " + (tilesOn ? "ION" : "LOCAL");
+    if (DEBUG) hud.textContent = (tilesOn ? "GOOGLE  " : "LOCAL  ") + st + "  WP " + wp + "/27  RAW " + (rawAgl[rawAgl.length - 1] || 0).toFixed(3) + " m";
   }
-  viewer.clock.shouldAnimate = true;
   window.__AUMARA.advanceTo = function (elapsedTarget) {
     viewer.clock.shouldAnimate = false;
     viewer.clock.currentTime = C.JulianDate.addSeconds(start, elapsedTarget, new C.JulianDate());
     lastHz = -1e9;
-    sampleOnce(true);
+    sampleOnce(false);
   };
   viewer.scene.postRender.addEventListener(() => {
     if (!firstFrameRendered) { firstFrameRendered = true; window.__AUMARA.firstFrameRendered = true; }
     const placed = [];
     arNodes.forEach(({ h, el }) => {
+      if (!localTwinVisible) { el.style.display = "none"; return; }
       const p = C.Cartesian3.fromDegrees(h.wgs84.longitude, h.wgs84.latitude, originH + 5.4);
       const win = C.SceneTransforms.worldToWindowCoordinates(viewer.scene, p);
       if (!win) { el.style.display = "none"; return; }

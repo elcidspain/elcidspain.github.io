@@ -1,10 +1,11 @@
-/* Cesium ion ↔ GitHub Pages
- * Dashboard: https://ion.cesium.com/tokens
+/* Cesium ion / Google Maps Photorealistic 3D Tiles
+ * Dashboard (Ion): https://ion.cesium.com/tokens
+ * Dashboard (Google): Maps Platform Photorealistic 3D Tiles API
  * Allowed URLs:
  *   https://elcidspain.github.io
  *   https://elcidspain.github.io/aumara/
+ * Runtime only: paste via the Ion button. Never put a key in the page URL.
  * Asset: 2275207 Google Photorealistic 3D Tiles
- * Paste once: /aumara/?ion=TOKEN  (saved in this browser)
  */
 window.AUMARA_ION = {
   asset: 2275207,
@@ -13,11 +14,6 @@ window.AUMARA_ION = {
     "https://elcidspain.github.io/aumara/",
   ],
   resolve: function () {
-    var q = new URLSearchParams(location.search).get("ion");
-    if (q) {
-      try { localStorage.setItem("CESIUM_ION_TOKEN", q); } catch (e) {}
-      return q;
-    }
     try { return localStorage.getItem("CESIUM_ION_TOKEN") || ""; } catch (e) { return ""; }
   },
   apply: function (C) {
