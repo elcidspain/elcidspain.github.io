@@ -1,0 +1,38 @@
+{
+  "project": "AUMARA",
+  "status": "ACTIVE",
+  "accepted_owner_proof": "aumara/jobs/AUMARA_OWNER_RUNTIME_PROOF_20260815.json",
+  "accepted": [
+    "GOOGLE_TILE_FIRST_RENDER",
+    "Google/Cesium attribution visible",
+    "owner browser Ion authorization works",
+    "V2.1 local twin CLOSED"
+  ],
+  "active_job": "aumara/jobs/AUMARA_GLOBAL_BLEND_STABILIZATION_GROK.json",
+  "execution_order": [
+    "read aumara/PROJECT.md",
+    "read aumara/ACTIVE_JOB.json",
+    "read active_job",
+    "patch current aumara runtime only",
+    "verify mobile Google tile refinement",
+    "verify cadastral parcel clipping",
+    "delay local twin reveal until blend window",
+    "gate A-F AR until blendComplete",
+    "strip ion query parameter without reload",
+    "record Earth-to-WP27 mobile and desktop",
+    "commit runtime JSON and receipt"
+  ],
+  "hard_freeze": [
+    "local V2.1 geometry",
+    "landing HTML/CSS/copy",
+    "A-F coordinates",
+    "Booking wiring",
+    "source manifests"
+  ],
+  "forbidden": [
+    "credential search",
+    "another project",
+    "reopening V2.1 geometry",
+    "calling first Google tile alone GLOBAL_DESCENT_READY"
+  ]
+}
