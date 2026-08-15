@@ -1,0 +1,43 @@
+{
+  "job_id": "AUMARA_MOBILE_RENDER_HOTFIX_GROK",
+  "priority": "P0_CRASH",
+  "mode": "SURGICAL_RUNTIME_PATCH",
+  "regression_commit": "782d271d9bf83d94a205dd136c3661352e7d585c",
+  "last_owner_proven_render_base": "9a292dc0584c139df45d7c50556812b8d423d5d4",
+  "symptom": "iPhone Safari Cesium render aborts with RangeError: Invalid array length after blend-stabilization patch.",
+  "objective": "Restore the last owner-proven Google Photorealistic render path first. Preserve ion URL stripping and AR/blend gating where they do not affect Cesium tile allocation. Do not pursue visual quality until crash-free mobile render is restored.",
+  "freeze": [
+    "landing HTML/CSS/copy",
+    "V2.1 local GLB",
+    "georeference",
+    "A-F positions",
+    "Booking wiring",
+    "owner Ion authorization"
+  ],
+  "patches": [
+    "Remove tileset.immediatelyLoadDesiredLevelOfDetail=true. Explicitly set it false or leave default.",
+    "Restore the last owner-proven mobile tileset policy: skipLevelOfDetail=true; maximumScreenSpaceError=16 on mobile / 8 desktop; cacheBytes=256 MiB mobile / 768 MiB desktop; dynamicScreenSpaceError=true with Cesium defaults.",
+    "Remove per-frame tuneTilesForAlt SSE reduction for this hotfix. Do not drive mobile SSE down to 2 while descending.",
+    "Remove stabilization-only dynamicScreenSpaceErrorFactor/Density/HeightFalloff overrides; use Cesium defaults until crash-free proof.",
+    "For clipping, call Cesium.ClippingPolygonCollection.isSupported(viewer.scene) before creating/assigning clipping polygons. If unsupported, set parcelClippingActive=false and continue rendering without clipping; never crash the scene.",
+    "Restore the simple canonical parcel ring used in the last owner-proven build for the crash hotfix. Do not add/reverse/duplicate the closing vertex in this pass.",
+    "Keep ?ion= stripping via history.replaceState.",
+    "Keep GLB delayed reveal and A-F AR labels hidden until blendComplete, but if parcel clipping is unsupported allow LOCAL_FALLBACK_BLEND so the flight continues instead of aborting.",
+    "Set viewer.scene.rethrowRenderErrors=false and add a renderError listener that records window.__AUMARA.renderError without displaying Cesium's fatal error panel in guest mode; debug mode may expose details. Do not swallow the failure silently in telemetry."
+  ],
+  "acceptance": {
+    "owner_iPhone_Safari": "Google Photorealistic first tile renders and scene continues for at least 20 seconds without RangeError/RenderLoopError",
+    "firstGoogleTileRendered": true,
+    "fatalRenderError": false,
+    "attributionVisible": true,
+    "ionQueryRemoved": true,
+    "landingUnchanged": true,
+    "localTwinUnchanged": true
+  },
+  "evidence": [
+    "owner mobile screenshot after 20s crash-free render",
+    "window.__AUMARA.ownerProof() including renderError=null",
+    "commit + hotfix receipt"
+  ],
+  "stop_rule": "CRASH FIRST. Do not optimize tile quality, do not change GLB, do not redesign blend, do not create a new project. Restore proven render -> owner proof -> only then resume visual stabilization incrementally."
+}
