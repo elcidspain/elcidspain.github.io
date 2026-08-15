@@ -418,6 +418,7 @@ async function runTwin() {
     labelsVisibleBeforeBlend: false, zFightingObserved: false,
     clipSupported: clipSupported, renderError: null, fatalRenderError: false,
     ionQueryRemoved: !new URL(location.href).searchParams.has("ion"),
+    flightComplete: false,
     stage: tilesOn ? "EARTH" : "LOCAL_FALLBACK",
     verification_status: tilesOn && firstGoogleTileRendered ? "READY" : "AWAITING_OWNER_RUNTIME_PROOF",
     required_events: ["GOOGLE_TILE_FIRST_RENDER","EARTH_STAGE","IBERIA_STAGE","COSTA_BLANCA_STAGE","PARCEL_APPROACH","LOCAL_TWIN_VISIBLE","BLEND_COMPLETE","WP0","WP27"],
@@ -440,6 +441,7 @@ async function runTwin() {
         renderError: a.renderError,
         fatalRenderError: a.fatalRenderError,
         ionQueryRemoved: a.ionQueryRemoved,
+        flightComplete: a.flightComplete,
         blendComplete: a.blendComplete,
         waypointReached: a.waypointReached,
         stage: a.stage,
@@ -460,21 +462,36 @@ async function runTwin() {
     if (alt > 70) return "PARCEL_APPROACH";
     return "LOCAL_BLEND";
   }
+  const flightEnd = intro + dur;
+  let tickHandler = null;
+  function finiteVec(v) {
+    return !!(v && isFinite(v.x) && isFinite(v.y) && isFinite(v.z));
+  }
   function sampleOnce(measureOnly) {
     const p = pos.getValue(viewer.clock.currentTime);
     if (!p) return;
     const elapsed = C.JulianDate.secondsDifference(viewer.clock.currentTime, start);
-    const t2 = C.JulianDate.addSeconds(viewer.clock.currentTime, 0.55, new C.JulianDate());
-    const n = pos.getValue(t2) || p;
+    const atEnd = elapsed >= flightEnd - 0.02;
     const carto = C.Cartographic.fromCartesian(p);
     const alt = carto.height;
     if (!measureOnly) {
-      const dir = C.Cartesian3.normalize(C.Cartesian3.subtract(n, p, new C.Cartesian3()), new C.Cartesian3());
-      const up = C.Ellipsoid.WGS84.geodeticSurfaceNormal(p, new C.Cartesian3());
-      const right = C.Cartesian3.normalize(C.Cartesian3.cross(dir, up, new C.Cartesian3()), new C.Cartesian3());
-      const pitch = alt > 1e6 ? -0.12 : alt > 2e4 ? -0.22 : alt > 400 ? -0.30 : -0.38;
-      const look = C.Matrix3.multiplyByVector(C.Matrix3.fromQuaternion(C.Quaternion.fromAxisAngle(right, pitch)), dir, new C.Cartesian3());
-      viewer.camera.setView({ destination: p, orientation: { direction: look, up } });
+      const lookT = atEnd ? Math.max(elapsed - 0.55, 0) : Math.min(elapsed + 0.55, flightEnd);
+      const other = pos.getValue(C.JulianDate.addSeconds(start, lookT, new C.JulianDate()));
+      if (other && finiteVec(p) && finiteVec(other)) {
+        const dir = atEnd ? C.Cartesian3.subtract(p, other, new C.Cartesian3()) : C.Cartesian3.subtract(other, p, new C.Cartesian3());
+        const mag2 = C.Cartesian3.magnitudeSquared(dir);
+        if (mag2 >= 1e-12 && finiteVec(dir)) {
+          C.Cartesian3.normalize(dir, dir);
+          const up = C.Ellipsoid.WGS84.geodeticSurfaceNormal(p, new C.Cartesian3());
+          const right = C.Cartesian3.cross(dir, up, new C.Cartesian3());
+          if (finiteVec(up) && finiteVec(right) && C.Cartesian3.magnitudeSquared(right) >= 1e-12) {
+            C.Cartesian3.normalize(right, right);
+            const pitch = alt > 1e6 ? -0.12 : alt > 2e4 ? -0.22 : alt > 400 ? -0.30 : -0.38;
+            const look = C.Matrix3.multiplyByVector(C.Matrix3.fromQuaternion(C.Quaternion.fromAxisAngle(right, pitch)), dir, new C.Cartesian3());
+            if (finiteVec(look)) viewer.camera.setView({ destination: p, orientation: { direction: look, up } });
+          }
+        }
+      }
     }
     const st = stageOf(alt, elapsed);
     if (window.__AUMARA.stage !== st) {
@@ -524,7 +541,18 @@ async function runTwin() {
         raw_agl_m: raw, ground_source: gs.source, stage: st
       });
     }
-    if (wp === 27 && !window.__AUMARA.ended_at) window.__AUMARA.ended_at = new Date().toISOString();
+    if ((wp === 27 || atEnd) && !window.__AUMARA.flightComplete) {
+      window.__AUMARA.ended_at = window.__AUMARA.ended_at || new Date().toISOString();
+      window.__AUMARA.flightComplete = true;
+      window.__AUMARA.waypointReached = 27;
+      viewer.clock.shouldAnimate = false;
+      viewer.clock.currentTime = viewer.clock.stopTime.clone();
+      if (tickHandler) {
+        try { viewer.clock.onTick.removeEventListener(tickHandler); } catch (e) {}
+        tickHandler = null;
+      }
+      emit("WP27");
+    }
     if (DEBUG) hud.textContent = window.__AUMARA.verification_status + "  " + (tilesOn ? "GOOGLE  " : "LOCAL  ") + st + "  WP " + wp + "/27";
   }
   window.__AUMARA.advanceTo = function (elapsedTarget) {
@@ -561,7 +589,8 @@ async function runTwin() {
       if (!clash) { a.el.style.left = a.win.x + "px"; a.el.style.top = a.win.y + "px"; }
     });
   });
-  viewer.clock.onTick.addEventListener(() => { sampleOnce(); });
+  tickHandler = function onFlightTick() { sampleOnce(); };
+  viewer.clock.onTick.addEventListener(tickHandler);
 }
 </script>
 </body>

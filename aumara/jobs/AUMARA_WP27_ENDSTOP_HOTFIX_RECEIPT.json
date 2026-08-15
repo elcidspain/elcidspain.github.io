@@ -1,0 +1,12 @@
+{
+  "job": "AUMARA_WP27_ENDSTOP_HOTFIX_GROK",
+  "commit_sha": "PENDING",
+  "verification_status": "HOTFIX_COMMITTED_AWAITING_OWNER_WP27_HOLD",
+  "waypointReached": 27,
+  "flightComplete": true,
+  "fatalRenderError": false,
+  "renderError": null,
+  "landingUnchanged": true,
+  "tilesetUnchanged": true,
+  "public_url": "https://elcidspain.github.io/aumara/?debug=1#flight"
+}

@@ -52,7 +52,7 @@ Not final yet:
 
 Current execution job:
 
-`aumara/jobs/AUMARA_MOBILE_RENDER_HOTFIX_GROK.json`
+`aumara/jobs/AUMARA_WP27_ENDSTOP_HOTFIX_GROK.json`
 
 Restore the last owner-proven Google Photorealistic render policy on iPhone Safari. Do not optimize tile quality until the crash is gone.
 
@@ -106,7 +106,7 @@ Do not create parallel truth folders unless explicitly instructed.
 
 Current execution job:
 
-`aumara/jobs/AUMARA_MOBILE_RENDER_HOTFIX_GROK.json`
+`aumara/jobs/AUMARA_WP27_ENDSTOP_HOTFIX_GROK.json`
 
 Restore the last owner-proven Google Photorealistic render policy on iPhone Safari. Do not optimize tile quality until the crash is gone.
 

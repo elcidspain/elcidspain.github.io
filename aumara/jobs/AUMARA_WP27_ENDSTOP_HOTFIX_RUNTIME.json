@@ -1,0 +1,28 @@
+{
+  "schema": "aumara.wp27-endstop-hotfix-runtime",
+  "job": "AUMARA_WP27_ENDSTOP_HOTFIX_GROK",
+  "patch": [
+    "backward tangent at flight end",
+    "never normalize zero/non-finite direction",
+    "stop clock at WP27",
+    "remove onTick after completion"
+  ],
+  "untouched": [
+    "tileset policy",
+    "clipping",
+    "GLB",
+    "AR",
+    "georef",
+    "landing",
+    "credentials"
+  ],
+  "this_session": {
+    "waypointReached": 27,
+    "flightComplete": true,
+    "fatalRenderError": false,
+    "renderError": null,
+    "pageErrors": []
+  },
+  "public_url": "https://elcidspain.github.io/aumara/?debug=1#flight",
+  "owner_console": "copy(JSON.stringify(window.__AUMARA.ownerProof(), null, 2))"
+}
