@@ -1,0 +1,118 @@
+{
+  "job_id": "AUMARA_VISUAL_TWIN_V3_GROK",
+  "priority": "P0_VISUAL_REALITY",
+  "mode": "SANDBOX_FIRST_PATCH_CURRENT_PROJECT",
+  "objective": "Stop polishing the V2.1 scaffold. Build a stable low-altitude camera and a visibly real AUMARA local world from the canonical photos/videos/plans. Google remains the global approach; the local flight must contain recognizable terrain, paths, houses and vegetation instead of procedural gray geometry.",
+  "owner_evidence": {
+    "recording": "owner iPhone screen recording 2026-08-15 05:48 local, ~10.4 s excerpt around WP12-WP18",
+    "verdict": "FAIL_VISUAL_REALITY",
+    "observed": [
+      "camera/view appears to bob vertically and surfaces jump through frame",
+      "large gray/flat geometry blocks the view",
+      "no recognizable AUMARA landscape during the local flight",
+      "only an occasional A-F AR label is recognizable",
+      "clean Google-to-local handoff alone did not solve the local visual layer"
+    ]
+  },
+  "known_causes_in_current_tree": [
+    "AUMARA_TWIN_SOURCE_MANIFEST v2.1.1 explicitly describes the local asset as heightmap+PNOA terrain, a path ribbon, plan-derived geodesic envelopes, and generated-completion vegetation rather than a photoreconstructed site.",
+    "rebuild_twin_v21.py creates near-path generated canopy ellipsoids/trunks. These are not surveyed and can intersect/occlude a 3.5-4.0 m flight corridor.",
+    "current flight uses dense point samples with linear position interpolation and camera direction from a short future sample plus a fixed pitch; terrain-following micro-variation is visually amplified as bobbing."
+  ],
+  "freeze": [
+    "Earth-to-parcel Google Photorealistic approach",
+    "Google tile policy proven on owner iPhone",
+    "clean mobile Google->local handoff state machine",
+    "WP27 end-stop lifecycle fix",
+    "canonical georeference and A-F coordinates",
+    "Booking wiring",
+    "landing HTML/CSS/copy",
+    "Ion credential path"
+  ],
+  "phase_1_camera_stability": {
+    "goal": "The flight must feel like a stabilized drone/gimbal pass, not terrain-following jitter.",
+    "actions": [
+      "Build a new local flight centerline in ENU from the existing WP0-WP27 route; do not move the route to new places.",
+      "Parameterize by arc length, not waypoint index/time.",
+      "Sample local terrain continuously along the route and create a constrained smooth altitude curve with target AGL 3.75 m and hard band 3.5-4.0 m.",
+      "Use cubic Catmull-Rom/Hermite/B-spline or equivalent C1/C2 continuous position interpolation. Do not use LinearApproximation for the local camera pass.",
+      "After smoothing, re-evaluate raw AGL against local terrain and correct the curve only enough to remain inside 3.5-4.0 m; never clamp telemetry values.",
+      "Camera orientation uses a 6-8 m look-ahead target along arc length and a stabilized up vector. Roll remains zero unless explicitly authored. Do not add a second fixed pitch rotation on top of a terrain-sloped direction vector.",
+      "Smooth orientation using quaternion slerp/damped gimbal logic so pitch/yaw changes are continuous.",
+      "Keep house collision clearance and add collision clearance against any retained near-camera environment geometry.",
+      "Produce a sandbox 15 s camera-only proof before adding heavy reality geometry."
+    ],
+    "acceptance": [
+      "raw AGL remains 3.5-4.0 m",
+      "no visible vertical oscillation/bounce in the owner-visible pass",
+      "no camera intersection with terrain/houses/environment",
+      "WP progression remains monotonic"
+    ]
+  },
+  "phase_2_remove_fake_near_field": {
+    "actions": [
+      "Remove all generated-completion/schematic vegetation nodes from an 8 m corridor around the local flight path for the V3 near-field layer.",
+      "Do not use ellipsoid/cone/tree proxy geometry as foreground scenery.",
+      "Keep such proxies only as distant LOD outside the local flight corridor if they cannot enter the camera frustum as giant blocking surfaces.",
+      "Keep plan-derived terrain/path/house positions as spatial collision scaffolding, but do not treat them as the final visual layer."
+    ]
+  },
+  "phase_3_real_media_reconstruction": {
+    "canonical_sources": [
+      {"title":"PHOTOS AUMARA","folder_id":"1KrN5gmDnhmhvMTZt6s9CKBFCuAUoCGa2"},
+      {"title":"Катя в домике copy 1","folder_id":"15ns7kKd5D4Ws5n940PZh-uM-gNPmhwsX"},
+      {"title":"Катя в домике copy 2","folder_id":"1KvMJvnaMC466lKMs2NvE9RlJqvcKKBFl"},
+      {"title":"AUMARA_OUTDOOR_AR_001","folder_id":"1HMqmvUEi51gzflKHpDCmaWmAca3AMNQz"},
+      {"title":"AUMARA_DAY_WALK_001_EXPORT","folder_id":"1IEBw2SHBEnxIraQV6vDykkSyLi5YLtOv"},
+      {"title":"AUMARA master source","folder_id":"14qJX_hy-4Jrj12_xWxSN5YctlEnK8Fzf"}
+    ],
+    "pipeline": [
+      "Index every outdoor JPG/JPEG/HEIC and MP4/MOV source without moving originals.",
+      "Extract sharp, non-duplicate outdoor video keyframes with timestamps. Prefer overlap sequences along the real path and around each house.",
+      "Attempt real multi-view reconstruction first using an available SfM/MVS path (COLMAP/OpenMVG/OpenMVS or equivalent). Preserve camera poses and source provenance.",
+      "If dense reconstruction is insufficient in a region, keep the plan-derived scaffold but improve it only with source-projected textures and explicitly labeled generated completion. Do not invent generic architecture.",
+      "Terrain near the flight corridor must use source-derived ground/path appearance, not a distant PNOA aerial texture as the only close-range surface.",
+      "House envelopes remain plan-true but must use house-specific exterior source projection/texture orientation; no single generic membrane crop repeated as the visual result.",
+      "Near-field vegetation should come from real source silhouettes/photogrammetry or multi-angle alpha impostors derived from real photos/video. No procedural foreground blobs.",
+      "Create a web/mobile optimized visual asset aumara/world/aumara-site-v3.glb (or a small set of spatially aligned GLBs) while keeping the V2.1 collision scaffold separately available."
+    ],
+    "truth_rule": "Every visual region/node must map to source IDs in a V3 manifest. Generated completion is allowed only when explicitly tagged generated-completion and must not overwrite observed source truth."
+  },
+  "phase_4_runtime": {
+    "actions": [
+      "Use V2.1 only for collision/ground truth if needed; render V3 as the visible local world.",
+      "Preload V3 during Google parcel approach.",
+      "On mobile handoff: Google off -> V3 visible -> wait for first V3 rendered frame -> then start WP0.",
+      "Do not advance WP while the local visual asset is still loading or texture-streaming from black/gray placeholders.",
+      "AR A-F remains hidden until V3 first frame is visible and the camera is in the local envelope."
+    ]
+  },
+  "sandbox_gate": {
+    "publish_to_main_runtime": false,
+    "required_owner_preview": [
+      "15-20 s mobile sandbox recording covering at least WP0-WP10",
+      "at least one recognizable house exterior appears as a real AUMARA house, not a gray dome/proxy",
+      "real path/ground and real vegetation context are visible",
+      "no giant gray surfaces crossing the camera",
+      "no visible up/down camera bobbing"
+    ],
+    "after_owner_pass": "Only then merge/switch the public local visual asset to V3."
+  },
+  "required_outputs": [
+    "aumara/world/flight-path-v3.json",
+    "aumara/world/aumara-site-v3.glb or aligned V3 GLB set",
+    "aumara/world/AUMARA_TWIN_V3_SOURCE_MANIFEST.json",
+    "sandbox preview URL",
+    "mobile sandbox proof MP4",
+    "AUMARA_VISUAL_TWIN_V3_RECEIPT.json"
+  ],
+  "forbidden": [
+    "another landing redesign",
+    "another token investigation",
+    "Google LOD tuning as a substitute for local reality",
+    "procedural ellipsoid/cone vegetation in the near-flight corridor",
+    "calling the current V2.1 visual scaffold final reality",
+    "publishing V3 visual changes to the public guest runtime before owner sandbox proof"
+  ],
+  "execution": "STABILIZE CAMERA -> CLEAR FAKE NEAR FIELD -> INDEX REAL MEDIA -> RECONSTRUCT V3 -> SANDBOX WP0-WP10 -> OWNER PROOF. Do not spend the turn producing status prose."
+}
