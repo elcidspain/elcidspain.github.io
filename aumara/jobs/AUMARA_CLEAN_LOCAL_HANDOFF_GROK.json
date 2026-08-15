@@ -1,0 +1,69 @@
+{
+  "job_id": "AUMARA_CLEAN_LOCAL_HANDOFF_GROK",
+  "priority": "P1_VISUAL",
+  "mode": "PATCH_CURRENT_RUNTIME_ONLY",
+  "objective": "Keep the proven Google Earth-to-parcel descent, but stop rendering close-range Google photogrammetry inside the local AUMARA envelope. Hand off cleanly to the accepted V2.1 local twin before WP0 so the 3.5-4.0 m flight is visually coherent on iPhone Safari.",
+  "owner_visual_proof": {
+    "status": "CRASH_FREE_BUT_VISUALLY_UNACCEPTABLE",
+    "observed": [
+      "Google Photorealistic renders and reaches WP27 without the previous crash",
+      "near-ground frame contains giant gray/blocky photogrammetry shards",
+      "local AUMARA terrain/twin competes visually with Google mesh",
+      "WP0-WP27 should not use close-range Google photogrammetry"
+    ]
+  },
+  "freeze": [
+    "landing HTML/CSS/copy",
+    "Google tileset LOD/SSE/cache policy from 1bdeb96a4354858986eab1e38d58bc165ab009e3",
+    "WP27 end-stop patch from 6bbcfd94c58045f9c09ae58e91c0048af0a154b1",
+    "V2.1 local GLB geometry",
+    "georeference",
+    "A-F coordinates",
+    "Booking wiring",
+    "Ion credential path"
+  ],
+  "handoff_policy": {
+    "global_context": "Google Photorealistic remains authoritative from Earth through Benidoleig/parcel approach.",
+    "preload_local": "Keep aumara-site-v2_1.glb loaded but hidden while altitude is above 140 m AGL-equivalent/local transition altitude.",
+    "transition_start": "At parcel approach inside 220 m horizontal radius and below approximately 120 m above local origin, prepare local handoff but keep AR hidden.",
+    "mobile_hard_handoff": "On mobile/iPhone, once camera is inside 180 m local radius and below 90 m above local origin, set tileset.show=false and glb.show=true. Do not render Google and local terrain simultaneously inside the low-altitude local envelope.",
+    "desktop_supported_clip": "On desktop, clipping may remain active if stable; however below 70 m inside the local envelope the local twin is authoritative and Google tiles must not occlude/intersect the camera path.",
+    "local_flight": "WP0-WP27 at 3.5-4.0 m runs with local twin authoritative. Google may remain hidden until the local flight ends.",
+    "restore": "If guest exits/restarts back to global Earth stage, restore tileset.show=true before the next descent."
+  },
+  "camera_and_visibility": [
+    "Do not start WP0 while Google tileset is still visible on mobile.",
+    "Use a short 1-2 second spatial handoff window between ~120 m and ~70 m: local twin becomes visible only after Google is hidden or safely clipped.",
+    "Do not full-screen dissolve to a different camera. Keep the same Cesium camera/world coordinates.",
+    "Set window.__AUMARA.globalTilesVisible and localTwinVisible on every state transition for proof.",
+    "Emit GOOGLE_LOCAL_HANDOFF_START and GOOGLE_LOCAL_HANDOFF_COMPLETE events.",
+    "Handoff complete requires tileset.show===false (mobile low envelope), glb.show===true, and no fatalRenderError."
+  ],
+  "ar_gate": [
+    "A-F labels remain hidden through Earth/parcel approach and during handoff.",
+    "Allow AR only after GOOGLE_LOCAL_HANDOFF_COMPLETE and camera is below 20 m above local terrain / in local envelope.",
+    "Do not show labels on top of coarse Google photogrammetry."
+  ],
+  "measurement": [
+    "Once Google is hidden for local flight, groundSample must not call/sample Google terrain for local AGL proof.",
+    "Use LOCAL_TERRAIN_RAYCAST against the local twin terrain, fallback LOCAL_DEM only if no valid local hit.",
+    "Keep raw unclamped telemetry and the existing WP27 lifecycle fix."
+  ],
+  "acceptance": {
+    "GoogleEarthStageVisible": true,
+    "GoogleParcelApproachVisible": true,
+    "mobileGoogleHiddenBeforeWP0": true,
+    "localTwinVisibleAtWP0": true,
+    "labelsVisibleBeforeHandoffComplete": false,
+    "waypointReached": 27,
+    "flightComplete": true,
+    "fatalRenderError": false,
+    "grayPhotogrammetryShardsDuringWP0_27": false,
+    "ownerVisualVerdict": "clean enough to continue content/atmosphere work"
+  },
+  "required_outputs": [
+    "patched aumara/index.html runtime only",
+    "aumara/jobs/AUMARA_CLEAN_LOCAL_HANDOFF_RECEIPT.json"
+  ],
+  "stop_rule": "Do not tune Google LOD, rebuild GLB, redesign landing, alter credentials, or reopen geometry. Solve only low-altitude coexistence: Google context -> clean local handoff -> local WP0-WP27. Commit and stop for owner visual proof."
+}
