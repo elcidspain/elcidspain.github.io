@@ -1,6 +1,6 @@
 {
   "project": "AUMARA",
-  "status": "P0_VISUAL_TWIN_V3_SANDBOX",
+  "status": "P0_V3_EVIDENCE_DELIVERY",
   "accepted_owner_proof": "aumara/jobs/AUMARA_OWNER_RUNTIME_PROOF_20260815.json",
   "accepted": [
     "GOOGLE_TILE_FIRST_RENDER",
@@ -9,23 +9,23 @@
     "V2.1 georeference / A-F positions / collision scaffold",
     "mobile Google tileset crash policy restored",
     "WP27 end-stop crash fixed",
-    "clean Google->local handoff implemented"
+    "clean Google->local handoff implemented",
+    "V3 sandbox asset and proof artifacts already built; chat attachment delivery failed"
   ],
-  "owner_visual_verdict": "FAIL_VISUAL_REALITY: local flight bobs vertically; near-field contains gray/procedural geometry; recognizable AUMARA landscape is missing.",
-  "active_job": "aumara/jobs/AUMARA_VISUAL_TWIN_V3_GROK.json",
+  "owner_visual_verdict": "PENDING_V3_VISUAL_QA: delivery channel failed before owner could inspect the V3 proof.",
+  "active_job": "aumara/jobs/AUMARA_V3_EVIDENCE_DELIVERY_GROK.json",
   "execution_order": [
     "read aumara/PROJECT.md",
     "read aumara/ACTIVE_JOB.json",
     "read active_job",
-    "stabilize local camera in ENU using arc-length smooth spline",
-    "clear procedural/generated foreground geometry from flight corridor",
-    "index canonical outdoor photos and videos",
-    "build real-media reconstruction V3 with source provenance",
-    "render V3 as visible world while retaining V2.1 only as collision scaffold if needed",
-    "produce mobile sandbox WP0-WP10 proof",
-    "stop for owner visual approval before any public V3 switch"
+    "do not rebuild V3",
+    "expose existing V3 proof artifacts on sandbox /v3-proof",
+    "verify mobile Safari-compatible playback and JSON links",
+    "return only absolute /v3-proof URL",
+    "stop for owner visual QA"
   ],
   "hard_freeze": [
+    "public AUMARA runtime",
     "Earth-to-parcel Google approach",
     "Google tile LOD/SSE/cache policy",
     "clean mobile Google->local handoff state machine",
@@ -34,14 +34,14 @@
     "A-F coordinates",
     "Booking wiring",
     "landing HTML/CSS/copy",
-    "Ion credential path"
+    "Ion credential path",
+    "existing V3 visual build during evidence delivery"
   ],
   "forbidden": [
-    "publishing V3 visual changes to public runtime before sandbox owner proof",
-    "another landing redesign",
+    "publishing V3 visual changes to public runtime before owner proof",
+    "rebuilding V3 just because chat attachments failed",
     "credential investigation",
-    "Google LOD tuning as substitute for local visual reality",
-    "procedural ellipsoid/cone vegetation in the near-flight corridor",
-    "calling V2.1 scaffold final reality"
+    "another fake Earth sandbox player",
+    "describing PASS instead of showing browser evidence"
   ]
 }
