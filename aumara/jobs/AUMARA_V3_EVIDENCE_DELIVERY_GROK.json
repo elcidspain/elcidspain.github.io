@@ -1,0 +1,49 @@
+{
+  "job_id": "AUMARA_V3_EVIDENCE_DELIVERY_GROK",
+  "priority": "P0_EVIDENCE",
+  "mode": "SANDBOX_ONLY_NO_MAIN_RUNTIME_PUSH",
+  "objective": "Deliver the already-built V3 sandbox proof through the sandbox web server instead of Grok chat attachments, which are failing.",
+  "known_state": {
+    "v3_asset": "sandbox/aumara-v3/aumara-site-v3.glb",
+    "manifest_version": "3.1.0",
+    "publish_to_main_runtime": false,
+    "chat_attachment_delivery": "FAILED"
+  },
+  "do_not_rebuild": [
+    "V3 GLB",
+    "camera spline",
+    "media index",
+    "manifest",
+    "public main runtime"
+  ],
+  "required_action": [
+    "Create a sandbox-only route /v3-proof on the existing Grok preview server.",
+    "The route must be a plain mobile-friendly proof page, not a redesign and not a new app/project.",
+    "Serve AUMARA_V3_WP0_WP10_MOBILE.mp4 directly with native controls, playsinline, muted optional.",
+    "Show three still frames generated from that exact MP4 at WP0, WP5 and WP10. Each still must display its waypoint label and timestamp outside the image; do not burn debug overlays into the proof image unless already present in the recording.",
+    "Provide direct clickable/downloadable links to AUMARA_TWIN_V3_SOURCE_MANIFEST.json and AUMARA_V3_MEDIA_INDEX.json.",
+    "Provide a direct link to aumara-site-v3.glb only for technical download; the owner should not need to download it to judge the visual pass.",
+    "At top of page show only: V3 SANDBOX PROOF · NOT PUBLISHED · WP0→WP10.",
+    "Do not depend on Cesium/Ion/Google for this proof page. It must render from the local sandbox V3 assets only.",
+    "Verify the page from a 390x844 mobile viewport before returning the URL."
+  ],
+  "proof_page_order": [
+    "mobile proof video",
+    "WP0 still",
+    "WP5 still",
+    "WP10 still",
+    "source manifest link",
+    "media index link",
+    "GLB link"
+  ],
+  "acceptance": [
+    "owner can open /v3-proof without login",
+    "video plays in Safari/iPhone",
+    "all three stills render",
+    "manifest opens as JSON",
+    "media index opens as JSON",
+    "no 'Something went wrong' attachment dependency",
+    "nothing is pushed to public AUMARA runtime"
+  ],
+  "return_format": "Return ONLY the absolute sandbox /v3-proof URL and one line: READY_FOR_OWNER_VISUAL_QA. No attachments. No PASS claim."
+}
