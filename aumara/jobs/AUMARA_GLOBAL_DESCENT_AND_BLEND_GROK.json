@@ -3,30 +3,119 @@
   "priority": "P0",
   "mode": "PATCH_CURRENT_BUILD_ONLY",
   "depends_on": "AUMARA_WORLD_V2_1_1_SOURCE_PURGE_GROK CLOSED",
-  "objective": "One continuous Earth/Spain/Benidoleig descent that blends into the accepted V2.1.1 local twin and then flies WP0-WP27 at 3.5-4.0 m AGL. Do not reopen house-feature invention.",
+  "objective": "One real continuous Earth -> Iberia -> Costa Blanca -> Benidoleig -> AUMARA parcel descent using Google Photorealistic 3D Tiles when authorized, then a spatially continuous blend into the accepted V2.1.1 local twin and WP0-WP27 flight at 3.5-4.0 m AGL.",
   "freeze": [
     "landing HTML/CSS/copy",
     "AUMARA_WORLD_GEOREFERENCE_v1.json",
     "house A-F positions",
     "aumara-site-v2_1.glb feature purge",
-    "Booking/AR wiring"
+    "Booking/AR wiring",
+    "V2.1.1 receipt and telemetry"
   ],
-  "when_tiles_ready": {
-    "path": "Earth view -> Iberia -> Costa Blanca -> Benidoleig parcel -> local twin WP0-27",
-    "blend": "local GLB remains georeferenced; do not hide it under a buried globe"
+  "global_world": {
+    "required_provider": "Google Photorealistic 3D Tiles via CesiumJS",
+    "preferred_api": "Cesium.createGooglePhotorealistic3DTileset(...) or Cesium3DTileset root URL https://tile.googleapis.com/v1/3dtiles/root.json?key=<runtime-key>",
+    "runtime_credentials_only": true,
+    "never_commit_or_print_key": true,
+    "never_pass_key_in_public_page_url": true,
+    "credits_required": true,
+    "credits_rule": "Google tile attribution must remain visible; use Cesium credit display/showCreditsOnScreen-compatible path.",
+    "not_accepted_as_global_world": [
+      "Esri 2D imagery",
+      "single satellite raster",
+      "empty ellipsoid/globe",
+      "camera keyframes without loaded 3D tiles",
+      "pre-rendered Earth video"
+    ]
   },
-  "when_tiles_blocked": {
-    "status": "BLOCKED is valid",
-    "path": "high local approach over the parcel -> WP0-27",
-    "do_not": "block descent work on missing Ion/Google keys"
+  "tiles_readiness_gate": {
+    "globalTilesStatus_READY_requires": [
+      "Google photorealistic tileset object exists",
+      "root tileset request succeeded",
+      "at least one visible Google 3D tile rendered before descent is called READY",
+      "no required tile/auth request failure",
+      "Google/Cesium attribution visible"
+    ],
+    "if_missing_key_or_auth": "Set globalTilesStatus=BLOCKED_GOOGLE_KEY and keep the local twin usable. Do not claim Earth-to-AUMARA descent READY."
+  },
+  "descent_path": {
+    "continuous_camera": true,
+    "no_flyto_hops": true,
+    "stages": [
+      {"name":"EARTH","target":"global view","altitude_m_approx":18000000},
+      {"name":"IBERIA","target":"Spain / eastern Iberia","altitude_m_approx":650000},
+      {"name":"COSTA_BLANCA","target":"Marina Alta / Costa Blanca","altitude_m_approx":30000},
+      {"name":"BENIDOLEIG","target":"Benidoleig surroundings","altitude_m_approx":2200},
+      {"name":"PARCEL_APPROACH","target":"AUMARA parcel","altitude_m_approx":140},
+      {"name":"LOCAL_BLEND","target":"local twin entry","altitude_m_approx":40},
+      {"name":"WP0_27","target":"existing local spline","agl_m":[3.5,4.0]}
+    ],
+    "orientation": "Camera must continuously look ahead/down toward the next spatial target; no orientation snap at stage boundaries.",
+    "timing": "Use eased spline/interpolation so velocity and pitch changes are continuous."
+  },
+  "blend": {
+    "require_parcel_footprint": true,
+    "footprint_source": "canonical cadastral/georeference parcel polygon; never invent a replacement rectangle if parcel polygon exists",
+    "global_local_overlap_rule": "Do not render Google's parcel geometry through the local twin.",
+    "preferred_method": "Apply Cesium ClippingPolygonCollection to the Google global tileset over the AUMARA parcel footprint, then inset the georeferenced local GLB inside the clipped region.",
+    "visibility_sequence": [
+      "Above local transition altitude: Google global world dominant; local twin may be preloaded but visually unobtrusive.",
+      "During parcel approach: clipped parcel opens and local twin becomes visible without positional jump.",
+      "At local flight entry: local twin fully authoritative inside parcel; Google remains contextual outside parcel."
+    ],
+    "no_crossfade_cheat": "A simple full-screen dissolve between unrelated camera/render contexts is not a spatial blend. Camera world coordinates must remain continuous."
   },
   "local_flight": {
-    "agl_m": [3.5, 4.0],
-    "waypoints": "existing WP0-27",
-    "measurement": "keep live 10 Hz unclamped sampler"
+    "asset": "aumara/world/aumara-site-v2_1.glb",
+    "agl_m": [3.5,4.0],
+    "waypoints": "existing WP0-WP27",
+    "measurement": "keep live 10 Hz unclamped sampler",
+    "ar": "world-anchored A-F labels/cards; declutter; Booking"
+  },
+  "fallback": {
+    "when_global_tiles_blocked": "Keep current high-local approach -> WP0-WP27 as usable fallback only.",
+    "label": "LOCAL_FALLBACK, not GLOBAL_DESCENT_READY",
+    "do_not": "Do not replace Google Photorealistic 3D Tiles with Esri imagery and call the global stage complete."
+  },
+  "runtime_proof": {
+    "capture": "one uncut desktop and one uncut mobile run",
+    "start": "Earth/global stage after first visible Google 3D tile",
+    "end": "WP27",
+    "required_events": [
+      "GOOGLE_TILE_FIRST_RENDER",
+      "EARTH_STAGE",
+      "IBERIA_STAGE",
+      "COSTA_BLANCA_STAGE",
+      "PARCEL_APPROACH",
+      "LOCAL_TWIN_VISIBLE",
+      "BLEND_COMPLETE",
+      "WP0",
+      "WP27"
+    ],
+    "no_loading_screen_in_evidence": true,
+    "no_cuts": true
   },
   "required_outputs": [
-    "patched aumara/index.html descent keyframes",
+    "patched aumara/index.html runtime only",
+    "aumara/jobs/AUMARA_GLOBAL_DESCENT_DESKTOP.mp4",
+    "aumara/jobs/AUMARA_GLOBAL_DESCENT_MOBILE.mp4",
+    "aumara/jobs/AUMARA_GLOBAL_DESCENT_RUNTIME.json",
     "aumara/jobs/AUMARA_GLOBAL_DESCENT_RECEIPT.json"
-  ]
+  ],
+  "receipt_required": {
+    "globalTilesStatus": "READY|BLOCKED_GOOGLE_KEY|FAILED",
+    "provider": "GOOGLE_PHOTOREALISTIC_3D_TILES",
+    "firstGoogleTileRendered": true,
+    "attributionVisible": true,
+    "continuousCamera": true,
+    "parcelClippingActive": true,
+    "localTwinLoaded": true,
+    "blendComplete": true,
+    "waypointReached": 27,
+    "rawAglMin_gte": 3.5,
+    "rawAglMax_lte": 4.0,
+    "consoleErrors": [],
+    "failedRequiredRequests": []
+  },
+  "stop_rule": "Do not redesign landing, rebuild the local twin, create a new project, or call keyframes alone a global descent. Load real Google 3D tiles -> prove first tile -> continuous descent -> clip parcel -> inset local twin -> WP0-WP27 -> record -> commit -> receipt."
 }
