@@ -314,18 +314,20 @@ async function runTwin() {
   function groundSample(lonX, latX) {
     const en = lonLatToEn(lonX, latX, lon, lat);
     const dem = originH + sampleHM(hm, en.east, en.north);
+    const googleLive = !!(tileset && tileset.show);
     try {
       const startP = C.Cartesian3.fromDegrees(lonX, latX, dem + 80);
       const nrm = C.Ellipsoid.WGS84.geodeticSurfaceNormal(startP, new C.Cartesian3());
       const down = C.Cartesian3.negate(nrm, new C.Cartesian3());
-      const hit = viewer.scene.pickFromRay(new C.Ray(startP, down), tilesOn ? [tileset] : []);
+      const exclude = tileset ? [tileset] : [];
+      const hit = viewer.scene.pickFromRay(new C.Ray(startP, down), exclude);
       if (hit && hit.position) {
         const hh = C.Cartographic.fromCartesian(hit.position).height;
         const dh = hh - dem;
         if (isFinite(hh) && dh > -0.4 && dh < 0.45) return { ground: hh, source: "LOCAL_TERRAIN_RAYCAST" };
       }
     } catch (e) {}
-    if (tilesOn) {
+    if (googleLive) {
       try {
         const hgt = viewer.scene.sampleHeight(C.Cartographic.fromDegrees(lonX, latX), [glb]);
         if (typeof hgt === "number" && isFinite(hgt) && Math.abs(hgt - dem) < 12) return { ground: hgt, source: "GOOGLE_TERRAIN" };
@@ -396,7 +398,7 @@ async function runTwin() {
   viewer.clock.clockRange = C.ClockRange.CLAMPED;
   viewer.clock.shouldAnimate = true;
   let firstFrameRendered = false, maxWp = -1, lastHz = -0.1;
-  let blendComplete = false, localTwinVisible = false;
+  let blendComplete = !tilesOn, localTwinVisible = false, handoffComplete = !tilesOn;
   let localTwinVisibleBeforeBlend = false, labelsVisibleBeforeBlend = false, zFightingObserved = false;
   const rawAgl = [];
   const startedMs = Date.now();
@@ -415,13 +417,16 @@ async function runTwin() {
     firstGoogleTileRendered, attributionVisible: !!(creditsEl && creditsEl.offsetParent !== null || (creditsEl && creditsEl.childNodes.length)),
     continuousCamera: true, parcelClippingActive, localTwinLoaded: true, blendComplete,
     localTwinVisible: false, localTwinVisibleBeforeBlend: false,
-    labelsVisibleBeforeBlend: false, zFightingObserved: false,
+    labelsVisibleBeforeBlend: false, labelsVisibleBeforeHandoffComplete: false,
+    zFightingObserved: false, globalTilesVisible: tilesOn, handoffComplete: !tilesOn,
+    mobileGoogleHiddenBeforeWP0: !mobile || !tilesOn, localTwinVisibleAtWP0: false,
+    GoogleEarthStageVisible: false, GoogleParcelApproachVisible: false,
     clipSupported: clipSupported, renderError: null, fatalRenderError: false,
     ionQueryRemoved: !new URL(location.href).searchParams.has("ion"),
     flightComplete: false,
     stage: tilesOn ? "EARTH" : "LOCAL_FALLBACK",
     verification_status: tilesOn && firstGoogleTileRendered ? "READY" : "AWAITING_OWNER_RUNTIME_PROOF",
-    required_events: ["GOOGLE_TILE_FIRST_RENDER","EARTH_STAGE","IBERIA_STAGE","COSTA_BLANCA_STAGE","PARCEL_APPROACH","LOCAL_TWIN_VISIBLE","BLEND_COMPLETE","WP0","WP27"],
+    required_events: ["GOOGLE_TILE_FIRST_RENDER","EARTH_STAGE","IBERIA_STAGE","COSTA_BLANCA_STAGE","PARCEL_APPROACH","GOOGLE_LOCAL_HANDOFF_START","GOOGLE_LOCAL_HANDOFF_COMPLETE","LOCAL_TWIN_VISIBLE","BLEND_COMPLETE","WP0","WP27"],
     ownerProof: function () {
       const a = window.__AUMARA;
       return {
@@ -436,6 +441,13 @@ async function runTwin() {
         localTwinVisible: a.localTwinVisible,
         localTwinVisibleBeforeBlend: a.localTwinVisibleBeforeBlend,
         labelsVisibleBeforeBlend: a.labelsVisibleBeforeBlend,
+        labelsVisibleBeforeHandoffComplete: a.labelsVisibleBeforeHandoffComplete,
+        globalTilesVisible: a.globalTilesVisible,
+        handoffComplete: a.handoffComplete,
+        mobileGoogleHiddenBeforeWP0: a.mobileGoogleHiddenBeforeWP0,
+        localTwinVisibleAtWP0: a.localTwinVisibleAtWP0,
+        GoogleEarthStageVisible: a.GoogleEarthStageVisible,
+        GoogleParcelApproachVisible: a.GoogleParcelApproachVisible,
         zFightingObserved: a.zFightingObserved,
         clipSupported: a.clipSupported,
         renderError: a.renderError,
@@ -504,30 +516,50 @@ async function runTwin() {
       if (st === "LOCAL_BLEND") emit("LOCAL_BLEND");
       if (st === "WP0" || (elapsed >= intro && maxWp < 0)) emit("WP0");
     }
-    const inBlendWindow = alt < 160;
-    const inLocalEnvelope = alt < 70 && (function () {
-      const en = lonLatToEn(carto.longitude * 180 / Math.PI, carto.latitude * 180 / Math.PI, lon, lat);
-      return Math.hypot(en.east, en.north) < 180;
-    })();
-    if (!localTwinVisible && ((tilesOn && inBlendWindow && (parcelClippingActive || !clipSupported)) || (!tilesOn && alt < 80))) {
+    const lonX = carto.longitude * 180 / Math.PI, latX = carto.latitude * 180 / Math.PI;
+    const enNow = lonLatToEn(lonX, latX, lon, lat);
+    const horiz = Math.hypot(enNow.east, enNow.north);
+    const localAlt = alt - originH;
+    if (tileset && tilesOn && (localAlt > 600 || elapsed < 4)) {
+      if (!tileset.show) tileset.show = true;
+    }
+    if (st === "EARTH" && tileset && tileset.show) window.__AUMARA.GoogleEarthStageVisible = true;
+    if (st === "PARCEL_APPROACH" && tileset && tileset.show) window.__AUMARA.GoogleParcelApproachVisible = true;
+    if (tilesOn && !window.__AUMARA._handoffStart && horiz < 220 && localAlt < 120) {
+      window.__AUMARA._handoffStart = true;
+      emit("GOOGLE_LOCAL_HANDOFF_START");
+    }
+    const mobileHide = mobile && tilesOn && horiz < 180 && localAlt < 90;
+    const deskHide = !mobile && tilesOn && horiz < 180 && localAlt < 70;
+    if (tileset && (mobileHide || deskHide || (tilesOn && elapsed >= intro))) tileset.show = false;
+    const googleHidden = !tileset || !tileset.show;
+    if (!glb.show && (!tilesOn || (googleHidden && localAlt < 140))) {
       glb.show = true;
       localTwinVisible = true;
       emit("LOCAL_TWIN_VISIBLE");
       window.__AUMARA.localTwinVisible = true;
       window.__AUMARA.localTwinLoaded = true;
     }
-    if (localTwinVisible && !blendComplete && alt >= 160) {
+    if (localTwinVisible && tileset && tileset.show && localAlt > 140) {
       localTwinVisibleBeforeBlend = true;
       window.__AUMARA.localTwinVisibleBeforeBlend = true;
     }
-    if (!blendComplete && localTwinVisible && (alt < 55 || !tilesOn)) {
+    if (!handoffComplete && glb.show && googleHidden && !window.__AUMARA.fatalRenderError) {
+      handoffComplete = true;
       blendComplete = true;
-      glb.show = true;
-      emit("BLEND_COMPLETE");
+      window.__AUMARA.handoffComplete = true;
       window.__AUMARA.blendComplete = true;
+      emit("GOOGLE_LOCAL_HANDOFF_COMPLETE");
+      emit("BLEND_COMPLETE");
     }
-    const lonX = carto.longitude * 180 / Math.PI, latX = carto.latitude * 180 / Math.PI;
-    const wp = elapsed < intro ? 0 : Math.min(27, Math.round(((elapsed - intro) / dur) * 27));
+    window.__AUMARA.globalTilesVisible = !!(tileset && tileset.show);
+    window.__AUMARA.localTwinVisible = !!glb.show;
+    const googleBlockingWp = !!(mobile && tilesOn && tileset && tileset.show);
+    if (elapsed >= intro && !googleBlockingWp) {
+      if (googleHidden) window.__AUMARA.mobileGoogleHiddenBeforeWP0 = true;
+      if (glb.show) window.__AUMARA.localTwinVisibleAtWP0 = true;
+    }
+    const wp = (elapsed < intro || googleBlockingWp) ? 0 : Math.min(27, Math.round(((elapsed - intro) / dur) * 27));
     if (wp > maxWp) { maxWp = wp; window.__AUMARA.waypointReached = wp; if (wp === 27) emit("WP27"); }
     if (elapsed >= intro && wp === 0) emit("WP0");
     if (elapsed >= intro && elapsed - lastHz >= 0.1) {
@@ -567,10 +599,10 @@ async function runTwin() {
     arNodes.forEach(({ h, el }) => {
       const cam = viewer.camera.positionCartographic;
       const en = cam ? lonLatToEn(cam.longitude * 180 / Math.PI, cam.latitude * 180 / Math.PI, lon, lat) : { east: 999, north: 999 };
-      const inEnv = cam && (cam.height - originH) < 70 && Math.hypot(en.east, en.north) < 180;
-      const allow = localTwinVisible && blendComplete && inEnv;
+      const allow = handoffComplete && cam && (cam.height - originH) < 20 && Math.hypot(en.east, en.north) < 180;
       if (!allow) {
-        if (el.style.display === "block" && !blendComplete) {
+        if (el.style.display === "block" && !handoffComplete) {
+          window.__AUMARA.labelsVisibleBeforeHandoffComplete = true;
           labelsVisibleBeforeBlend = true;
           window.__AUMARA.labelsVisibleBeforeBlend = true;
         }

@@ -45,14 +45,15 @@ Accepted:
 
 Not final yet:
 
-- P0 mobile Safari render hotfix (`aumara/jobs/AUMARA_MOBILE_RENDER_HOTFIX_GROK.json`).
-  Restore last owner-proven Google tile policy. Do not optimize quality until iPhone render is crash-free.
+- clean Google → local twin handoff before WP0
+  (`aumara/jobs/AUMARA_CLEAN_LOCAL_HANDOFF_GROK.json`).
+  Do not tune Google LOD. Do not reopen V2.1 geometry.
 
 ## Active job
 
 Current execution job:
 
-`aumara/jobs/AUMARA_WP27_ENDSTOP_HOTFIX_GROK.json`
+`aumara/jobs/AUMARA_CLEAN_LOCAL_HANDOFF_GROK.json`
 
 Restore the last owner-proven Google Photorealistic render policy on iPhone Safari. Do not optimize tile quality until the crash is gone.
 
@@ -106,7 +107,7 @@ Do not create parallel truth folders unless explicitly instructed.
 
 Current execution job:
 
-`aumara/jobs/AUMARA_WP27_ENDSTOP_HOTFIX_GROK.json`
+`aumara/jobs/AUMARA_CLEAN_LOCAL_HANDOFF_GROK.json`
 
 Restore the last owner-proven Google Photorealistic render policy on iPhone Safari. Do not optimize tile quality until the crash is gone.
 

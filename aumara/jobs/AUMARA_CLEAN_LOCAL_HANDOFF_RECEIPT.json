@@ -1,0 +1,23 @@
+{
+  "job": "AUMARA_CLEAN_LOCAL_HANDOFF_GROK",
+  "commit_sha": "PENDING",
+  "verification_status": "HANDOFF_COMMITTED_AWAITING_OWNER_VISUAL",
+  "tilesetPolicyUnchanged": true,
+  "v21GeometryUnchanged": true,
+  "landingUnchanged": true,
+  "wp27EndstopKept": true,
+  "mobile_hard_handoff": "tileset.show=false inside 180 m / below 90 m before WP0",
+  "desktop_handoff": "tileset.show=false inside 180 m / below 70 m",
+  "ar_gate": "only after handoffComplete and localAlt < 20 m",
+  "this_session_fallback": {
+    "handoffComplete": true,
+    "mobileGoogleHiddenBeforeWP0": true,
+    "localTwinVisibleAtWP0": true,
+    "labelsVisibleBeforeHandoffComplete": false,
+    "waypointReached": 27,
+    "flightComplete": true,
+    "fatalRenderError": false
+  },
+  "public_url": "https://elcidspain.github.io/aumara/?debug=1#flight",
+  "owner_console": "copy(JSON.stringify(window.__AUMARA.ownerProof(), null, 2))"
+}
