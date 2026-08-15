@@ -1,6 +1,6 @@
 {
   "job": "AUMARA_GLOBAL_DESCENT_AND_BLEND_GROK",
-  "commit_sha": "PENDING",
+  "commit_sha": "1db94df3f7ff61f88732c1cce8169fe0ed5f707b",
   "globalTilesStatus": "BLOCKED_ION_TOKEN",
   "provider": "GOOGLE_PHOTOREALISTIC_3D_TILES",
   "firstGoogleTileRendered": false,
