@@ -1,7 +1,7 @@
 {
   "job": "AUMARA_GLOBAL_DESCENT_AND_BLEND_GROK",
-  "commit_sha": "a6a34a626fcaf7c98ca33d57994e8491aae408f3",
-  "globalTilesStatus": "BLOCKED_GOOGLE_KEY",
+  "commit_sha": "PENDING",
+  "globalTilesStatus": "BLOCKED_ION_TOKEN",
   "provider": "GOOGLE_PHOTOREALISTIC_3D_TILES",
   "firstGoogleTileRendered": false,
   "attributionVisible": true,
@@ -10,11 +10,9 @@
   "localTwinLoaded": true,
   "blendComplete": false,
   "waypointReached": null,
-  "localTwinStatus": "READY",
-  "v21_local_layer": "CLOSED_UNCHANGED",
-  "esri_used_as_global_world": false,
-  "keyframes_called_descent": false,
   "consoleErrors": [],
   "failedRequiredRequests": [],
-  "note": "Runtime implements Google Photorealistic 3D Tiles, cadastral clipping, and a continuous Earth-to-WP27 spline. Live probe received 401 from Ion. No Google Maps / authorized Ion credential is available in this environment. Descent is not READY."
+  "esri_used_as_global_world": false,
+  "v21_local_layer": "CLOSED_UNCHANGED",
+  "note": "Stopped. Runtime ion session token unavailable / Ion 401 on createGooglePhotorealistic3DTileset(). Need a dedicated AUMARA ion token with Google Photorealistic 3D Tiles enabled and Allowed URLs restricted to https://elcidspain.github.io/aumara/ and https://aumara.me/."
 }

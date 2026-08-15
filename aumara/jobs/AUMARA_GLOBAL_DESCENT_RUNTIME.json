@@ -2,21 +2,33 @@
   "schema": "aumara.global-descent-runtime",
   "capture_mode": "LIVE_BROWSER_RUNTIME",
   "provider": "GOOGLE_PHOTOREALISTIC_3D_TILES",
-  "globalTilesStatus": "BLOCKED_GOOGLE_KEY",
+  "loader": "Cesium.createGooglePhotorealistic3DTileset()",
+  "globalTilesStatus": "BLOCKED_ION_TOKEN",
+  "ionSessionToken": false,
+  "ionDefaultTokenPresent": true,
+  "ionRequestStatus": 401,
   "firstGoogleTileRendered": false,
   "attributionVisible": true,
   "continuousCamera": true,
   "parcelClippingActive": false,
   "localTwinLoaded": true,
   "blendComplete": false,
-  "waypointReached": null,
-  "reason": "Cesium createGooglePhotorealistic3DTileset returned 401. No Google Maps Photorealistic 3D Tiles key and no authorized Cesium Ion token are present in this runtime. Esri/keyframes were not used as a substitute.",
-  "runtime_ready_when_key_present": [
-    "Google Photorealistic 3D Tiles via createGooglePhotorealistic3DTileset or tile.googleapis.com",
-    "wait for first visible tile before descent clock",
-    "eased Earth->Iberia->Costa Blanca->Benidoleig->parcel->blend->WP0-27 spline",
-    "cadastral ClippingPolygonCollection hole in Google tiles",
-    "local aumara-site-v2_1.glb inset, shown at parcel approach"
-  ],
-  "how_to_authorize": "Use the existing Ion button. A Google Maps key (AIza...) is stored as AUMARA_GOOGLE_MAPS_KEY; a Cesium Ion token is stored as CESIUM_ION_TOKEN. Never put the key in the page URL."
+  "esri_used": false,
+  "drive_secret_search": false,
+  "public_url_token": false,
+  "reason": "No dedicated AUMARA Cesium ion session token. Library defaultAccessToken is present and createGooglePhotorealistic3DTileset() returns 401. Google Photorealistic access is not enabled for the available token.",
+  "token_requirements": {
+    "type": "dedicated AUMARA application token",
+    "scopes": "minimum public scopes only",
+    "allowed_urls": [
+      "https://elcidspain.github.io/aumara/",
+      "https://aumara.me/"
+    ],
+    "never": [
+      "print",
+      "commit",
+      "?ion=",
+      "public page URL"
+    ]
+  }
 }

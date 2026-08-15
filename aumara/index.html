@@ -154,13 +154,9 @@ let started = false;
 document.getElementById("flight").onclick = () => startFlight();
 document.getElementById("close").onclick = () => { document.getElementById("stage").classList.remove("on"); sheet.className = ""; };
 document.getElementById("ionbtn").onclick = () => {
-  const next = prompt("Cesium ion / Google Maps key", "");
+  const next = prompt("Cesium ion token", "");
   if (!next) return;
-  const v = next.trim();
-  try {
-    if (v.indexOf("AIza") === 0) localStorage.setItem("AUMARA_GOOGLE_MAPS_KEY", v);
-    else localStorage.setItem("CESIUM_ION_TOKEN", v);
-  } catch (e) {}
+  try { localStorage.setItem("CESIUM_ION_TOKEN", next.trim()); } catch (e) {}
 };
 if (location.hash === "#flight") startFlight();
 async function startFlight() {
@@ -176,14 +172,8 @@ async function runTwin() {
   const C = window.Cesium;
   window.CESIUM_BASE_URL = "https://cesium.com/downloads/cesiumjs/releases/1.134/Build/Cesium/";
   if (window.AUMARA_ION) window.AUMARA_ION.apply(C);
-  function resolveGoogleKey() {
-    try {
-      if (window.AUMARA_GOOGLE_MAPS_KEY) return String(window.AUMARA_GOOGLE_MAPS_KEY);
-      return localStorage.getItem("AUMARA_GOOGLE_MAPS_KEY") || "";
-    } catch (e) { return ""; }
-  }
-  const gKey = resolveGoogleKey();
-  if (gKey && C.GoogleMaps) C.GoogleMaps.defaultApiKey = gKey;
+  const ionPresent = !!(C.Ion && C.Ion.defaultAccessToken);
+  const sessionIon = !!(window.AUMARA_ION && window.AUMARA_ION.resolve && window.AUMARA_ION.resolve());
   const [geo, flight, hm] = await Promise.all([
     GEO ? Promise.resolve(GEO) : fetch("./AUMARA_WORLD_GEOREFERENCE_v1.json").then((r) => r.json()),
     fetch("./world/flight-path.json").then((r) => r.json()),
@@ -218,14 +208,12 @@ async function runTwin() {
     events.push({ name, t: Date.now(), extra: extra || null });
     if (window.__AUMARA) window.__AUMARA.events = events;
   }
-  let tilesOn = false, tileset = null, firstGoogleTileRendered = false, tilesStatus = "BLOCKED_GOOGLE_KEY";
+  let tilesOn = false, tileset = null, firstGoogleTileRendered = false, tilesStatus = "BLOCKED_ION_TOKEN";
   try {
-    const opts = { maximumScreenSpaceError: mobile ? 16 : 8, skipLevelOfDetail: true, enableCollision: true };
-    if (gKey) {
-      tileset = await C.Cesium3DTileset.fromUrl("https://tile.googleapis.com/v1/3dtiles/root.json?key=" + encodeURIComponent(gKey), opts);
-    } else {
-      tileset = await C.createGooglePhotorealistic3DTileset({ onlyUsingWithGoogleGeocoder: true }, opts);
-    }
+    if (!ionPresent) throw new Error("NO_ION_TOKEN");
+    tileset = await C.createGooglePhotorealistic3DTileset();
+    tileset.maximumScreenSpaceError = mobile ? 16 : 8;
+    tileset.skipLevelOfDetail = true;
     if (tileset.cacheBytes !== undefined) tileset.cacheBytes = mobile ? 256 * 1024 * 1024 : 768 * 1024 * 1024;
     tileset.dynamicScreenSpaceError = true;
     viewer.scene.primitives.add(tileset);
@@ -246,7 +234,7 @@ async function runTwin() {
   } catch (e) {
     tilesOn = false;
     tileset = null;
-    tilesStatus = /401|403|key|token|denied|unauthorized/i.test(String(e && e.message ? e.message : e)) ? "BLOCKED_GOOGLE_KEY" : "FAILED";
+    tilesStatus = /401|403|key|token|denied|unauthorized|NO_ION_TOKEN/i.test(String(e && e.message ? e.message : e)) ? "BLOCKED_ION_TOKEN" : "FAILED";
     try { window.__AUMARA_TILES_ERROR = String(e && e.message ? e.message : e).slice(0, 240); } catch (e2) {}
     viewer.scene.globe.show = false;
   }
@@ -391,6 +379,8 @@ async function runTwin() {
     rawAgl, samples: [], consoleErrors: [], events,
     globalTilesStatus: tilesOn && firstGoogleTileRendered ? "READY" : tilesStatus,
     provider: "GOOGLE_PHOTOREALISTIC_3D_TILES",
+    ionSessionToken: sessionIon,
+    ionDefaultTokenPresent: ionPresent,
     firstGoogleTileRendered, attributionVisible: !!(creditsEl && creditsEl.offsetParent !== null || (creditsEl && creditsEl.childNodes.length)),
     continuousCamera: true, parcelClippingActive, localTwinLoaded: true, blendComplete,
     stage: tilesOn ? "EARTH" : "LOCAL_FALLBACK",
