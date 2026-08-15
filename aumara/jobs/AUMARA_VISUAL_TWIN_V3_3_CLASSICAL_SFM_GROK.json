@@ -1,0 +1,72 @@
+{
+  "job_id":"AUMARA_VISUAL_TWIN_V3_3_CLASSICAL_SFM_GROK",
+  "priority":"P0_VISUAL_REALITY",
+  "mode":"SANDBOX_ONLY",
+  "owner_verdict":"V3.1 rejected; V3.2 neural engine unavailable. Continue with source-derived classical SfM + plan-true hybrid twin. No fake posters.",
+  "truth_sources":{
+    "primary_outdoor_video":{
+      "title":"AUMARA_DAY_MASTER_C_CALM_PACE_v01.mp4",
+      "drive_id":"1aG4Sgez6tvkwDdnXDX8l7QVoN2Dct783",
+      "duration_s":8.0,
+      "role":"PRIMARY_NEAR_FIELD_TRUTH",
+      "observed_content":"real path, stone edging, pines, at least three houses, terraces, valley context"
+    },
+    "outdoor_reference":{
+      "title":"IMG_7368.JPG",
+      "drive_id":"10EIwRAP18xj6is7T1tVdfK5j7n3w6EIG",
+      "role":"NIGHT_EXTERIOR_REFERENCE_ONLY"
+    },
+    "far_context":{
+      "title":"ground_real.jpg",
+      "drive_id":"1G2Epwbza3a_ZMaNTDcvSv2KvaBdURq1M",
+      "role":"DISTANT_AERIAL_CONTEXT_ONLY",
+      "note":"Google satellite mosaic; never use as eye-level ground material"
+    },
+    "quarantine_interior_titles":["1B6A9875.JPEG","1B6A9866.JPEG","1B6A9867.JPEG","1B6A9873.JPEG","1B6A9861.JPEG","1B6A8857.JPEG","1B6A8852.JPEG","1B6A8803.JPEG"]
+  },
+  "verified_cpu_reconstruction_baseline":{
+    "input_frames":31,
+    "method":"OpenCV SIFT + essential-matrix pose recovery + triangulation + voxel merge",
+    "source_derived_points":19568,
+    "gpu_required":false,
+    "status":"PROVEN_FEASIBLE_BY_GPT_LEAD",
+    "instruction":"Reproduce or improve this method in sandbox; BLOCKED_RECON_ENGINE is not valid for classical SfM. Neural dense reconstruction may remain blocked."
+  },
+  "freeze":["public runtime","Google approach","tile policy","clean handoff","WP27 fix","canonical georeference","A-F positions","Booking","landing","Ion path"],
+  "pipeline":[
+    "Use ONLY frames from the primary outdoor video for near-field reconstruction unless a candidate image is visually classified OUTDOOR first.",
+    "Extract 3-5 fps sharp video frames. Maintain exact frame timestamps.",
+    "Estimate camera poses with SIFT/ORB correspondences + essential matrix/RANSAC. Use optical-flow tracks to densify correspondences where stable.",
+    "Triangulate a colored source-derived point cloud. Reject non-positive depth, high reprojection error, floaters, and unstable pairs.",
+    "Register reconstructed camera trajectory and point cloud to the existing WP/path and canonical plan/GML using similarity transform. Do not invent GPS from frames.",
+    "Render source-derived geometry as true world-space colored splats/points, not image planes. Use circular/gaussian point sprites only; no rectangular photo cards.",
+    "Use plan/GML to render clean house shell geometry at the six canonical positions. House proportions/roof/wall forms must follow plans and day-walk visual evidence. Do not call them tents.",
+    "Derive house wall/roof material colors and repeating surface textures from OUTDOOR day-walk crops only. Never project whole photographs onto shells.",
+    "Build the path, stone border and terrace geometry from plan/path constraints and day-walk visual evidence. Extract tileable path/stone materials from outdoor frames.",
+    "Vegetation near the flight corridor should be represented first by source-derived point/splat geometry. Add modeled trunks/canopies only where their location is supported by reconstructed points/video evidence; no generic forest wall in foreground.",
+    "Keep satellite texture only outside the reconstructed local envelope as distant ground context."
+  ],
+  "camera":[
+    "Reuse the smoothed arc-length local route.",
+    "Heading follows path tangent, roll=0, 6-8m look-ahead.",
+    "Use reconstructed video camera path only as visual alignment evidence, not as the final guest camera path.",
+    "Raw local clearance remains 3.5-4.0m against canonical/local terrain."
+  ],
+  "sandbox_proof":{
+    "route":"/v3-3-proof",
+    "scope":"WP0-WP10",
+    "must_show":["real source-derived splat/point environment","recognizable path/stone border","at least one correctly positioned modeled AUMARA house with outdoor-derived materials","real vegetation context from source points","stable camera"],
+    "must_not_show":["interior pixels","photo rectangles","stretched wall photos","giant gray surfaces","procedural foreground blobs"]
+  },
+  "pass_bar":[
+    "owner can visually recognize the day-walk location",
+    "no interior contamination",
+    "no visible poster/billboard method",
+    "house reads as spatial geometry rather than a flat image",
+    "path and trees retain source-derived visual evidence",
+    "camera does not bob",
+    "nothing published to public runtime"
+  ],
+  "neural_upgrade_later":"If/when GPU compute is available, MASt3R/DUSt3R/3DGS may replace/densify the source-derived splat layer without changing georef/house/path truth.",
+  "return":"absolute /v3-3-proof URL + frame count + matched pairs + reconstructed point count + registration residual + short truth manifest"
+}
