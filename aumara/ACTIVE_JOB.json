@@ -1,47 +1,48 @@
 {
-  "project": "AUMARA",
-  "status": "P0_V3_EVIDENCE_DELIVERY",
-  "accepted_owner_proof": "aumara/jobs/AUMARA_OWNER_RUNTIME_PROOF_20260815.json",
-  "accepted": [
+  "project":"AUMARA",
+  "status":"P0_VISUAL_TWIN_V3_2_OUTDOOR_RECON",
+  "accepted":[
     "GOOGLE_TILE_FIRST_RENDER",
-    "Google/Cesium attribution visible",
-    "owner browser Ion authorization works",
-    "V2.1 georeference / A-F positions / collision scaffold",
-    "mobile Google tileset crash policy restored",
-    "WP27 end-stop crash fixed",
-    "clean Google->local handoff implemented",
-    "V3 sandbox asset and proof artifacts already built; chat attachment delivery failed"
+    "owner Ion authorization works",
+    "V2.1 georeference/A-F/collision scaffold",
+    "mobile render crash fixed",
+    "WP27 end-stop fixed",
+    "clean Google-to-local handoff implemented"
   ],
-  "owner_visual_verdict": "PENDING_V3_VISUAL_QA: delivery channel failed before owner could inspect the V3 proof.",
-  "active_job": "aumara/jobs/AUMARA_V3_EVIDENCE_DELIVERY_GROK.json",
-  "execution_order": [
+  "owner_visual_verdict":"V3.1 REJECTED: indoor imagery and stretched source projections contaminate the outdoor twin; result is not recognizable AUMARA.",
+  "active_job":"aumara/jobs/AUMARA_VISUAL_TWIN_V3_2_OUTDOOR_RECON_GROK.json",
+  "execution_order":[
     "read aumara/PROJECT.md",
     "read aumara/ACTIVE_JOB.json",
     "read active_job",
-    "do not rebuild V3",
-    "expose existing V3 proof artifacts on sandbox /v3-proof",
-    "verify mobile Safari-compatible playback and JSON links",
-    "return only absolute /v3-proof URL",
+    "quarantine/classify all candidate media",
+    "exclude all interior/detail/reject files from outdoor visible scene",
+    "extract sharp overlapping outdoor video keyframes",
+    "run genuine multi-view pose/depth reconstruction (MASt3R preferred; DUSt3R fallback)",
+    "align solved geometry to canonical ENU/georeference and plan constraints",
+    "build sandbox-only V3.2 visual asset",
+    "serve proof at /v3-2-proof",
     "stop for owner visual QA"
   ],
-  "hard_freeze": [
+  "hard_freeze":[
     "public AUMARA runtime",
     "Earth-to-parcel Google approach",
-    "Google tile LOD/SSE/cache policy",
-    "clean mobile Google->local handoff state machine",
+    "Google tile policy",
+    "Google-to-local handoff",
     "WP27 lifecycle fix",
     "canonical georeference",
     "A-F coordinates",
-    "Booking wiring",
-    "landing HTML/CSS/copy",
-    "Ion credential path",
-    "existing V3 visual build during evidence delivery"
+    "Booking",
+    "landing",
+    "Ion credential path"
   ],
-  "forbidden": [
-    "publishing V3 visual changes to public runtime before owner proof",
-    "rebuilding V3 just because chat attachments failed",
-    "credential investigation",
-    "another fake Earth sandbox player",
-    "describing PASS instead of showing browser evidence"
+  "forbidden":[
+    "publishing V3.2 before owner sandbox proof",
+    "visible photo planes/posters/billboards",
+    "interior imagery in outdoor scene",
+    "generic texture wrapping as final reality",
+    "procedural foreground vegetation",
+    "fake Earth player",
+    "credential investigation"
   ]
 }
