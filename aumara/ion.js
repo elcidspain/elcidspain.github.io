@@ -4,10 +4,19 @@
  * Allowed URLs (restrict the token to these only):
  *   https://elcidspain.github.io/aumara/
  *   https://aumara.me/
- * Runtime only: set Cesium.Ion.defaultAccessToken from session storage.
- * Never print the token. Never pass it through ?ion= or any public URL.
+ * Runtime only: CESIUM_ION_TOKEN from localStorage. Ignore ?ion= completely.
+ * Never print the token. Never pass it through a public page URL.
  * Asset: 2275207 Google Photorealistic 3D Tiles
  */
+(function () {
+  try {
+    var u = new URL(location.href);
+    if (u.searchParams.has("ion")) {
+      u.searchParams.delete("ion");
+      history.replaceState(null, "", u.pathname + (u.search || "") + (u.hash || ""));
+    }
+  } catch (e) {}
+})();
 window.AUMARA_ION = {
   asset: 2275207,
   pages: [

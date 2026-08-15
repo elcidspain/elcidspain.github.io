@@ -45,17 +45,17 @@ Accepted:
 
 Not final yet:
 
-- owner-browser proof of Google Photorealistic 3D Tiles (`AWAITING_OWNER_RUNTIME_PROOF`).
-  Runtime code for Earth → Iberia → Costa Blanca → Benidoleig → parcel clip → local twin → WP0–27 is committed.
-  Local fallback stays intact when the owner Ion token is not in the current browser.
+- mobile Google tile refinement, parcel clip orientation, delayed local-twin blend, and AR gating
+  (`aumara/jobs/AUMARA_GLOBAL_BLEND_STABILIZATION_GROK.json`).
+  Owner Google first-tile proof is ACCEPTED. Do not reopen V2.1 geometry.
 
 ## Active job
 
 Current execution job:
 
-`aumara/jobs/AUMARA_GLOBAL_DESCENT_AND_BLEND_GROK.json`
+`aumara/jobs/AUMARA_GLOBAL_BLEND_STABILIZATION_GROK.json`
 
-Close the local V2.1 layer. Advance to Earth → Spain → Benidoleig → parcel descent and blend into the accepted local twin. Do not reopen house-feature invention.
+Owner Google Photorealistic proof is ACCEPTED. Stabilize mobile tiles, parcel clipping, local-twin blend and AR gating. Do not reopen house-feature invention.
 
 Use:
 
@@ -107,9 +107,9 @@ Do not create parallel truth folders unless explicitly instructed.
 
 Current execution job:
 
-`aumara/jobs/AUMARA_GLOBAL_DESCENT_AND_BLEND_GROK.json`
+`aumara/jobs/AUMARA_GLOBAL_BLEND_STABILIZATION_GROK.json`
 
-V2.1 local layer is CLOSED. Advance to Earth → Spain → Benidoleig → parcel descent and blend into the accepted local twin. Do not reopen unsupported house-feature invention.
+Owner Google Photorealistic proof is ACCEPTED. Stabilize mobile tiles, parcel clipping, local-twin blend and AR gating. Do not reopen unsupported house-feature invention.
 
 ## Hard freezes
 

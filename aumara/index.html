@@ -91,6 +91,15 @@ const BOOK = "https://www.booking.com/hotel/es/aumara.es.html";
 const CESIUM_JS = "https://cesium.com/downloads/cesiumjs/releases/1.134/Build/Cesium/Cesium.js";
 const CESIUM_CSS = "https://cesium.com/downloads/cesiumjs/releases/1.134/Build/Cesium/Widgets/widgets.css";
 const DEBUG = /(?:\?|&)debug=1(?:&|$)/.test(location.search);
+(function stripIonQuery() {
+  try {
+    const u = new URL(location.href);
+    if (u.searchParams.has("ion")) {
+      u.searchParams.delete("ion");
+      history.replaceState(null, "", u.pathname + (u.search || "") + (u.hash || ""));
+    }
+  } catch (e) {}
+})();
 const pic = (id) => "https://lh3.googleusercontent.com/d/" + id + "=w1600";
 const housesEl = document.getElementById("houses");
 const overlay = document.getElementById("overlay");
@@ -211,10 +220,16 @@ async function runTwin() {
   let tilesOn = false, tileset = null, firstGoogleTileRendered = false, tilesStatus = "AWAITING_OWNER_RUNTIME_PROOF";
   try {
     tileset = await C.createGooglePhotorealistic3DTileset();
-    tileset.maximumScreenSpaceError = mobile ? 16 : 8;
-    tileset.skipLevelOfDetail = true;
-    if (tileset.cacheBytes !== undefined) tileset.cacheBytes = mobile ? 256 * 1024 * 1024 : 768 * 1024 * 1024;
+    tileset.skipLevelOfDetail = false;
+    tileset.immediatelyLoadDesiredLevelOfDetail = true;
     tileset.dynamicScreenSpaceError = true;
+    try {
+      tileset.dynamicScreenSpaceErrorFactor = 24;
+      tileset.dynamicScreenSpaceErrorDensity = 0.0002;
+      tileset.dynamicScreenSpaceErrorHeightFalloff = 0.25;
+    } catch (e) {}
+    tileset.maximumScreenSpaceError = mobile ? 10 : 6;
+    if (tileset.cacheBytes !== undefined) tileset.cacheBytes = mobile ? 384 * 1024 * 1024 : 768 * 1024 * 1024;
     viewer.scene.primitives.add(tileset);
     tilesOn = true;
     tilesStatus = "LOADING";
@@ -258,13 +273,22 @@ async function runTwin() {
   let parcelClippingActive = false;
   if (tilesOn && tileset && C.ClippingPolygon && geo.officialParcelBoundary) {
     try {
-      const ring = geo.officialParcelBoundary.geometry.coordinates[0];
+      const ring = geo.officialParcelBoundary.geometry.coordinates[0].slice();
+      if (ring.length > 1) {
+        const a0 = ring[0], aN = ring[ring.length - 1];
+        if (a0[0] !== aN[0] || a0[1] !== aN[1]) ring.push(a0);
+      }
+      let area = 0;
+      for (let i = 0; i < ring.length - 1; i++) area += (ring[i + 1][0] - ring[i][0]) * (ring[i + 1][1] + ring[i][1]);
+      if (area > 0) ring.reverse();
       const clipPos = ring.map((p) => C.Cartesian3.fromDegrees(p[0], p[1]));
-      tileset.clippingPolygons = new C.ClippingPolygonCollection({
+      const collection = new C.ClippingPolygonCollection({
         polygons: [new C.ClippingPolygon({ positions: clipPos })],
         enabled: true,
+        inverse: false,
       });
-      parcelClippingActive = true;
+      tileset.clippingPolygons = collection;
+      parcelClippingActive = !!(tileset.clippingPolygons && tileset.clippingPolygons.enabled && tileset.clippingPolygons.length);
     } catch (e) { parcelClippingActive = false; }
   }
   const origin = C.Cartesian3.fromDegrees(lon, lat, originH);
@@ -274,10 +298,11 @@ async function runTwin() {
     scale: 1.0, incrementallyLoadTextures: true, backFaceCulling: true,
   });
   viewer.scene.primitives.add(glb);
-  glb.show = !tilesOn;
+  glb.show = false;
   const arNodes = geo.houses.map((h) => {
     const el = document.createElement("button");
     el.className = "ar"; el.type = "button"; el.textContent = h.spatialId;
+    el.style.display = "none";
     el.onclick = () => openSheet(h); overlay.appendChild(el);
     return { h, el };
   });
@@ -365,7 +390,19 @@ async function runTwin() {
   viewer.clock.currentTime = start.clone();
   viewer.clock.clockRange = C.ClockRange.CLAMPED;
   viewer.clock.shouldAnimate = true;
-  let firstFrameRendered = false, maxWp = -1, lastHz = -0.1, blendComplete = !tilesOn, localTwinVisible = !tilesOn;
+  let firstFrameRendered = false, maxWp = -1, lastHz = -0.1;
+  let blendComplete = false, localTwinVisible = false;
+  let localTwinVisibleBeforeBlend = false, labelsVisibleBeforeBlend = false, zFightingObserved = false;
+  let parcelTilesRefined = !tilesOn, refineWait0 = 0;
+  function tuneTilesForAlt(alt) {
+    if (!tileset) return;
+    let sse;
+    if (alt > 3000) sse = mobile ? 10 : 6;
+    else if (alt > 800) sse = mobile ? 6 : 3;
+    else if (alt > 200) sse = mobile ? 3 : 2;
+    else sse = mobile ? 2 : 1;
+    if (tileset.maximumScreenSpaceError !== sse) tileset.maximumScreenSpaceError = sse;
+  }
   const rawAgl = [];
   const startedMs = Date.now();
   const RUN_ID = "gd-" + startedMs.toString(36);
@@ -382,6 +419,8 @@ async function runTwin() {
     ionDefaultTokenPresent: ionPresent,
     firstGoogleTileRendered, attributionVisible: !!(creditsEl && creditsEl.offsetParent !== null || (creditsEl && creditsEl.childNodes.length)),
     continuousCamera: true, parcelClippingActive, localTwinLoaded: true, blendComplete,
+    localTwinVisible: false, localTwinVisibleBeforeBlend: false,
+    labelsVisibleBeforeBlend: false, zFightingObserved: false, parcelTilesRefined: !tilesOn,
     stage: tilesOn ? "EARTH" : "LOCAL_FALLBACK",
     verification_status: tilesOn && firstGoogleTileRendered ? "READY" : "AWAITING_OWNER_RUNTIME_PROOF",
     required_events: ["GOOGLE_TILE_FIRST_RENDER","EARTH_STAGE","IBERIA_STAGE","COSTA_BLANCA_STAGE","PARCEL_APPROACH","LOCAL_TWIN_VISIBLE","BLEND_COMPLETE","WP0","WP27"],
@@ -396,6 +435,11 @@ async function runTwin() {
         continuousCamera: a.continuousCamera,
         parcelClippingActive: a.parcelClippingActive,
         localTwinLoaded: a.localTwinLoaded,
+        localTwinVisible: a.localTwinVisible,
+        localTwinVisibleBeforeBlend: a.localTwinVisibleBeforeBlend,
+        labelsVisibleBeforeBlend: a.labelsVisibleBeforeBlend,
+        zFightingObserved: a.zFightingObserved,
+        parcelTilesRefined: a.parcelTilesRefined,
         blendComplete: a.blendComplete,
         waypointReached: a.waypointReached,
         stage: a.stage,
@@ -443,18 +487,43 @@ async function runTwin() {
       if (st === "LOCAL_BLEND") emit("LOCAL_BLEND");
       if (st === "WP0" || (elapsed >= intro && maxWp < 0)) emit("WP0");
     }
-    if (tilesOn && alt < 2500 && !localTwinVisible) {
-      glb.show = true; localTwinVisible = true; emit("LOCAL_TWIN_VISIBLE");
+    if (tilesOn) tuneTilesForAlt(alt);
+    if (tilesOn && alt < 300 && !parcelTilesRefined) {
+      if (!refineWait0) refineWait0 = performance.now();
+      if ((tileset && tileset.tilesLoaded) || performance.now() - refineWait0 > 3500) {
+        parcelTilesRefined = true;
+        window.__AUMARA.parcelTilesRefined = true;
+        viewer.clock.shouldAnimate = true;
+      } else if (!measureOnly) {
+        viewer.clock.shouldAnimate = false;
+      }
+    }
+    const inBlendWindow = alt < 160;
+    const inLocalEnvelope = alt < 70 && (function () {
+      const en = lonLatToEn(carto.longitude * 180 / Math.PI, carto.latitude * 180 / Math.PI, lon, lat);
+      return Math.hypot(en.east, en.north) < 180;
+    })();
+    if (!localTwinVisible && ((tilesOn && inBlendWindow && parcelClippingActive && parcelTilesRefined) || (!tilesOn && alt < 80))) {
+      glb.show = true;
+      localTwinVisible = true;
+      emit("LOCAL_TWIN_VISIBLE");
+      window.__AUMARA.localTwinVisible = true;
       window.__AUMARA.localTwinLoaded = true;
     }
-    if (tilesOn && alt < 80 && !blendComplete) {
-      blendComplete = true; glb.show = true;
+    if (localTwinVisible && !blendComplete && alt >= 160) {
+      localTwinVisibleBeforeBlend = true;
+      window.__AUMARA.localTwinVisibleBeforeBlend = true;
+    }
+    if (!blendComplete && localTwinVisible && (alt < 55 || !tilesOn)) {
+      blendComplete = true;
+      glb.show = true;
       emit("BLEND_COMPLETE");
       window.__AUMARA.blendComplete = true;
     }
     const lonX = carto.longitude * 180 / Math.PI, latX = carto.latitude * 180 / Math.PI;
     const wp = elapsed < intro ? 0 : Math.min(27, Math.round(((elapsed - intro) / dur) * 27));
     if (wp > maxWp) { maxWp = wp; window.__AUMARA.waypointReached = wp; if (wp === 27) emit("WP27"); }
+    if (elapsed >= intro && wp === 0) emit("WP0");
     if (elapsed >= intro && elapsed - lastHz >= 0.1) {
       lastHz = elapsed;
       const gs = groundSample(lonX, latX);
@@ -479,7 +548,18 @@ async function runTwin() {
     if (!firstFrameRendered) { firstFrameRendered = true; window.__AUMARA.firstFrameRendered = true; }
     const placed = [];
     arNodes.forEach(({ h, el }) => {
-      if (!localTwinVisible) { el.style.display = "none"; return; }
+      const cam = viewer.camera.positionCartographic;
+      const en = cam ? lonLatToEn(cam.longitude * 180 / Math.PI, cam.latitude * 180 / Math.PI, lon, lat) : { east: 999, north: 999 };
+      const inEnv = cam && (cam.height - originH) < 70 && Math.hypot(en.east, en.north) < 180;
+      const allow = localTwinVisible && blendComplete && inEnv;
+      if (!allow) {
+        if (el.style.display === "block" && !blendComplete) {
+          labelsVisibleBeforeBlend = true;
+          window.__AUMARA.labelsVisibleBeforeBlend = true;
+        }
+        el.style.display = "none";
+        return;
+      }
       const p = C.Cartesian3.fromDegrees(h.wgs84.longitude, h.wgs84.latitude, originH + 5.4);
       const win = C.SceneTransforms.worldToWindowCoordinates(viewer.scene, p);
       if (!win) { el.style.display = "none"; return; }
