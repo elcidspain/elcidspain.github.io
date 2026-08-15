@@ -1,6 +1,6 @@
 {
   "job": "AUMARA_MOBILE_RENDER_HOTFIX_GROK",
-  "commit_sha": "PENDING",
+  "commit_sha": "1bdeb96a4354858986eab1e38d58bc165ab009e3",
   "verification_status": "HOTFIX_COMMITTED_AWAITING_OWNER_IPHONE_20S",
   "fatalRenderError": false,
   "renderError": null,
