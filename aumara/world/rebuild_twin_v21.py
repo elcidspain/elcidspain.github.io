@@ -56,12 +56,12 @@ def crop_frac(im, box):
 
 
 def fabric_from_photo(im):
-    """Tent membrane only — not the whole photo (avoids billboard wrap)."""
-    tent = crop_frac(im, (0.28, 0.12, 0.78, 0.62))
-    tent = ImageEnhance.Color(tent).enhance(0.45)
-    tent = ImageEnhance.Brightness(tent).enhance(1.18)
-    tent = ImageEnhance.Contrast(tent).enhance(0.85)
-    return tent
+    """Membrane albedo crop only — not a full-frame photo wrap."""
+    mem = crop_frac(im, (0.28, 0.12, 0.78, 0.62))
+    mem = ImageEnhance.Color(mem).enhance(0.45)
+    mem = ImageEnhance.Brightness(mem).enhance(1.18)
+    mem = ImageEnhance.Contrast(mem).enhance(0.85)
+    return mem
 
 
 def wood_swatch(im, box, warm=(72, 48, 28)):
@@ -232,22 +232,36 @@ def unit_to_world(x, y, z, east, north, base, r, height, yaw):
     return enu(east + rx, north - rz, base + py), yn, math.atan2(z, x)
 
 
-def in_door_sector(ang, door_ang, half=0.28):
-    d = (ang - door_ang + math.pi) % (2 * math.pi) - math.pi
+def feature_class(house_manifest, name):
+    for f in house_manifest.get("features", []):
+        if f.get("feature") == name:
+            return f.get("classification")
+    return None
+
+
+def is_truth(cls):
+    return cls in ("observed", "plan-derived")
+
+
+def in_opening_sector(ang, half=0.22):
+    d = (ang + math.pi) % (2 * math.pi) - math.pi
     return abs(d) < half
 
 
-def house_parts(hid, east, north, base, diameter, height, facing):
-    """Framed geodesic + path-facing door/windows + timber deck. Not a photo sphere."""
+def house_parts(hid, east, north, base, diameter, height, facing, house_manifest):
+    """Plan-true geodesic envelope; openings/deck/struts only if manifest truth."""
     r = diameter / 2.0
     verts, faces = icosahedron()
     verts, faces = subdivide(verts, faces, 2)
-    canvas, timber, deck, glass = Mesh("house_" + hid), Mesh("frame_" + hid), Mesh("deck_" + hid), Mesh("glass_" + hid)
+    canvas = Mesh("house_" + hid)
+    strut = Mesh("strut_" + hid)
+    platform = Mesh("platform_" + hid)
+    opening_panel = Mesh("opening_panel_" + hid)
+    opening_frame = Mesh("opening_frame_" + hid)
     yaw = facing
-    door_ang = 0.0  # local +X after yaw? we apply yaw in unit_to_world; door faces +local Z toward path
-    # facing is atan2(de, dn) in east/north. Door should sit at that world direction.
-    # unit sphere: we treat local +Z (south in glTF after ENU? ) — bake door in unrotated sphere at angle 0
-    # then rotate the whole house by facing.
+    want_strut = is_truth(feature_class(house_manifest, "strut_edges"))
+    want_deck = is_truth(feature_class(house_manifest, "front_deck_sector"))
+    want_opening = is_truth(feature_class(house_manifest, "path_facing_opening"))
 
     kept = []
     edges = set()
@@ -260,106 +274,87 @@ def house_parts(hid, east, north, base, diameter, height, facing):
             edges.add(tuple(sorted((i, j))))
 
     for a, b, c in kept:
-        pts, uvs, angs, yns = [], [], [], []
+        pts, uvs = [], []
         skip = False
         for i in (a, b, c):
             p, yn, ang = unit_to_world(*verts[i], east, north, base, r, height, yaw)
             pts.append(p)
-            yns.append(yn)
-            angs.append(ang)
             uvs.append((0.5 + math.atan2(verts[i][2], verts[i][0]) / (2 * math.pi), 1.0 - yn))
-            if yn < 0.48 and in_door_sector(ang, 0.0, 0.22):
+            if want_opening and yn < 0.48 and in_opening_sector(ang, 0.22):
                 skip = True
         if skip:
             continue
         nrm = norm(cross(sub(pts[1], pts[0]), sub(pts[2], pts[0])))
         canvas.tri(pts[0], pts[1], pts[2], nrm, uvs[0], uvs[1], uvs[2])
 
-    for i, j in edges:
-        pa, pb = verts[i], verts[j]
-        if pa[1] < -0.1 and pb[1] < -0.1:
-            continue
-        a, _, _ = unit_to_world(*pa, east, north, base, r, height, yaw)
-        b, _, _ = unit_to_world(*pb, east, north, base, r, height, yaw)
-        timber.box(a, b, 0.045)
+    if want_strut:
+        for i, j in edges:
+            pa, pb = verts[i], verts[j]
+            if pa[1] < -0.1 and pb[1] < -0.1:
+                continue
+            a, _, _ = unit_to_world(*pa, east, north, base, r, height, yaw)
+            b, _, _ = unit_to_world(*pb, east, north, base, r, height, yaw)
+            strut.box(a, b, 0.045)
+        segs = 28
+        for i in range(segs):
+            t0, t1 = 2 * math.pi * i / segs, 2 * math.pi * (i + 1) / segs
+            a = enu(east + r * math.cos(t0), north + r * math.sin(t0), base + 0.06)
+            b = enu(east + r * math.cos(t1), north + r * math.sin(t1), base + 0.06)
+            strut.box(a, b, 0.05)
 
-    # base ring
-    segs = 28
-    for i in range(segs):
-        t0, t1 = 2 * math.pi * i / segs, 2 * math.pi * (i + 1) / segs
-        a = enu(east + r * math.cos(t0), north + r * math.sin(t0), base + 0.06)
-        b = enu(east + r * math.cos(t1), north + r * math.sin(t1), base + 0.06)
-        timber.box(a, b, 0.05)
+    if want_deck:
+        deck_r0, deck_r1 = r * 0.15, r + 1.15
+        span = math.radians(150)
+        dsegs = 14
+        for i in range(dsegs):
+            a0 = facing - span / 2 + span * i / dsegs
+            a1 = facing - span / 2 + span * (i + 1) / dsegs
+            p00 = enu(east + deck_r0 * math.sin(a0), north + deck_r0 * math.cos(a0), base + 0.07)
+            p10 = enu(east + deck_r1 * math.sin(a0), north + deck_r1 * math.cos(a0), base + 0.07)
+            p11 = enu(east + deck_r1 * math.sin(a1), north + deck_r1 * math.cos(a1), base + 0.07)
+            p01 = enu(east + deck_r0 * math.sin(a1), north + deck_r0 * math.cos(a1), base + 0.07)
+            platform.quad(p00, p10, p11, p01, (0, 1, 0), (0, 0), (1, 0), (1, 1), (0, 1))
+        if want_strut:
+            for i in range(dsegs + 1):
+                ang = facing - span / 2 + span * i / dsegs
+                px = east + deck_r1 * math.sin(ang)
+                pn = north + deck_r1 * math.cos(ang)
+                strut.box(enu(px, pn, base + 0.07), enu(px, pn, base + 1.02), 0.035)
+            for i in range(dsegs):
+                a0 = facing - span / 2 + span * i / dsegs
+                a1 = facing - span / 2 + span * (i + 1) / dsegs
+                p0 = enu(east + deck_r1 * math.sin(a0), north + deck_r1 * math.cos(a0), base + 1.00)
+                p1 = enu(east + deck_r1 * math.sin(a1), north + deck_r1 * math.cos(a1), base + 1.00)
+                strut.box(p0, p1, 0.03)
 
-    # path-facing deck sector (photos: timber deck + rail in front of glass door)
-    deck_r0, deck_r1 = r * 0.15, r + 1.15
-    span = math.radians(150)
-    dsegs = 14
-    for i in range(dsegs):
-        a0 = facing - span / 2 + span * i / dsegs
-        a1 = facing - span / 2 + span * (i + 1) / dsegs
-        p00 = enu(east + deck_r0 * math.sin(a0), north + deck_r0 * math.cos(a0), base + 0.07)
-        p10 = enu(east + deck_r1 * math.sin(a0), north + deck_r1 * math.cos(a0), base + 0.07)
-        p11 = enu(east + deck_r1 * math.sin(a1), north + deck_r1 * math.cos(a1), base + 0.07)
-        p01 = enu(east + deck_r0 * math.sin(a1), north + deck_r0 * math.cos(a1), base + 0.07)
-        deck.quad(p00, p10, p11, p01, (0, 1, 0), (0, 0), (1, 0), (1, 1), (0, 1))
-    # posts + rail
-    for i in range(dsegs + 1):
-        ang = facing - span / 2 + span * i / dsegs
-        px = east + deck_r1 * math.sin(ang)
-        pn = north + deck_r1 * math.cos(ang)
-        timber.box(enu(px, pn, base + 0.07), enu(px, pn, base + 1.02), 0.035)
-    for i in range(dsegs):
-        a0 = facing - span / 2 + span * i / dsegs
-        a1 = facing - span / 2 + span * (i + 1) / dsegs
-        p0 = enu(east + deck_r1 * math.sin(a0), north + deck_r1 * math.cos(a0), base + 1.00)
-        p1 = enu(east + deck_r1 * math.sin(a1), north + deck_r1 * math.cos(a1), base + 1.00)
-        timber.box(p0, p1, 0.03)
-
-    # glass door facing path (photos: dark-framed glass entrance)
-    door_w, door_h = 1.15 if diameter > 8 else 1.02, 2.15
-    de, dn = math.sin(facing), math.cos(facing)
-    pe, pn = east + de * (r * 0.96), north + dn * (r * 0.96)
-    sx, sn = -dn, de
-    y0, y1 = base + 0.08, base + door_h
-    g00 = enu(pe - sx * door_w / 2, pn - sn * door_w / 2, y0)
-    g10 = enu(pe + sx * door_w / 2, pn + sn * door_w / 2, y0)
-    g11 = enu(pe + sx * door_w / 2, pn + sn * door_w / 2, y1)
-    g01 = enu(pe - sx * door_w / 2, pn - sn * door_w / 2, y1)
-    gn = norm((de, 0, -dn))
-    glass.quad(g00, g10, g11, g01, gn)
-    timber.box(g00, g01, 0.04)
-    timber.box(g10, g11, 0.04)
-    timber.box(g01, g11, 0.04)
-    timber.box(g00, g10, 0.04)
-    # mid mullion
-    mid0 = enu(pe, pn, y0)
-    mid1 = enu(pe, pn, y1)
-    timber.box(mid0, mid1, 0.03)
-
-    # side windows at ±62°
-    for side in (-1, 1):
-        ang = facing + side * math.radians(62)
-        de, dn = math.sin(ang), math.cos(ang)
-        pe, pn = east + de * (r * 0.97), north + dn * (r * 0.97)
+    if want_opening:
+        ow, oh = 1.15 if diameter > 8 else 1.02, 2.15
+        de, dn = math.sin(facing), math.cos(facing)
+        pe, pn = east + de * (r * 0.96), north + dn * (r * 0.96)
         sx, sn = -dn, de
-        ww, wh, wb = 0.95, 0.95, base + 1.15
-        w00 = enu(pe - sx * ww / 2, pn - sn * ww / 2, wb)
-        w10 = enu(pe + sx * ww / 2, pn + sn * ww / 2, wb)
-        w11 = enu(pe + sx * ww / 2, pn + sn * ww / 2, wb + wh)
-        w01 = enu(pe - sx * ww / 2, pn - sn * ww / 2, wb + wh)
-        glass.quad(w00, w10, w11, w01, norm((de, 0, -dn)))
-        timber.box(w00, w01, 0.03)
-        timber.box(w10, w11, 0.03)
-        timber.box(w00, w10, 0.03)
-        timber.box(w01, w11, 0.03)
+        y0, y1 = base + 0.08, base + oh
+        g00 = enu(pe - sx * ow / 2, pn - sn * ow / 2, y0)
+        g10 = enu(pe + sx * ow / 2, pn + sn * ow / 2, y0)
+        g11 = enu(pe + sx * ow / 2, pn + sn * ow / 2, y1)
+        g01 = enu(pe - sx * ow / 2, pn - sn * ow / 2, y1)
+        gn = norm((de, 0, -dn))
+        opening_panel.quad(g00, g10, g11, g01, gn)
+        opening_frame.box(g00, g01, 0.04)
+        opening_frame.box(g10, g11, 0.04)
+        opening_frame.box(g01, g11, 0.04)
+        opening_frame.box(g00, g10, 0.04)
+        opening_frame.box(enu(pe, pn, y0), enu(pe, pn, y1), 0.03)
 
-    return [
-        ("canvas_" + hid, canvas, "canvas_" + hid),
-        ("timber_" + hid, timber, "timber"),
-        ("deck_" + hid, deck, "deck"),
-        ("glass_" + hid, glass, "glass"),
-    ]
+    out = [("canvas_" + hid, canvas, "canvas_" + hid)]
+    if strut.idx:
+        out.append(("strut_" + hid, strut, "strut_" + hid))
+    if platform.idx:
+        out.append(("platform_" + hid, platform, "platform_" + hid))
+    if opening_panel.idx:
+        out.append(("opening_panel_" + hid, opening_panel, "opening_panel"))
+    if opening_frame.idx:
+        out.append(("opening_frame_" + hid, opening_frame, "opening_frame"))
+    return out
 
 
 def pack_glb(entries, images):
@@ -387,14 +382,22 @@ def pack_glb(entries, images):
     def ensure_mat(name):
         if name in mat_index:
             return mat_index[name]
-        if name == "glass":
+        if name == "opening_panel":
             materials.append({
-                "name": "glass",
-                "alphaMode": "BLEND",
+                "name": "opening_panel",
                 "pbrMetallicRoughness": {
-                    "baseColorFactor": [0.18, 0.28, 0.30, 0.55],
-                    "metallicFactor": 0.2,
-                    "roughnessFactor": 0.12,
+                    "baseColorFactor": [0.10, 0.11, 0.12, 1],
+                    "metallicFactor": 0,
+                    "roughnessFactor": 0.55,
+                },
+            })
+        elif name == "opening_frame":
+            materials.append({
+                "name": "opening_frame",
+                "pbrMetallicRoughness": {
+                    "baseColorFactor": [0.16, 0.14, 0.12, 1],
+                    "metallicFactor": 0,
+                    "roughnessFactor": 0.72,
                 },
             })
         elif name == "veg_lod":
@@ -444,9 +447,11 @@ def pack_glb(entries, images):
     order = []
     for node_name, mesh, mat in entries:
         key = node_name
-        if node_name.startswith("house_") or node_name.startswith("canvas_") or node_name.startswith("timber_") or node_name.startswith("deck_") or node_name.startswith("glass_"):
-            hid = node_name.split("_")[1]
+        if node_name.startswith(("house_", "canvas_", "strut_", "platform_", "opening_panel_", "opening_frame_")):
+            hid = node_name.split("_")[-1] if node_name.split("_")[-1] in "ABCDEF" else node_name.split("_")[1]
             key = "house_" + hid
+        elif node_name.startswith("generated_completion_"):
+            key = node_name
         if key not in grouped:
             grouped[key] = []
             order.append(key)
@@ -513,6 +518,8 @@ def main():
     hm = json.loads((ROOT / "world" / "heightmap.json").read_text())
     geo = json.loads((ROOT / "AUMARA_WORLD_GEOREFERENCE_v1.json").read_text())
     fp = json.loads((ROOT / "world" / "flight-path.json").read_text())
+    man = json.loads((ROOT / "world" / "AUMARA_TWIN_SOURCE_MANIFEST.json").read_text())
+    by_house = {m["house"]: m for m in man["meshes"] if m.get("house")}
     wps = fp["waypoints"]
 
     photos = {
@@ -526,13 +533,16 @@ def main():
     images = {
         "ground": jpg_bytes(load_rgb(PUB / "twin/pnoa_25cm.jpg"), 1024, 84),
         "path": jpg_bytes(load_rgb(PUB / "site/path_day_v1.jpg"), 384, 80),
-        "timber": jpg_bytes(wood_swatch(load_rgb(photos["A"]), (0.05, 0.62, 0.45, 0.92)), 256, 78),
-        "deck": jpg_bytes(wood_swatch(load_rgb(photos["B"]), (0.15, 0.70, 0.70, 0.98)), 256, 78),
         "canopy": jpg_bytes(crop_frac(load_rgb(photos["A"]), (0.55, 0.00, 0.98, 0.45)), 256, 76),
         "bark": jpg_bytes(crop_frac(load_rgb(photos["C"]), (0.02, 0.35, 0.18, 0.85)), 128, 74),
     }
     for hid, p in photos.items():
         images["canvas_" + hid] = jpg_bytes(fabric_from_photo(load_rgb(p)), 384, 80)
+        hmft = by_house.get(hid, {})
+        if is_truth(feature_class(hmft, "strut_edges")):
+            images["strut_" + hid] = jpg_bytes(wood_swatch(load_rgb(p), (0.05, 0.62, 0.40, 0.95)), 256, 78)
+        if is_truth(feature_class(hmft, "front_deck_sector")):
+            images["platform_" + hid] = jpg_bytes(wood_swatch(load_rgb(p), (0.12, 0.68, 0.72, 0.98)), 256, 78)
 
     # denser terrain: bilinear upsample of verified heightmap so raycast ≈ DEM
     terrain = Mesh("terrain")
@@ -595,10 +605,11 @@ def main():
         facing = math.atan2(nearest["local"]["east"] - e, nearest["local"]["north"] - n)
         height = 5.50 if h["diameterMetres"] == 9 else 4.86
         houses[h["spatialId"]] = house_parts(
-            h["spatialId"], e, n, hm_at(hm, e, n), h["diameterMetres"], height, facing
+            h["spatialId"], e, n, hm_at(hm, e, n), h["diameterMetres"], height, facing,
+            by_house.get(h["spatialId"], {}),
         )
 
-    # source-guided pines along the real walk (DAY_WALK / outdoor photos: pines line the gravel)
+    # generated-completion canopy volumes along the walk (not a surveyed inventory)
     veg = Mesh("veg")
     bark = Mesh("bark")
     occ = [(h["localMetres"]["east"], h["localMetres"]["north"], h["diameterMetres"] / 2 + 2.0) for h in geo["houses"]]
@@ -617,11 +628,10 @@ def main():
                 return True
         return False
 
-    def pine(e, n, ht):
+    def canopy_vol(e, n, ht):
         base = hm_at(hm, e, n)
         trunk_h = ht * 0.38
         bark.cylinder(e, n, base, base + trunk_h + 0.4, 0.14 + ht * 0.012, 7)
-        # layered umbrella canopies — Aleppo/stone-pine volumes from photos
         layers = ((0.42, 0.55, 1.6), (0.62, 0.38, 1.25), (0.80, 0.24, 0.85))
         for frac, ry, rx in layers:
             veg.ellipsoid(e, n, base + ht * frac, rx * (0.7 + ht * 0.06), ry * ht * 0.35, rx * (0.7 + ht * 0.06), 8, 5)
@@ -646,7 +656,7 @@ def main():
             n = a["north"] + dy * 0.5 + py * side * dist
             if blocked(e, n, 1.6):
                 continue
-            pine(e, n, ht)
+            canopy_vol(e, n, ht)
             n_pine += 1
 
     # a few more from photo-guided pockets north of the cluster (wooded CV-733 edge)
@@ -658,7 +668,7 @@ def main():
     for e, n, ht in pockets:
         if blocked(e, n, 1.8):
             continue
-        pine(e, n, ht)
+        canopy_vol(e, n, ht)
         n_pine += 1
 
     # distant schematic LOD cones — marked generated
