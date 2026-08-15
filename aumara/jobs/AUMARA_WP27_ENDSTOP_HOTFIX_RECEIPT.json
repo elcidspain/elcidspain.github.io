@@ -1,6 +1,6 @@
 {
   "job": "AUMARA_WP27_ENDSTOP_HOTFIX_GROK",
-  "commit_sha": "PENDING",
+  "commit_sha": "6bbcfd94c58045f9c09ae58e91c0048af0a154b1",
   "verification_status": "HOTFIX_COMMITTED_AWAITING_OWNER_WP27_HOLD",
   "waypointReached": 27,
   "flightComplete": true,
