@@ -1,45 +1,47 @@
 {
   "project": "AUMARA",
-  "status": "P1_VISUAL_CLEAN_LOCAL_HANDOFF",
+  "status": "P0_VISUAL_TWIN_V3_SANDBOX",
   "accepted_owner_proof": "aumara/jobs/AUMARA_OWNER_RUNTIME_PROOF_20260815.json",
   "accepted": [
     "GOOGLE_TILE_FIRST_RENDER",
     "Google/Cesium attribution visible",
     "owner browser Ion authorization works",
-    "V2.1 local twin CLOSED",
+    "V2.1 georeference / A-F positions / collision scaffold",
     "mobile Google tileset crash policy restored",
-    "WP27 end-stop crash fixed in 6bbcfd94c58045f9c09ae58e91c0048af0a154b1",
-    "owner run reaches WP27 without previous render crash"
+    "WP27 end-stop crash fixed",
+    "clean Google->local handoff implemented"
   ],
-  "active_job": "aumara/jobs/AUMARA_CLEAN_LOCAL_HANDOFF_GROK.json",
+  "owner_visual_verdict": "FAIL_VISUAL_REALITY: local flight bobs vertically; near-field contains gray/procedural geometry; recognizable AUMARA landscape is missing.",
+  "active_job": "aumara/jobs/AUMARA_VISUAL_TWIN_V3_GROK.json",
   "execution_order": [
     "read aumara/PROJECT.md",
     "read aumara/ACTIVE_JOB.json",
     "read active_job",
-    "keep Google as Earth-to-parcel context only",
-    "handoff to local twin before low-altitude WP0 flight",
-    "hide Google tiles inside mobile local envelope",
-    "gate A-F AR until handoff complete",
-    "keep local raw AGL sampling on local terrain",
-    "commit runtime patch + receipt",
-    "owner iPhone visual proof"
+    "stabilize local camera in ENU using arc-length smooth spline",
+    "clear procedural/generated foreground geometry from flight corridor",
+    "index canonical outdoor photos and videos",
+    "build real-media reconstruction V3 with source provenance",
+    "render V3 as visible world while retaining V2.1 only as collision scaffold if needed",
+    "produce mobile sandbox WP0-WP10 proof",
+    "stop for owner visual approval before any public V3 switch"
   ],
   "hard_freeze": [
-    "Google tileset LOD/SSE/cache policy from 1bdeb96a4354858986eab1e38d58bc165ab009e3",
-    "WP27 end-stop patch from 6bbcfd94c58045f9c09ae58e91c0048af0a154b1",
-    "local V2.1 geometry",
-    "landing HTML/CSS/copy",
+    "Earth-to-parcel Google approach",
+    "Google tile LOD/SSE/cache policy",
+    "clean mobile Google->local handoff state machine",
+    "WP27 lifecycle fix",
+    "canonical georeference",
     "A-F coordinates",
     "Booking wiring",
-    "source manifests",
+    "landing HTML/CSS/copy",
     "Ion credential path"
   ],
   "forbidden": [
-    "any new LOD/SSE/cache tuning",
-    "credential search",
-    "another project",
-    "reopening V2.1 geometry",
-    "showing Google close-range photogrammetry during WP0-WP27 on mobile",
-    "showing AR labels before local handoff completes"
+    "publishing V3 visual changes to public runtime before sandbox owner proof",
+    "another landing redesign",
+    "credential investigation",
+    "Google LOD tuning as substitute for local visual reality",
+    "procedural ellipsoid/cone vegetation in the near-flight corridor",
+    "calling V2.1 scaffold final reality"
   ]
 }
