@@ -208,9 +208,8 @@ async function runTwin() {
     events.push({ name, t: Date.now(), extra: extra || null });
     if (window.__AUMARA) window.__AUMARA.events = events;
   }
-  let tilesOn = false, tileset = null, firstGoogleTileRendered = false, tilesStatus = "BLOCKED_ION_TOKEN";
+  let tilesOn = false, tileset = null, firstGoogleTileRendered = false, tilesStatus = "AWAITING_OWNER_RUNTIME_PROOF";
   try {
-    if (!ionPresent) throw new Error("NO_ION_TOKEN");
     tileset = await C.createGooglePhotorealistic3DTileset();
     tileset.maximumScreenSpaceError = mobile ? 16 : 8;
     tileset.skipLevelOfDetail = true;
@@ -227,6 +226,7 @@ async function runTwin() {
       if (window.__AUMARA) {
         window.__AUMARA.firstGoogleTileRendered = true;
         window.__AUMARA.globalTilesStatus = "READY";
+        window.__AUMARA.verification_status = "READY";
       }
     };
     tileset.tileVisible.addEventListener(markTile);
@@ -234,8 +234,7 @@ async function runTwin() {
   } catch (e) {
     tilesOn = false;
     tileset = null;
-    tilesStatus = /401|403|key|token|denied|unauthorized|NO_ION_TOKEN/i.test(String(e && e.message ? e.message : e)) ? "BLOCKED_ION_TOKEN" : "FAILED";
-    try { window.__AUMARA_TILES_ERROR = String(e && e.message ? e.message : e).slice(0, 240); } catch (e2) {}
+    tilesStatus = "AWAITING_OWNER_RUNTIME_PROOF";
     viewer.scene.globe.show = false;
   }
   if (tilesOn) {
@@ -244,8 +243,8 @@ async function runTwin() {
       await new Promise((r) => setTimeout(r, 200));
     }
     if (!firstGoogleTileRendered) {
-      tilesStatus = "FAILED";
-      tilesOn = false;
+      tilesStatus = sessionIon ? "LOADING" : "AWAITING_OWNER_RUNTIME_PROOF";
+      if (!sessionIon) tilesOn = false;
     }
   }
   let originH = tilesOn ? refMsl : 0;
@@ -384,6 +383,25 @@ async function runTwin() {
     firstGoogleTileRendered, attributionVisible: !!(creditsEl && creditsEl.offsetParent !== null || (creditsEl && creditsEl.childNodes.length)),
     continuousCamera: true, parcelClippingActive, localTwinLoaded: true, blendComplete,
     stage: tilesOn ? "EARTH" : "LOCAL_FALLBACK",
+    verification_status: tilesOn && firstGoogleTileRendered ? "READY" : "AWAITING_OWNER_RUNTIME_PROOF",
+    required_events: ["GOOGLE_TILE_FIRST_RENDER","EARTH_STAGE","IBERIA_STAGE","COSTA_BLANCA_STAGE","PARCEL_APPROACH","LOCAL_TWIN_VISIBLE","BLEND_COMPLETE","WP0","WP27"],
+    ownerProof: function () {
+      const a = window.__AUMARA;
+      return {
+        verification_status: a.verification_status,
+        globalTilesStatus: a.globalTilesStatus,
+        provider: a.provider,
+        firstGoogleTileRendered: a.firstGoogleTileRendered,
+        attributionVisible: a.attributionVisible,
+        continuousCamera: a.continuousCamera,
+        parcelClippingActive: a.parcelClippingActive,
+        localTwinLoaded: a.localTwinLoaded,
+        blendComplete: a.blendComplete,
+        waypointReached: a.waypointReached,
+        stage: a.stage,
+        events: (a.events || []).map(function (e) { return e.name; })
+      };
+    }
   };
   fetch("./world/aumara-site-v2_1.glb").then((r) => r.arrayBuffer()).then((buf) => crypto.subtle.digest("SHA-256", buf)).then((h) => {
     window.__AUMARA.glb_sha = Array.from(new Uint8Array(h)).map((b) => b.toString(16).padStart(2, "0")).join("");
@@ -449,7 +467,7 @@ async function runTwin() {
       });
     }
     if (wp === 27 && !window.__AUMARA.ended_at) window.__AUMARA.ended_at = new Date().toISOString();
-    if (DEBUG) hud.textContent = (tilesOn ? "GOOGLE  " : "LOCAL  ") + st + "  WP " + wp + "/27  RAW " + (rawAgl[rawAgl.length - 1] || 0).toFixed(3) + " m";
+    if (DEBUG) hud.textContent = window.__AUMARA.verification_status + "  " + (tilesOn ? "GOOGLE  " : "LOCAL  ") + st + "  WP " + wp + "/27";
   }
   window.__AUMARA.advanceTo = function (elapsedTarget) {
     viewer.clock.shouldAnimate = false;

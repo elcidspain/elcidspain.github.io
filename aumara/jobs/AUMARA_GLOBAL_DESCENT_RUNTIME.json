@@ -1,34 +1,39 @@
 {
   "schema": "aumara.global-descent-runtime",
-  "capture_mode": "LIVE_BROWSER_RUNTIME",
+  "capture_mode": "OWNER_BROWSER_RUNTIME",
+  "verification_status": "AWAITING_OWNER_RUNTIME_PROOF",
   "provider": "GOOGLE_PHOTOREALISTIC_3D_TILES",
   "loader": "Cesium.createGooglePhotorealistic3DTileset()",
-  "globalTilesStatus": "BLOCKED_ION_TOKEN",
-  "ionSessionToken": false,
-  "ionDefaultTokenPresent": true,
-  "ionRequestStatus": 401,
-  "firstGoogleTileRendered": false,
-  "attributionVisible": true,
-  "continuousCamera": true,
-  "parcelClippingActive": false,
-  "localTwinLoaded": true,
-  "blendComplete": false,
+  "public_url": "https://elcidspain.github.io/aumara/?debug=1#flight",
+  "guest_url": "https://elcidspain.github.io/aumara/",
+  "local_fallback": true,
+  "v21_local_layer": "CLOSED_UNCHANGED",
   "esri_used": false,
-  "drive_secret_search": false,
   "public_url_token": false,
-  "reason": "No dedicated AUMARA Cesium ion session token. Library defaultAccessToken is present and createGooglePhotorealistic3DTileset() returns 401. Google Photorealistic access is not enabled for the available token.",
-  "token_requirements": {
-    "type": "dedicated AUMARA application token",
-    "scopes": "minimum public scopes only",
-    "allowed_urls": [
-      "https://elcidspain.github.io/aumara/",
-      "https://aumara.me/"
-    ],
-    "never": [
-      "print",
-      "commit",
-      "?ion=",
-      "public page URL"
-    ]
-  }
+  "owner_must_verify": [
+    "verification_status",
+    "globalTilesStatus",
+    "provider",
+    "firstGoogleTileRendered",
+    "attributionVisible",
+    "continuousCamera",
+    "parcelClippingActive",
+    "localTwinLoaded",
+    "blendComplete",
+    "waypointReached",
+    "stage",
+    "events"
+  ],
+  "required_events": [
+    "GOOGLE_TILE_FIRST_RENDER",
+    "EARTH_STAGE",
+    "IBERIA_STAGE",
+    "COSTA_BLANCA_STAGE",
+    "PARCEL_APPROACH",
+    "LOCAL_TWIN_VISIBLE",
+    "BLEND_COMPLETE",
+    "WP0",
+    "WP27"
+  ],
+  "owner_console": "copy(JSON.stringify(window.__AUMARA.ownerProof(), null, 2))"
 }

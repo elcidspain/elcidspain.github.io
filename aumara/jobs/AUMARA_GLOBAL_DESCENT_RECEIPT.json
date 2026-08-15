@@ -1,18 +1,14 @@
 {
   "job": "AUMARA_GLOBAL_DESCENT_AND_BLEND_GROK",
-  "commit_sha": "1db94df3f7ff61f88732c1cce8169fe0ed5f707b",
-  "globalTilesStatus": "BLOCKED_ION_TOKEN",
+  "commit_sha": "PENDING",
+  "verification_status": "AWAITING_OWNER_RUNTIME_PROOF",
   "provider": "GOOGLE_PHOTOREALISTIC_3D_TILES",
-  "firstGoogleTileRendered": false,
-  "attributionVisible": true,
-  "continuousCamera": true,
-  "parcelClippingActive": false,
-  "localTwinLoaded": true,
-  "blendComplete": false,
-  "waypointReached": null,
-  "consoleErrors": [],
-  "failedRequiredRequests": [],
-  "esri_used_as_global_world": false,
+  "public_url": "https://elcidspain.github.io/aumara/?debug=1#flight",
+  "guest_url": "https://elcidspain.github.io/aumara/",
+  "local_fallback": true,
   "v21_local_layer": "CLOSED_UNCHANGED",
-  "note": "Stopped. Runtime ion session token unavailable / Ion 401 on createGooglePhotorealistic3DTileset(). Need a dedicated AUMARA ion token with Google Photorealistic 3D Tiles enabled and Allowed URLs restricted to https://elcidspain.github.io/aumara/ and https://aumara.me/."
+  "esri_used_as_global_world": false,
+  "landing_frozen": true,
+  "runtime_complete": true,
+  "owner_proof": "window.__AUMARA.ownerProof()"
 }

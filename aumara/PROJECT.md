@@ -45,7 +45,9 @@ Accepted:
 
 Not final yet:
 
-- global Earth-to-AUMARA cinematic descent and blend with the local twin.
+- owner-browser proof of Google Photorealistic 3D Tiles (`AWAITING_OWNER_RUNTIME_PROOF`).
+  Runtime code for Earth → Iberia → Costa Blanca → Benidoleig → parcel clip → local twin → WP0–27 is committed.
+  Local fallback stays intact when the owner Ion token is not in the current browser.
 
 ## Active job
 
