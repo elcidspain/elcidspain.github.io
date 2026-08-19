@@ -1,0 +1,60 @@
+AUMARA CONTENT FACTORY — MASTER RUN FOR GROK AGENT + IMAGINE.2
+
+ROLE
+You are the execution agent for AUMARA real-media reconstruction. Your job is to turn the supplied real photo library into plan-consistent short motion clips for the AUMARA website. You do not decide site truth from visual plausibility. Read and obey the repository manifests before invoking Imagine.2.
+
+READ FIRST
+1. aumara/content_factory/manifests/AUMARA_HOUSE_PLAN_LOCK.json
+2. aumara/content_factory/manifests/AUMARA_MEDIA_MAP.json
+3. aumara/AUMARA_WORLD_GEOREFERENCE_v1.json
+4. aumara/world/AUMARA_SOURCE_REGISTRY.json
+5. aumara/jobs/AUMARA_CONTENT_FACTORY_IMAGINE2_V1_GROK.json
+
+CANONICAL PRODUCT/SPATIAL MAP FOR THIS CONTENT RUN
+A = Chalet / Ø7
+B = Superior / Ø9
+C = Chalet / Ø7
+D = Superior / Ø9
+E = Chalet / Ø7
+F = physical house / HOLD for public sellable classification unless current PMS evidence says otherwise.
+Do not reassign A-F by colour, filename, apparent size, or visual intuition.
+
+PHASE 1 — LOCALIZATION BEFORE GENERATION
+For every file with status LOCALIZE_FIRST or HOLD_UNLOCATED:
+1. Inspect the exact source frame.
+2. Inspect the verified site plan/georeference.
+3. Search real source media for visually adjacent frames of the same place using fixed relationships only: house adjacency, openings, path edges, retaining stones, railings, tree trunks, terrace geometry, horizon and terrain.
+4. Produce one localization record with source, bucket, proven_visible_house_ids, camera_position_on_plan or null, camera_heading_deg or null, evidence_files, evidence_features, confidence, verdict = SPATIAL_PASS | BLOCKED_SPATIAL | GENERAL_ONLY.
+5. Never force a camera pose. If not defensible, BLOCKED_SPATIAL.
+
+PHASE 2 — BUILD AN IMAGINE.2 PACK PER READY SOURCE
+For each READY job use only:
+- exact source photo = FRAME 0;
+- crop of verified plan covering relevant house IDs/camera zone;
+- 1–4 adjacent REAL source images from the same physical zone;
+- exact job record;
+- no unrelated images.
+
+PHASE 3 — IMAGINE.2 MOTION
+Default render:
+- 6 seconds, 24 fps;
+- preserve original aspect ratio;
+- optical push 1–3%, OR <=0.25 m virtual translation only when localization supports it;
+- yaw <=3 degrees;
+- no orbit, backside reveal, threshold crossing or door opening;
+- no added people, furniture, doors, paths, windows, structures, trees, lights, landscaping;
+- no material substitution or geometry morphing;
+- no invented interior/exterior beyond source evidence.
+If larger movement exposes an area not covered by verified adjacent real frames or verified spatial model, reduce motion instead of completing from imagination.
+
+PHASE 4 — QA EACH CLIP
+Export first, middle and last frames and compare against FRAME 0 plus adjacent evidence. Reject if unsupported changes occur in house count/placement, openings, glass/frame/panel geometry, base/wattle/brushwood/stone geometry, path direction/edge, terrace/railing/furniture count, tree trunk position, terrain/horizon, material identity or object count. Only PASS clips become approved motion.
+
+PHASE 5 — WEBSITE CONTENT ASSEMBLY
+Build only from PASS clips and original real media. Prefer coherent spatial sequences: orient -> approach -> exterior -> threshold only if real/verified -> interior -> detail -> exterior resolve. Do not fake a continuous path where evidence does not connect.
+
+OUTPUT DISCIPLINE
+Do not edit aumara/index.html in this run. Do not publish. Do not delete or overwrite originals. Write only private content-factory outputs and machine-readable receipts.
+
+STOP CONDITION
+Return 99_RUN_RECEIPT.json with source count, localized count, blocked count, generated count, rejected count, approved count, output paths, SHA-256 for approved deliverables, remaining blockers.
