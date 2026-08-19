@@ -27,7 +27,7 @@
       "filename": "AUMARA_CONTENT_FACTORY_CONTROL_ONLY.zip",
       "uri": "drive://1Dmz5TJ2McL6-UwVL2u571SAzENEtANnn",
       "mime_type": "application/zip",
-      "size_bytes": 1714164,
+      "size_bytes": 1734330,
       "sha256": "0928cb0a508e71778ba48d32e4d52c954713b07fbff2cecec407629c3c3b07c8",
       "provenance": "EDITED_REAL"
     }
@@ -40,14 +40,7 @@
     "timeout_seconds": 3600,
     "output_spec": {
       "format": "json",
-      "required": [
-        "source_inventory_verified",
-        "localization_records",
-        "adjacent_reference_sets",
-        "ready_for_grok_ids",
-        "blocked_ids",
-        "qa_summary"
-      ]
+      "required": ["source_inventory_verified", "localization_records", "adjacent_reference_sets", "ready_for_grok_ids", "blocked_ids", "qa_summary"]
     }
   },
   "truth_lock": [
