@@ -1,0 +1,52 @@
+{
+  "schema": "aumara.content-factory-dispatch",
+  "version": "1.0.0",
+  "status": "RUNNING_PIPELINE",
+  "current_stage": "GEMINI_SOURCE_QA",
+  "execution_order": [
+    {
+      "stage": 1,
+      "recipient": "GEMINI",
+      "job": "aumara/jobs/AUMARA_CONTENT_FACTORY_SOURCE_QA_V1_GEMINI.json",
+      "gate": "SOURCE_PASS + SPATIAL_LOCALIZATION_RECORDS",
+      "status": "READY"
+    },
+    {
+      "stage": 2,
+      "recipient": "GROK",
+      "job": "aumara/jobs/AUMARA_CONTENT_FACTORY_IMAGINE2_V1_GROK.json",
+      "gate": "GEMINI QA output exists and hashes/readback pass",
+      "status": "WAITING_DEPENDENCY"
+    },
+    {
+      "stage": 3,
+      "recipient": "META",
+      "job": "CREATE_AFTER_GROK_PASS",
+      "gate": "Only Grok PASS clips with first/middle/last-frame QA and hashes",
+      "status": "WAITING_DEPENDENCY"
+    },
+    {
+      "stage": 4,
+      "recipient": "GPT",
+      "job": "FINAL_QA_AND_MASTER_SELECTION",
+      "gate": "SOURCE_PASS + SPATIAL_PASS + STORY_PASS + MOBILE_PASS + TRUTH_PASS + DELIVERY_PASS",
+      "status": "WAITING_DEPENDENCY"
+    }
+  ],
+  "shared_drive": {
+    "content_factory_folder_id": "1j7AjGTjAsrxPoP5AOMYm4JZlV_dLk9be",
+    "control_pack_file_id": "1Dmz5TJ2McL6-UwVL2u571SAzENEtANnn",
+    "media_map_file_id": "13EAIlPesEeoRIOIIhWIb6wpI6lakkbzT"
+  },
+  "hard_freeze": [
+    "aumara/index.html",
+    "public runtime",
+    "current V3.3 visual twin job",
+    "canonical georeference",
+    "A-F coordinates",
+    "Booking",
+    "permissions",
+    "source originals"
+  ],
+  "release": "HOLD_UNTIL_EXPLICIT_OWNER_AUTHORIZATION"
+}
