@@ -1,0 +1,81 @@
+{
+  "protocol": "ELCID-COLLAB",
+  "version": "1.1",
+  "message_id": "GPT-20260819-AUMARA_CONTENT_FACTORY_SOURCE_QA_V1_GEMINI",
+  "idempotency_key": "aumara-content-factory-source-qa-v1-gemini-20260819",
+  "created_at_utc": "2026-08-19T03:58:00Z",
+  "sender": "GPT_ORCHESTRATOR",
+  "recipient": "GEMINI",
+  "project": "AUMARA",
+  "lane": "CONTENT_QA",
+  "priority": "P0",
+  "status": "READY",
+  "intent": "SOURCE_QA_ONLY",
+  "depends_on": [],
+  "input_artifacts": [
+    {
+      "artifact_id": "AUMARA-MEDIA-MAP-001",
+      "filename": "AUMARA_MEDIA_MAP.json",
+      "uri": "drive://13EAIlPesEeoRIOIIhWIb6wpI6lakkbzT",
+      "mime_type": "application/json",
+      "size_bytes": 32082,
+      "sha256": "e31bfa31c146c1193ced8d2fbf206a4512bf7b32b43b176b05f9a09880a75f33",
+      "provenance": "EDITED_REAL"
+    },
+    {
+      "artifact_id": "AUMARA-CONTENT-CONTROL-001",
+      "filename": "AUMARA_CONTENT_FACTORY_CONTROL_ONLY.zip",
+      "uri": "drive://1Dmz5TJ2McL6-UwVL2u571SAzENEtANnn",
+      "mime_type": "application/zip",
+      "size_bytes": 1714164,
+      "sha256": "0928cb0a508e71778ba48d32e4d52c954713b07fbff2cecec407629c3c3b07c8",
+      "provenance": "EDITED_REAL"
+    }
+  ],
+  "job": {
+    "job_id": "AUMARA_CONTENT_FACTORY_SOURCE_QA_V1_GEMINI",
+    "capability": "FORENSIC_IMAGE_SPATIAL_LOCALIZATION",
+    "instructions": "Read aumara/content_factory/manifests/AUMARA_HOUSE_PLAN_LOCK.json, the authoritative AUMARA_MEDIA_MAP from Drive, aumara/AUMARA_WORLD_GEOREFERENCE_v1.json and aumara/world/AUMARA_SOURCE_REGISTRY.json. Inspect the registered REAL source photos and videos. For every LOCALIZE_FIRST or HOLD_UNLOCATED image, attempt plan localization using only fixed spatial evidence: house adjacency, openings, paths, retaining stones, railings, terrace geometry, tree trunks, terrain and horizon. Never infer A-F from colour, filename or visual plausibility. Return SPATIAL_PASS only when defensible; otherwise BLOCKED_SPATIAL or GENERAL_ONLY. Also identify adjacent REAL frames suitable as conditioning references. Generate no media.",
+    "max_attempts": 1,
+    "timeout_seconds": 3600,
+    "output_spec": {
+      "format": "json",
+      "required": [
+        "source_inventory_verified",
+        "localization_records",
+        "adjacent_reference_sets",
+        "ready_for_grok_ids",
+        "blocked_ids",
+        "qa_summary"
+      ]
+    }
+  },
+  "truth_lock": [
+    "AUMARA is the visible creative brand.",
+    "There are six physical houses; five are currently bookable.",
+    "Preserve exact architecture, openings, paths, vegetation, terrain, horizon and object count.",
+    "Do not invent or remove property elements, camera paths, thresholds or interiors.",
+    "Do not assign A-F house identity from colour, appearance, or filename alone."
+  ],
+  "authorization_scope": {
+    "allowed": ["read_inputs", "read_github_canon", "read_drive_sources", "write_private_outputs", "write_job_receipts"],
+    "forbidden": ["publish", "change_permissions", "overwrite_source", "invent_architecture", "misstate_inventory", "generate_media"]
+  },
+  "acceptance_tests": [
+    "Verify every input byte size and SHA-256 before work.",
+    "Every LOCALIZE_FIRST/HOLD source receives a verdict and evidence list.",
+    "Every SPATIAL_PASS record contains evidence_files and evidence_features.",
+    "No A-F assignment is based only on colour, filename or visual intuition.",
+    "Return actual output JSON to the shared destination and verify readback."
+  ],
+  "output_destination": {
+    "portal_dir": "/docs/AUMARA/jobs/AUMARA_CONTENT_FACTORY_SOURCE_QA_V1_GEMINI/outputs",
+    "drive_folder_id": "1j7AjGTjAsrxPoP5AOMYm4JZlV_dLk9be",
+    "overwrite": false
+  },
+  "response_contract": {
+    "reply_to": "/docs/COLLAB/outbox/AUMARA_CONTENT_FACTORY_SOURCE_QA_V1_GEMINI_GEMINI.json",
+    "required_fields": ["message_id", "status", "input_hashes_observed", "outputs", "qa_verdict", "blocker", "single_next_action"]
+  },
+  "failure_policy": {"on_blocked": "RETURN_BLOCKED", "max_attempts": 1}
+}
