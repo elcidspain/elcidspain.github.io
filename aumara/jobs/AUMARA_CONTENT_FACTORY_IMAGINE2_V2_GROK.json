@@ -1,0 +1,33 @@
+{
+  "protocol": "ELCID-COLLAB",
+  "version": "1.1",
+  "message_id": "GPT-20260819-AUMARA-IMAGINE2-V2-GROK",
+  "project": "AUMARA",
+  "recipient": "GROK_IMAGINE_2",
+  "priority": "P0",
+  "status": "READY",
+  "intent": "RUN_SOURCE_CONDITIONED_SAFE_BATCH",
+  "dependency_resolution": {
+    "gemini_job": "AUMARA_CONTENT_FACTORY_SOURCE_QA_V1_GEMINI",
+    "gemini_verdict": "BLOCKED",
+    "gemini_blocker": "BLOCKED_MEDIA_NOT_PRESENT_IN_CURRENT_GEMINI_SESSION",
+    "replacement_qa": "AUMARA_GPT_DIRECT_SOURCE_QA_V1",
+    "replacement_qa_provider_run_real": true
+  },
+  "drive_batch": {
+    "folder_id": "1poesJPEodu5CHBLnZIuohDhGJUCXgAki",
+    "manifest_file_id": "1KtXuYBNw4yid15TuzKeVY2OFLfBH03iF",
+    "run_now_file_id": "1iZtU0Y3sJdjDJxMpQPg8e-vJjHsvYU5e",
+    "qa_file_id": "1LdSdnVmFlRLgPqgmPDw-xUQsoLrDDEfp",
+    "job_count": 10
+  },
+  "instructions": [
+    "Run all 10 jobs from AUMARA_GROK_SPATIAL_BATCH_V1.json using only source/reference files physically present in the Drive batch folder.",
+    "Exact A-F identity may be used only on jobs that carry an explicit canonical house_id in the manifest.",
+    "Return an actual provider run/job id, clip, first/middle/last stills, PASS/REJECT and receipt per job.",
+    "Structural drift or unsupported reveal is automatic REJECT.",
+    "Do not publish or change public runtime."
+  ],
+  "truth_lock": true,
+  "release": "HOLD"
+}
