@@ -1,0 +1,11 @@
+{
+  "schema": "aumara.media-map-pointer",
+  "version": "1.0.0",
+  "authoritative_drive_file_id": "13EAIlPesEeoRIOIIhWIb6wpI6lakkbzT",
+  "authoritative_drive_uri": "drive://13EAIlPesEeoRIOIIhWIb6wpI6lakkbzT",
+  "filename": "AUMARA_MEDIA_MAP.json",
+  "size_bytes": 32082,
+  "sha256": "e31bfa31c146c1193ced8d2fbf206a4512bf7b32b43b176b05f9a09880a75f33",
+  "source_control_pack_drive_id": "1Dmz5TJ2McL6-UwVL2u571SAzENEtANnn",
+  "rule": "Fetch the authoritative media map from Drive and verify SHA-256 before using it. Do not infer classifications from historical ZIP folder names."
+}
