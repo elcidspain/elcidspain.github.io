@@ -9,35 +9,38 @@
   "project": "AUMARA",
   "lane": "VIDEO_GENERATE",
   "priority": "P0",
-  "status": "READY",
+  "status": "WAITING_DEPENDENCY",
   "intent": "SOURCE_CONDITIONED_WEBSITE_MOTION_FACTORY",
-  "depends_on": [],
+  "depends_on": ["AUMARA_CONTENT_FACTORY_SOURCE_QA_V1_GEMINI"],
   "input_artifacts": [
     {
       "artifact_id": "AUMARA-CONTENT-CONTROL-001",
       "filename": "AUMARA_CONTENT_FACTORY_CONTROL_ONLY.zip",
       "uri": "drive://1Dmz5TJ2McL6-UwVL2u571SAzENEtANnn",
       "mime_type": "application/zip",
-      "size_bytes": 1714164,
+      "size_bytes": 1734330,
       "sha256": "0928cb0a508e71778ba48d32e4d52c954713b07fbff2cecec407629c3c3b07c8",
+      "provenance": "EDITED_REAL"
+    },
+    {
+      "artifact_id": "AUMARA-MEDIA-MAP-001",
+      "filename": "AUMARA_MEDIA_MAP.json",
+      "uri": "drive://13EAIlPesEeoRIOIIhWIb6wpI6lakkbzT",
+      "mime_type": "application/json",
+      "size_bytes": 32082,
+      "sha256": "e31bfa31c146c1193ced8d2fbf206a4512bf7b32b43b176b05f9a09880a75f33",
       "provenance": "EDITED_REAL"
     }
   ],
   "job": {
     "job_id": "AUMARA_CONTENT_FACTORY_IMAGINE2_V1_GROK",
     "capability": "PLAN_LOCALIZED_REAL_PHOTO_TO_VIDEO",
-    "instructions": "Read the control pack from Drive. Use the canonical Puchol/georeference files already in this repository and the Drive source registry. First localize real photos against verified plan and adjacent real frames; then create only conservative Imagine.2 motion packs. Never infer house identity from filename/colour/visual plausibility. Reject structural drift. Do not edit public runtime or publish. Return localization records, QA records, approved clips and one machine-readable receipt.",
+    "instructions": "Wait for AUMARA_CONTENT_FACTORY_SOURCE_QA_V1_GEMINI. Then read aumara/content_factory/GROK_MASTER_RUN_PROMPT.txt, the verified Gemini localization output, the authoritative AUMARA_MEDIA_MAP from Drive, the canonical Puchol/georeference files and Drive source registry. Generate Imagine.2 motion only for QA-cleared sources, using exact source FRAME 0 plus verified adjacent REAL references. Never infer house identity from filename, colour or visual plausibility. Reject structural drift. Do not edit public runtime or publish. Return localization provenance, render receipts, first/middle/last QA, approved clips and 99_RUN_RECEIPT.json.",
     "max_attempts": 3,
     "timeout_seconds": 7200,
     "output_spec": {
       "format": "mixed_media_plus_json",
-      "required": [
-        "localization_records",
-        "imagine2_job_receipts",
-        "first_middle_last_frame_qa",
-        "approved_motion_clips",
-        "99_RUN_RECEIPT.json"
-      ]
+      "required": ["localization_records", "imagine2_job_receipts", "first_middle_last_frame_qa", "approved_motion_clips", "99_RUN_RECEIPT.json"]
     }
   },
   "truth_lock": [
@@ -50,27 +53,14 @@
     "Generated motion is source-conditioned content, never evidence of unseen geometry."
   ],
   "authorization_scope": {
-    "allowed": [
-      "read_inputs",
-      "read_github_canon",
-      "read_drive_sources",
-      "write_private_outputs",
-      "write_job_receipts"
-    ],
-    "forbidden": [
-      "publish",
-      "change_permissions",
-      "overwrite_source",
-      "invent_architecture",
-      "misstate_inventory",
-      "edit_public_runtime"
-    ]
+    "allowed": ["read_inputs", "read_github_canon", "read_drive_sources", "write_private_outputs", "write_job_receipts"],
+    "forbidden": ["publish", "change_permissions", "overwrite_source", "invent_architecture", "misstate_inventory", "edit_public_runtime"]
   },
   "acceptance_tests": [
     "Verify every input byte size and SHA-256 before work.",
     "Compare first, middle and last output frames against source geometry.",
     "Return actual output bytes to the shared destination and verify readback.",
-    "Every LOCALIZE_FIRST/HOLD frame has a localization verdict with evidence or BLOCKED_SPATIAL.",
+    "Every generated source must have a Gemini SPATIAL_PASS/GENERAL_ONLY record or be category-safe interior/detail material.",
     "Every generated clip has first/middle/last frame QA and PASS/REJECT.",
     "No approved clip introduces new doors, paths, windows, furniture, structures, vegetation, terrain or horizon changes unsupported by real evidence.",
     "Approved outputs have SHA-256 hashes and provenance in 99_RUN_RECEIPT.json."
@@ -82,18 +72,7 @@
   },
   "response_contract": {
     "reply_to": "/docs/COLLAB/outbox/AUMARA_CONTENT_FACTORY_IMAGINE2_V1_GROK_GROK.json",
-    "required_fields": [
-      "message_id",
-      "status",
-      "input_hashes_observed",
-      "outputs",
-      "qa_verdict",
-      "blocker",
-      "single_next_action"
-    ]
+    "required_fields": ["message_id", "status", "input_hashes_observed", "outputs", "qa_verdict", "blocker", "single_next_action"]
   },
-  "failure_policy": {
-    "on_blocked": "RETURN_BLOCKED",
-    "max_attempts": 3
-  }
+  "failure_policy": {"on_blocked": "RETURN_BLOCKED", "max_attempts": 3}
 }
