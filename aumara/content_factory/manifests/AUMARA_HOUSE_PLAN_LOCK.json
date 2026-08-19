@@ -1,0 +1,16 @@
+{
+  "schema": "aumara.house-plan-lock",
+  "version": "1.0.0",
+  "plan_source": "240307_9-PLANOS_Glamping.pdf page 3 / Distribucion parcela / scale 1:250",
+  "plan_reference_screenshot": "../00_PLAN/PLAN_REFERENCE_SCREENSHOT.jpg",
+  "commercial_mapping_source": "aumara/world/rebuild_twin_v21.py + AUMARA_SOURCE_MANIFEST_V2.json",
+  "houses": {
+    "A": {"kind":"chalet","diameter_m":7,"plan_page3_center_pdf":[292.26,402.98],"local_m":{"east":35.254,"north":0.845},"canonical_photo":"1B6A8852.jpg"},
+    "B": {"kind":"superior","diameter_m":9,"plan_page3_center_pdf":[484.14,355.34],"local_m":{"east":52.215,"north":4.961},"canonical_photo":"1B6A9875.JPEG"},
+    "C": {"kind":"chalet","diameter_m":7,"plan_page3_center_pdf":[612.06,252.62],"local_m":{"east":63.556,"north":13.969},"canonical_photo":"1B6A8803.jpg"},
+    "D": {"kind":"superior","diameter_m":9,"plan_page3_center_pdf":[654.18,403.46],"local_m":{"east":67.204,"north":0.633},"canonical_photo":"1B6A9866.JPEG"},
+    "E": {"kind":"chalet","diameter_m":7,"plan_page3_center_pdf":[760.98,301.70],"local_m":{"east":76.680,"north":9.566},"canonical_photo":"1B6A8857.jpg"},
+    "F": {"kind":"private_6_hold","diameter_m":7,"plan_page3_center_pdf":[845.94,401.06],"local_m":{"east":84.133,"north":0.755},"canonical_photo":null}
+  },
+  "rule": "Exact A-F identity is never inferred from colour, filename, or appearance. Only canonical seed photos have direct house assignment in this package."
+}
