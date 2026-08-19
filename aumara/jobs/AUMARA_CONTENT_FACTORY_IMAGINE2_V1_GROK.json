@@ -1,0 +1,99 @@
+{
+  "protocol": "ELCID-COLLAB",
+  "version": "1.1",
+  "message_id": "GPT-20260819-035601-AUMARA_CONTENT_FACTORY_IMAGINE2_V1_GROK",
+  "idempotency_key": "350d40ac8443a66111c0d41f71e7bf9ca74391fed2e96cc0af74b057e437e262",
+  "created_at_utc": "2026-08-19T03:56:01Z",
+  "sender": "GPT_ORCHESTRATOR",
+  "recipient": "GROK",
+  "project": "AUMARA",
+  "lane": "VIDEO_GENERATE",
+  "priority": "P0",
+  "status": "READY",
+  "intent": "SOURCE_CONDITIONED_WEBSITE_MOTION_FACTORY",
+  "depends_on": [],
+  "input_artifacts": [
+    {
+      "artifact_id": "AUMARA-CONTENT-CONTROL-001",
+      "filename": "AUMARA_CONTENT_FACTORY_CONTROL_ONLY.zip",
+      "uri": "drive://1Dmz5TJ2McL6-UwVL2u571SAzENEtANnn",
+      "mime_type": "application/zip",
+      "size_bytes": 1714164,
+      "sha256": "0928cb0a508e71778ba48d32e4d52c954713b07fbff2cecec407629c3c3b07c8",
+      "provenance": "EDITED_REAL"
+    }
+  ],
+  "job": {
+    "job_id": "AUMARA_CONTENT_FACTORY_IMAGINE2_V1_GROK",
+    "capability": "PLAN_LOCALIZED_REAL_PHOTO_TO_VIDEO",
+    "instructions": "Read the control pack from Drive. Use the canonical Puchol/georeference files already in this repository and the Drive source registry. First localize real photos against verified plan and adjacent real frames; then create only conservative Imagine.2 motion packs. Never infer house identity from filename/colour/visual plausibility. Reject structural drift. Do not edit public runtime or publish. Return localization records, QA records, approved clips and one machine-readable receipt.",
+    "max_attempts": 3,
+    "timeout_seconds": 7200,
+    "output_spec": {
+      "format": "mixed_media_plus_json",
+      "required": [
+        "localization_records",
+        "imagine2_job_receipts",
+        "first_middle_last_frame_qa",
+        "approved_motion_clips",
+        "99_RUN_RECEIPT.json"
+      ]
+    }
+  },
+  "truth_lock": [
+    "AUMARA is the visible creative brand.",
+    "There are six physical houses; five are currently bookable.",
+    "Preserve exact architecture, openings, paths, vegetation, terrain, horizon and object count.",
+    "Do not invent or remove property elements, camera paths, thresholds or interiors.",
+    "Use the canonical Puchol/georeference files as spatial authority.",
+    "Current content product mix is three Chalet and two Superior Chalet; house F remains HOLD for public sellable classification unless current PMS evidence says otherwise.",
+    "Generated motion is source-conditioned content, never evidence of unseen geometry."
+  ],
+  "authorization_scope": {
+    "allowed": [
+      "read_inputs",
+      "read_github_canon",
+      "read_drive_sources",
+      "write_private_outputs",
+      "write_job_receipts"
+    ],
+    "forbidden": [
+      "publish",
+      "change_permissions",
+      "overwrite_source",
+      "invent_architecture",
+      "misstate_inventory",
+      "edit_public_runtime"
+    ]
+  },
+  "acceptance_tests": [
+    "Verify every input byte size and SHA-256 before work.",
+    "Compare first, middle and last output frames against source geometry.",
+    "Return actual output bytes to the shared destination and verify readback.",
+    "Every LOCALIZE_FIRST/HOLD frame has a localization verdict with evidence or BLOCKED_SPATIAL.",
+    "Every generated clip has first/middle/last frame QA and PASS/REJECT.",
+    "No approved clip introduces new doors, paths, windows, furniture, structures, vegetation, terrain or horizon changes unsupported by real evidence.",
+    "Approved outputs have SHA-256 hashes and provenance in 99_RUN_RECEIPT.json."
+  ],
+  "output_destination": {
+    "portal_dir": "/docs/AUMARA/jobs/AUMARA_CONTENT_FACTORY_IMAGINE2_V1_GROK/outputs",
+    "drive_folder_id": "1j7AjGTjAsrxPoP5AOMYm4JZlV_dLk9be",
+    "overwrite": false
+  },
+  "response_contract": {
+    "reply_to": "/docs/COLLAB/outbox/AUMARA_CONTENT_FACTORY_IMAGINE2_V1_GROK_GROK.json",
+    "required_fields": [
+      "message_id",
+      "status",
+      "input_hashes_observed",
+      "outputs",
+      "qa_verdict",
+      "blocker",
+      "single_next_action"
+    ]
+  },
+  "failure_policy": {
+    "on_blocked": "RETURN_BLOCKED",
+    "max_attempts": 3
+  }
+}
