@@ -1,8 +1,8 @@
 {
   "schema": "aumara.reconstruction-preflight-result",
-  "version": "1.0.0",
-  "generated_at": "2026-08-21T05:01:40Z",
-  "status": "SPARSE_SFM_PROBE_RUNNING",
+  "version": "1.1.0",
+  "generated_at": "2026-08-21T05:05:30Z",
+  "status": "SPARSE_SFM_PROVEN_DENSE_BLOCKED",
   "sources": {
     "web_root": "1csfG7ehFiNUZEYD75EpEiCqmEsdwbY-b",
     "new_photos": "1apf9xnyInfhZSI0NfNA3n0OhEgiN8HXS",
@@ -25,14 +25,37 @@
     "sparse_multiview_candidate": true,
     "dense_reconstruction_candidate": false
   },
-  "interpretation": {
-    "safe_now": "Run real sparse SfM on strict-deduplicated frames.",
-    "blocked_now": "Do not promote a dense photogrammetry mesh from these two folders alone until sparse registration proves enough independent viewpoints.",
-    "scale_and_placement_truth": "AUMARA_WORLD_GEOREFERENCE_v1.json plus plan/cadastre control points remain authoritative."
-  },
-  "next_probe": {
-    "type": "COLMAP_SPARSE_SFM",
+  "colmap_sparse_probe": {
     "hf_job_id": "6a87dbac9cd058584adc50e8",
+    "completed": true,
+    "strict_unique_inputs": 26,
+    "real_sparse_sfm": true,
+    "dense_mesh_authorized_by_probe": false,
+    "best_model": {
+      "registered_images": 5,
+      "points3D": 1205,
+      "observations": 3592,
+      "mean_track_length": 2.9809,
+      "mean_reprojection_error_px": 0.457,
+      "registered_frames": [
+        {"name":"File_015.png","drive_file_id":"1HLieSZ9KzfWQjCGc9AlEK8FJR5k7ThxQ"},
+        {"name":"File_018.png","drive_file_id":"1S8clPt45VRvGNpntRhAUp2QmEhU4A508"},
+        {"name":"File_024.png","drive_file_id":"1cgQCdDx1p4BB89bYauYoh5I-QDv37B6f"},
+        {"name":"File_021.png","drive_file_id":"1qn4cKLjYRJLdIMCqNs4V7TcWN90E4pL0"},
+        {"name":"File_022.png","drive_file_id":"1k3CdjhmodEjmxVyKM-Jp0cOu9lWe2H7C"}
+      ]
+    }
+  },
+  "interpretation": {
+    "proven": "The Drive corpus contains one real five-view reconstructable component with 1,205 sparse 3D points and 0.457 px mean reprojection error.",
+    "production_rule": "Use this component as measured visual evidence inside the plan/cadastre-driven twin; do not substitute a dense photogrammetry mesh for the whole parcel from this corpus alone.",
+    "scale_and_placement_truth": "AUMARA_WORLD_GEOREFERENCE_v1.json plus plan/cadastre control points remain authoritative.",
+    "next_input_gain": "Additional independent exterior viewpoints around paths, house backs/sides and parcel perimeter will unlock dense reconstruction coverage."
+  },
+  "scene_classification_probe": {
+    "hf_job_id": "6a87dc859cd058584adc50ff",
+    "model": "Salesforce/blip-image-captioning-base",
+    "license": "BSD-3-Clause",
     "status": "RUNNING"
   }
 }
