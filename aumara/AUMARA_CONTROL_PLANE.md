@@ -32,7 +32,8 @@ Branch: main
 
 - Guest entry: /aumara/index.html
 - Georeference: /aumara/AUMARA_WORLD_GEOREFERENCE_v1.json
-- Local twin GLB: /aumara/world/aumara-site.glb
+- Local twin GLB: /aumara/world/aumara-site-v2_1.glb
+- Twin source manifest: /aumara/world/AUMARA_TWIN_SOURCE_MANIFEST.json
 - Flight path: /aumara/world/flight-path.json
 - Machine source registry: /aumara/world/AUMARA_SOURCE_REGISTRY.json
 
@@ -42,6 +43,10 @@ Do not move originals. Read and index them as reconstruction sources.
 
 - 00_AUMARA_COMMAND_CENTER — folder id 1z5oWIeRoyWT6YSw3_S73qxtcjmqfNOLv
 - AUMARA — folder id 14qJX_hy-4Jrj12_xWxSN5YctlEnK8Fzf
+- WEB working/ingestion root — folder id 1csfG7ehFiNUZEYD75EpEiCqmEsdwbY-b
+- NEW_PHOTOS — folder id 1apf9xnyInfhZSI0NfNA3n0OhEgiN8HXS
+- AUMARA_MOREPHOTOS — folder id 1dUiI_xwzBpGxEhV3VlZK38LqHzMyf8wu
+- BEDS24_READY_MANUAL_UPLOAD_2026-08-19 — folder id 1W_4IlgI2wJs_wWE0k-69ppe-QTWJvtw5
 - PHOTOS AUMARA — folder id 1KrN5gmDnhmhvMTZt6s9CKBFCuAUoCGa2
 - Katia in house copy 1 — folder id 15ns7kKd5D4Ws5n940PZh-uM-gNPmhwsX
 - Katia in house copy 2 — folder id 1KvMJvnaMC466lKMs2NvE9RlJqvcKKBFl
