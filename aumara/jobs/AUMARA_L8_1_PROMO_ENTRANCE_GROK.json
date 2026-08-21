@@ -1,0 +1,133 @@
+{
+  "protocol": "ELCID-COLLAB",
+  "version": "1.1",
+  "message_id": "GPT-20260821-174405-AUMARA_L8_1_PROMO_ENTRANCE_GROK",
+  "idempotency_key": "ae54402eae24afba2a225b6712aeb8a7c0bd208ff29e4bf861437dfc6215743c",
+  "created_at_utc": "2026-08-21T17:44:05Z",
+  "sender": "GPT_ORCHESTRATOR",
+  "recipient": "GROK",
+  "project": "AUMARA",
+  "lane": "VIDEO_GENERATE",
+  "priority": "P1",
+  "status": "READY",
+  "intent": "PREPARE_L8_1_PROMO_FROM_CANONICAL_WORLD_AFTER_V3_3_PASS",
+  "depends_on": [
+    "AUMARA_VISUAL_TWIN_V3_3_CLASSICAL_SFM_GROK:OWNER_VISUAL_QA_PASS"
+  ],
+  "input_artifacts": [
+    {
+      "artifact_id": "AUMARA-DAY-MASTER-C-20260809",
+      "filename": "AUMARA_DAY_MASTER_C_CALM_PACE_v01.mp4",
+      "uri": "drive://1aG4Sgez6tvkwDdnXDX8l7QVoN2Dct783",
+      "mime_type": "video/mp4",
+      "size_bytes": 17928585,
+      "sha256": "c772b33e515e76aab4f77797d64d0cf47d30f15b8ff32075040a73371281f12f",
+      "provenance": "REAL_CAMERA"
+    }
+  ],
+  "job": {
+    "job_id": "AUMARA_L8_1_PROMO_ENTRANCE_GROK",
+    "capability": "CANONICAL_WORLD_CAMERA_CAPTURE_AND_PROMO_RENDER",
+    "instructions": "Work only in canonical repository elcidspain/elcidspain.github.io. Do not use the superseded elcidspain/aumara L2/terrain_real/Next.js runtime. Wait for AUMARA_VISUAL_TWIN_V3_3_CLASSICAL_SFM_GROK owner visual QA PASS. Then render the accepted canonical local world using aumara/world/flight-path.json. Start at waypoint 0 on the entrance/approach side and traverse waypoint 0 through 27 continuously. Maintain measured 3.5-4.0 m AGL against canonical/local terrain; heading follows path tangent; roll=0; use 6-8 m look-ahead; use restrained ease-in/ease-out only and no bobbing. Preserve exact spatial geometry and source-derived visual layer. No invented furniture, vegetation, buildings, thresholds, sky, or objects. Capture from the current canonical Cesium/GLB runtime instead of creating a parallel legacy R3F product. Produce a clean mobile promo master and a camera/path manifest. Do not publish or change the public runtime.",
+    "max_attempts": 1,
+    "timeout_seconds": 1800,
+    "output_spec": {
+      "required": [
+        "MASTER_CLEAN_9x16.mp4",
+        "CAMERA_PATH_L8_1.json",
+        "QA.json"
+      ],
+      "master_video": {
+        "resolution": "1080x1920",
+        "duration_s": "20-30",
+        "color": "SDR BT.709",
+        "watermark": false,
+        "platform_music": false
+      },
+      "camera": {
+        "start_waypoint": 0,
+        "end_waypoint": 27,
+        "target_agl_m": 3.75,
+        "allowed_agl_m": [
+          3.5,
+          4.0
+        ],
+        "roll_deg": 0,
+        "lookahead_m": [
+          6,
+          8
+        ]
+      },
+      "qa_required": [
+        "firstFrameRendered=true",
+        "no black/grey dead screen",
+        "no geometry drift",
+        "no source-image billboards",
+        "camera route matches canonical flight-path.json",
+        "actual output bytes mirrored to Drive with SHA-256 readback"
+      ]
+    }
+  },
+  "truth_lock": [
+    "AUMARA is the visible creative brand.",
+    "There are six physical houses; all six are current canonical product inventory.",
+    "Preserve exact architecture, openings, paths, vegetation, terrain, horizon and object count.",
+    "Do not invent or remove property elements, camera paths, thresholds or interiors.",
+    "Canonical repository is elcidspain/elcidspain.github.io, branch main.",
+    "Canonical flight source is aumara/world/flight-path.json.",
+    "Waypoint 0 is the selected L8.1 promo start.",
+    "Legacy elcidspain/aumara AUMARA_TWIN_LOCK.json is superseded and must not drive production.",
+    "No inventory copy is required in this promo render."
+  ],
+  "authorization_scope": {
+    "allowed": [
+      "read_inputs",
+      "read_canonical_repo",
+      "write_private_outputs",
+      "write_sandbox_proof"
+    ],
+    "forbidden": [
+      "publish",
+      "change_permissions",
+      "overwrite_source",
+      "invent_architecture",
+      "misstate_inventory",
+      "modify_public_runtime",
+      "publish_to_aumara_me",
+      "change_dns",
+      "change_booking",
+      "change_credentials"
+    ]
+  },
+  "acceptance_tests": [
+    "Verify every input byte size and SHA-256 before work.",
+    "Compare first, middle and last output frames against source geometry.",
+    "Return actual output bytes to the shared destination and verify readback.",
+    "Dependency gate: do not render final promo until V3.3 owner visual QA is PASS.",
+    "Start frame is derived from canonical waypoint 0 and reads as the AUMARA entrance/approach side.",
+    "Traverse remains continuous through waypoint 27 with no camera teleport.",
+    "AGL remains within 3.5-4.0 m using real local terrain/mesh measurements.",
+    "Output contains no synthetic property geometry beyond the accepted canonical twin."
+  ],
+  "output_destination": {
+    "portal_dir": "/aumara/content/promo/L8_1",
+    "drive_folder_id": "1QCw1lxX56mW6fxMde6gZfntD5VBIK3Rq",
+    "overwrite": false
+  },
+  "response_contract": {
+    "reply_to": "/docs/COLLAB/outbox/AUMARA_L8_1_PROMO_ENTRANCE_GROK_GROK.json",
+    "required_fields": [
+      "message_id",
+      "status",
+      "input_hashes_observed",
+      "outputs",
+      "qa_verdict",
+      "blocker",
+      "single_next_action"
+    ]
+  },
+  "failure_policy": {
+    "on_blocked": "RETURN_BLOCKED",
+    "max_attempts": 1
+  }
+}
