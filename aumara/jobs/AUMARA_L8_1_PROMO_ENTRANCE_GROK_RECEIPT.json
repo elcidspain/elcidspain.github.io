@@ -1,0 +1,10 @@
+{
+  "job": "AUMARA_L8_1_PROMO_ENTRANCE_GROK",
+  "verification_status": "BLOCKED",
+  "qa_verdict": "FAIL_GATE",
+  "input_sha256": "c772b33e515e76aab4f77797d64d0cf47d30f15b8ff32075040a73371281f12f",
+  "input_size_bytes": 17928585,
+  "owner_visual_qa_v3_3": "NOT_PASS",
+  "public_runtime_changed": false,
+  "outputs": []
+}
