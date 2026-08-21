@@ -1,0 +1,38 @@
+{
+  "schema": "aumara.reconstruction-preflight-result",
+  "version": "1.0.0",
+  "generated_at": "2026-08-21T05:01:40Z",
+  "status": "SPARSE_SFM_PROBE_RUNNING",
+  "sources": {
+    "web_root": "1csfG7ehFiNUZEYD75EpEiCqmEsdwbY-b",
+    "new_photos": "1apf9xnyInfhZSI0NfNA3n0OhEgiN8HXS",
+    "more_photos": "1dUiI_xwzBpGxEhV3VlZK38LqHzMyf8wu"
+  },
+  "strict_preflight": {
+    "hf_job_id": "6a87dae69cd058584adc50ab",
+    "completed": true,
+    "downloaded_image_candidates": 56,
+    "unique_images_after_derivative_dedup": 26,
+    "near_duplicates_removed": 30,
+    "gps_exif_images": 0,
+    "captured_at_images": 0,
+    "feature_images": 26,
+    "pair_edges_ransac_10_plus": 71,
+    "strong_edges_ransac_25_plus": 12,
+    "largest_strong_component": 9,
+    "strong_components": [9, 3, 1, 1, 1, 1, 1, 1, 1, 1],
+    "isolated_images": 14,
+    "sparse_multiview_candidate": true,
+    "dense_reconstruction_candidate": false
+  },
+  "interpretation": {
+    "safe_now": "Run real sparse SfM on strict-deduplicated frames.",
+    "blocked_now": "Do not promote a dense photogrammetry mesh from these two folders alone until sparse registration proves enough independent viewpoints.",
+    "scale_and_placement_truth": "AUMARA_WORLD_GEOREFERENCE_v1.json plus plan/cadastre control points remain authoritative."
+  },
+  "next_probe": {
+    "type": "COLMAP_SPARSE_SFM",
+    "hf_job_id": "6a87dbac9cd058584adc50e8",
+    "status": "RUNNING"
+  }
+}
