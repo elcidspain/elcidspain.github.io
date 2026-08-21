@@ -1,6 +1,6 @@
 {
   "schema": "aumara.source-registry",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "status": "ACTIVE_CANON",
   "product": {
     "name": "AUMARA",
@@ -34,6 +34,11 @@
   "drive_sources": [
     {"role":"command_center","title":"00_AUMARA_COMMAND_CENTER","folder_id":"1z5oWIeRoyWT6YSw3_S73qxtcjmqfNOLv"},
     {"role":"master_aumara_source","title":"AUMARA","folder_id":"14qJX_hy-4Jrj12_xWxSN5YctlEnK8Fzf"},
+    {"role":"web_working_root","title":"WEB","folder_id":"1csfG7ehFiNUZEYD75EpEiCqmEsdwbY-b"},
+    {"role":"latest_photo_ingest","title":"NEW_PHOTOS","folder_id":"1apf9xnyInfhZSI0NfNA3n0OhEgiN8HXS"},
+    {"role":"latest_photo_ingest_more","title":"AUMARA_MOREPHOTOS","folder_id":"1dUiI_xwzBpGxEhV3VlZK38LqHzMyf8wu"},
+    {"role":"beds24_photo_ready","title":"BEDS24_READY_MANUAL_UPLOAD_2026-08-19","folder_id":"1W_4IlgI2wJs_wWE0k-69ppe-QTWJvtw5"},
+    {"role":"beds24_photo_upload_first","title":"01_UPLOAD_FIRST","folder_id":"12yPegmERNm2szbhK5E9kj84js_NYedl2"},
     {"role":"primary_photos","title":"PHOTOS AUMARA","folder_id":"1KrN5gmDnhmhvMTZt6s9CKBFCuAUoCGa2"},
     {"role":"house_photo_video_source","title":"Катя в домике.. - Katia Mir 2026-03-07","folder_id":"15ns7kKd5D4Ws5n940PZh-uM-gNPmhwsX"},
     {"role":"house_photo_video_source_copy","title":"Катя в домике.. - Katia Mir 2026-03-07","folder_id":"1KvMJvnaMC466lKMs2NvE9RlJqvcKKBFl"},
