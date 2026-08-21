@@ -1,6 +1,6 @@
 {
   "schema": "aumara.source-registry",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "status": "ACTIVE_CANON",
   "product": {
     "name": "AUMARA",
@@ -15,7 +15,8 @@
     "guest_entry": "aumara/index.html",
     "control_plane": "aumara/AUMARA_CONTROL_PLANE.md",
     "georeference": "aumara/AUMARA_WORLD_GEOREFERENCE_v1.json",
-    "local_twin_glb": "aumara/world/aumara-site.glb",
+    "local_twin_glb": "aumara/world/aumara-site-v2_1.glb",
+    "twin_source_manifest": "aumara/world/AUMARA_TWIN_SOURCE_MANIFEST.json",
     "flight_path": "aumara/world/flight-path.json"
   },
   "geospatial_truth": {
